@@ -551,10 +551,10 @@
         </a>
 
         <div style="display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;">
-            <!-- Indicador Supabase Nube Sincronizado -->
-            <div id="cloudStatusBadge" class="bcv-pill" style="cursor: pointer; background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.3); color: #34d399;" onclick="app.syncFromSupabase(true)" title="Base de datos multi-dispositivo en la nube Supabase. Clic para forzar sincronización">
-                <i id="cloudStatusIcon" class="bi bi-cloud-check-fill" style="color: #10b981;"></i>
-                <span id="cloudStatusText">Supabase Online</span>
+            <!-- Indicador Data Center Online Sincronizado -->
+            <div id="cloudStatusBadge" class="bcv-pill" style="cursor: pointer; background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.3); color: #34d399;" onclick="app.syncFromSupabase(true)" title="Data Center en la nube. Clic para forzar sincronización">
+                <i id="cloudStatusIcon" class="bi bi-hdd-network-fill" style="color: #10b981;"></i>
+                <span id="cloudStatusText">Data Center Online</span>
             </div>
             <div class="bcv-pill">
                 <i class="bi bi-bank2"></i>
@@ -2168,14 +2168,14 @@
                         }
                     }
 
-                    if (icon) icon.className = 'bi bi-cloud-check-fill';
-                    if (text) text.innerText = 'Supabase Online';
+                    if (icon) icon.className = 'bi bi-hdd-network-fill';
+                    if (text) text.innerText = 'Data Center Online';
                     if (isManual) {
-                        this.toast('✅ Base de datos sincronizada con la nube');
+                        this.toast('✅ Data Center sincronizado con la nube');
                     }
                 } catch (err) {
-                    console.error('Error sincronizando con Supabase:', err);
-                    if (icon) icon.className = 'bi bi-cloud-slash-fill';
+                    console.error('Error sincronizando con el Data Center:', err);
+                    if (icon) icon.className = 'bi bi-hdd-network';
                     if (text) text.innerText = 'Modo Local';
                     if (isManual) {
                         this.toast('⚠️ Conexión local activa');
