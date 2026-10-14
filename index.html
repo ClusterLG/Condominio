@@ -636,16 +636,12 @@
             <form id="form-login-admin" style="display: none;" onsubmit="app.handleAdminSubmit(event)">
                 <div class="form-group">
                     <label class="form-label"><i class="bi bi-person-badge"></i> Usuario Administrador:</label>
-                    <input type="text" id="admin-user" class="form-control" placeholder="Ej: admin o clusterlg" required>
+                    <input type="text" id="admin-user" class="form-control" placeholder="Usuario administrador" required autocomplete="username">
                 </div>
 
                 <div class="form-group">
                     <label class="form-label"><i class="bi bi-key"></i> Contraseña:</label>
-                    <input type="password" id="admin-pass" class="form-control" placeholder="Contraseña" required>
-                    <small style="color: var(--text-muted); font-size: 0.74rem; margin-top: 0.35rem; display: block; line-height: 1.4;">
-                        👑 Superusuario Global: <code style="color: #c084fc;">clusterlg</code> (clave: <code style="color: #c084fc;">glretsulc</code>)<br>
-                        🏢 Admin del Edificio: <code style="color: var(--primary);">admin</code> (clave: <code style="color: var(--primary);">admin123</code>)
-                    </small>
+                    <input type="password" id="admin-pass" class="form-control" placeholder="Contraseña" required autocomplete="current-password">
                 </div>
 
                 <button type="submit" class="btn-primary-saas">
