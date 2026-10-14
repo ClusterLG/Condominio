@@ -1,0 +1,35 @@
+name: PHP Syntax & Lint Calibration
+
+on:
+  push:
+    branches: [ main, feature/*, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    name: Lint PHP Files & Sanity Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: pdo, pdo_mysql, curl, mbstring, json
+
+      - name: Check PHP Syntax on all files
+        run: |
+          echo "Verificando sintaxis PHP en todos los archivos..."
+          find . -name "*.php" -not -path "./vendor/*" -exec php -l {} \;
+
+      - name: Validate .env.example exists
+        run: |
+          if [ -f ".env.example" ]; then
+            echo "Archivo .env.example presente y calibrado."
+          else
+            echo "Error: .env.example no encontrado." && exit 1
+          fi
