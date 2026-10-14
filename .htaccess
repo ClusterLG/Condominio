@@ -4,6 +4,7 @@
 
 # Evitar navegación directa de directorios
 Options -Indexes
+DirectoryIndex index.php index.html
 
 # Charset por defecto UTF-8
 AddDefaultCharset UTF-8

@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma Multi-Condominio SaaS | Residencias Los Samanes</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --bg-card-hover: #222d44;
+            --bg-input: #151d2d;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(59, 130, 246, 0.25);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --primary-light: rgba(59, 130, 246, 0.15);
+            --success: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.15);
+            --warning: #f59e0b;
+            --warning-bg: rgba(245, 158, 11, 0.15);
+            --danger: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.15);
+            --info: #06b6d4;
+            --info-bg: rgba(6, 182, 212, 0.15);
+            --purple: #8b5cf6;
+            --purple-bg: rgba(139, 92, 246, 0.15);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .navbar-saas {
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 0.85rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .bcv-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .portal-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2.5rem 1.25rem;
+        }
+
+        .hero-banner {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-title {
+            font-size: 2.25rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 30%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.6rem;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .condo-selector-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .condo-selector-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #10b981);
+        }
+
+        .condo-header-flex {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .condo-active-info {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .condo-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .condo-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.2rem;
+        }
+
+        .condo-meta {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-badge {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 0.25rem 0.65rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .stat-badge.clean {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border-color: rgba(16, 185, 129, 0.25);
+            font-weight: 600;
+        }
+
+        .roles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .role-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+        }
+
+        .role-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-glow);
+            box-shadow: 0 16px 32px -10px rgba(59, 130, 246, 0.15);
+        }
+
+        .role-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .role-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        .role-icon.super { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); }
+        .role-icon.admin { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .role-icon.resident { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+
+        .role-title { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.2rem; }
+        .role-desc { color: var(--text-secondary); font-size: 0.88rem; line-height: 1.4; margin-bottom: 1.25rem; }
+
+        .form-control-saas {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: #fff;
+            padding: 0.65rem 0.85rem;
+            font-size: 0.9rem;
+            margin-bottom: 0.85rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-control-saas:focus {
+            border-color: var(--primary);
+        }
+
+        .btn-saas {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.92rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary-saas { background: var(--primary); color: #fff; }
+        .btn-primary-saas:hover { background: var(--primary-hover); }
+        .btn-purple-saas { background: #8b5cf6; color: #fff; }
+        .btn-purple-saas:hover { background: #7c3aed; }
+        .btn-success-saas { background: #10b981; color: #fff; }
+        .btn-success-saas:hover { background: #059669; }
+        .btn-outline-saas { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); }
+        .btn-outline-saas:hover { background: var(--bg-card); color: #fff; border-color: var(--text-muted); }
+
+        /* Dashboard Styles */
+        .dashboard-view { display: none; padding: 2rem 1.25rem; max-width: 1300px; margin: 0 auto; }
+        .dashboard-view.active { display: block; }
+
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem 1.75rem;
+        }
+
+        .nav-tabs-saas {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg-secondary);
+            padding: 0.4rem;
+            border-radius: 12px;
+            margin-bottom: 1.75rem;
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .tab-item-saas {
+            padding: 0.6rem 1.15rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .tab-item-saas.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+        }
+
+        /* Floor Grid Layout */
+        .floor-row {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            margin-bottom: 1rem;
+            padding: 1rem 1.25rem;
+        }
+
+        .floor-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .units-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 0.85rem;
+        }
+
+        .unit-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .unit-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            background: var(--bg-card-hover);
+        }
+
+        .unit-card.clean {
+            border-left: 3px solid #10b981;
+        }
+
+        .unit-card.assigned {
+            border-left: 3px solid #3b82f6;
+        }
+
+        .unit-code {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .unit-owner {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.35rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .unit-alicuota {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+
+        /* Modal */
+        .modal-backdrop-saas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-backdrop-saas.active {
+            display: flex;
+        }
+
+        .modal-box-saas {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 580px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
+        }
+
+        .modal-header-saas {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+        .close-btn:hover { color: #fff; }
+
+        .stat-card-saas {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-icon-saas {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-val-saas {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .stat-lbl-saas {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .table-saas {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+
+        .table-saas th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-card);
+        }
+
+        .table-saas td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: var(--text-primary);
+        }
+
+        .toast-saas {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #10b981;
+            color: #fff;
+            padding: 0.85rem 1.25rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            font-weight: 600;
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            gap: 0.6rem;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR PRINCIPAL -->
+    <header class="navbar-saas">
+        <a href="#" class="brand-logo" onclick="app.showHome(); return false;">
+            <div class="brand-icon"><i class="bi bi-buildings"></i></div>
+            <span>CondoHub <span style="font-weight: 400; font-size: 0.85rem; color: #94a3b8;">SaaS</span></span>
+        </a>
+
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="bcv-pill">
+                <i class="bi bi-currency-exchange"></i>
+                <span>Tasa BCV: <strong id="topBcvRate">72.40</strong> Bs/$</span>
+            </div>
+            <button class="btn-saas btn-outline-saas" style="width: auto; padding: 0.4rem 0.85rem; font-size: 0.82rem;" onclick="app.showNewCondoModal()">
+                <i class="bi bi-plus-circle"></i> Nuevo Condominio
+            </button>
+            <button class="btn-saas btn-outline-saas" style="width: auto; padding: 0.4rem 0.85rem; font-size: 0.82rem;" onclick="app.resetSystemToClean()">
+                <i class="bi bi-arrow-counterclockwise"></i> Reiniciar Limpio
+            </button>
+        </div>
+    </header>
+
+    <!-- TOAST DE NOTIFICACIÓN -->
+    <div id="toastNotification" class="toast-saas">
+        <i class="bi bi-check-circle-fill"></i> <span id="toastMsg">Operación completada</span>
+    </div>
+
+    <!-- VISTA 1: SELECCIÓN DE CONDOMINIO Y PORTAL DE ACCESO (HOME) -->
+    <main id="viewHome" class="portal-container">
+        <div class="hero-banner">
+            <h1 class="hero-title">Plataforma Multi-Condominio</h1>
+            <p class="hero-subtitle">Estructura base lista para administrar múltiples edificios con configuraciones de pisos independientes, finanzas aisladas y soporte oficial BCV.</p>
+        </div>
+
+        <!-- TARJETA DEL CONDOMINIO ACTIVO -->
+        <div class="condo-selector-card">
+            <div class="condo-header-flex">
+                <div class="condo-active-info">
+                    <div class="condo-avatar" id="condoAvatar"><i class="bi bi-building"></i></div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                            <h2 class="condo-name" id="currentCondoName">Residencias Los Samanes</h2>
+                            <span class="stat-badge clean"><i class="bi bi-shield-check"></i> Sistema Limpio & Configurado</span>
+                        </div>
+                        <div class="condo-meta">
+                            <span id="currentCondoRif"><i class="bi bi-file-earmark-text"></i> RIF: J-12345678-0</span>
+                            <span id="currentCondoAddress"><i class="bi bi-geo-alt"></i> Av. Principal Los Samanes, Caracas</span>
+                            <span id="currentCondoStats"><i class="bi bi-grid-3x3-gap"></i> 12 Pisos + PB • 50 Unidades</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 0.75rem; min-width: 260px;">
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.25rem;">Cambiar de Condominio</label>
+                        <select id="condoSelect" class="form-control-saas" style="margin-bottom: 0;" onchange="app.switchCondominio(this.value)">
+                            <!-- Opciones cargadas dinámicamente -->
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen de Estado Limpio -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; border-top: 1px solid var(--border-color); padding-top: 1.25rem; margin-top: 0.75rem;">
+                <div class="stat-badge clean" style="padding: 0.5rem 0.85rem; font-size: 0.85rem;">
+                    <i class="bi bi-check2-circle"></i> <span id="statAptosCount">50 Apartamentos Estructurados</span>
+                </div>
+                <div class="stat-badge" style="padding: 0.5rem 0.85rem; font-size: 0.85rem;">
+                    <i class="bi bi-cash-stack"></i> <span>0 Pagos Pendientes (Limpio)</span>
+                </div>
+                <div class="stat-badge" style="padding: 0.5rem 0.85rem; font-size: 0.85rem;">
+                    <i class="bi bi-receipt"></i> <span>0 Deudas Anteriores</span>
+                </div>
+                <div class="stat-badge" style="padding: 0.5rem 0.85rem; font-size: 0.85rem;">
+                    <i class="bi bi-percent"></i> <span>Alícuotas Equitativas (2.00%)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- PUERTAS DE ACCESO PARA EL CONDOMINIO SELECCIONADO -->
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="bi bi-box-arrow-in-right text-primary"></i> Seleccione su Modo de Ingreso
+        </h3>
+
+        <div class="roles-grid">
+            <!-- 1. PORTAL RESIDENTE -->
+            <div class="role-card">
+                <div>
+                    <div class="role-card-header">
+                        <div class="role-icon resident"><i class="bi bi-person-fill"></i></div>
+                        <div>
+                            <h4 class="role-title">Portal del Residente</h4>
+                            <span style="font-size: 0.78rem; color: #34d399; font-weight: 600;">Autogestión de Propietario</span>
+                        </div>
+                    </div>
+                    <p class="role-desc">Consulte su estado de cuenta en USD y Bs (tasa BCV), reporte transferencias y pago móvil, registre habitantes o incidencias.</p>
+                    
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Seleccione su Apartamento:</label>
+                        <select id="residentAptoSelect" class="form-control-saas">
+                            <!-- Llenado dinámico -->
+                        </select>
+                        <label style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Clave de Acceso (Predeterminada: 123456):</label>
+                        <input type="password" id="residentPass" class="form-control-saas" value="123456" placeholder="Clave de acceso">
+                    </div>
+                </div>
+                <button class="btn-saas btn-success-saas" onclick="app.loginResident()">
+                    <i class="bi bi-door-open"></i> Entrar como Residente
+                </button>
+            </div>
+
+            <!-- 2. PORTAL ADMINISTRADOR LOCAL -->
+            <div class="role-card">
+                <div>
+                    <div class="role-card-header">
+                        <div class="role-icon admin"><i class="bi bi-shield-shaded"></i></div>
+                        <div>
+                            <h4 class="role-title">Administrador Local</h4>
+                            <span style="font-size: 0.78rem; color: #60a5fa; font-weight: 600;">Gestión del Edificio</span>
+                        </div>
+                    </div>
+                    <p class="role-desc">Gestione el mapa de pisos, adjudique apartamentos, emita cuotas ordinarias/extraordinarias y audite comprobantes de pago.</p>
+                    
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Usuario Administrador:</label>
+                        <input type="text" id="adminUser" class="form-control-saas" value="admin" readonly>
+                        <label style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Contraseña:</label>
+                        <input type="password" id="adminPass" class="form-control-saas" value="admin123" placeholder="Contraseña">
+                    </div>
+                </div>
+                <button class="btn-saas btn-primary-saas" onclick="app.loginAdmin()">
+                    <i class="bi bi-speedometer2"></i> Panel de Administración
+                </button>
+            </div>
+
+            <!-- 3. PORTAL SUPERADMINISTRADOR GLOBAL -->
+            <div class="role-card">
+                <div>
+                    <div class="role-card-header">
+                        <div class="role-icon super"><i class="bi bi-gem"></i></div>
+                        <div>
+                            <h4 class="role-title">Super-Administrador</h4>
+                            <span style="font-size: 0.78rem; color: #a78bfa; font-weight: 600;">Acceso Global SaaS</span>
+                        </div>
+                    </div>
+                    <p class="role-desc">Visión consolidada de todos los condominios registrados, generador de nuevos edificios y configuración de parámetros maestros.</p>
+                    
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Superusuario:</label>
+                        <input type="text" id="superUser" class="form-control-saas" value="clusterlg" readonly>
+                        <label style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Contraseña:</label>
+                        <input type="password" id="superPass" class="form-control-saas" value="glretsulc" placeholder="Contraseña">
+                    </div>
+                </div>
+                <button class="btn-saas btn-purple-saas" onclick="app.loginSuperadmin()">
+                    <i class="bi bi-cpu"></i> Panel Super-Admin
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- VISTA 2: PANEL DE ADMINISTRACIÓN LOCAL -->
+    <section id="viewAdmin" class="dashboard-view">
+        <div class="dashboard-header">
+            <div>
+                <span class="stat-badge" style="margin-bottom: 0.5rem; display: inline-flex;"><i class="bi bi-building"></i> <span id="adminViewCondoTitle">Residencias Los Samanes</span></span>
+                <h2 style="font-size: 1.6rem; font-weight: 800; color: #fff; margin: 0;">Panel de Control Administrativo</h2>
+            </div>
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                <button class="btn-saas btn-primary-saas" style="width: auto;" onclick="app.showEmitirCuotaModal()">
+                    <i class="bi bi-file-earmark-plus"></i> Emitir Cuota
+                </button>
+                <button class="btn-saas btn-outline-saas" style="width: auto;" onclick="app.showHome()">
+                    <i class="bi bi-box-arrow-left"></i> Cambiar Edificio / Salir
+                </button>
+            </div>
+        </div>
+
+        <!-- Métricas Rápidas -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+            <div class="stat-card-saas">
+                <div class="stat-icon-saas" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;"><i class="bi bi-houses"></i></div>
+                <div>
+                    <div class="stat-val-saas" id="adminTotalUnits">50</div>
+                    <div class="stat-lbl-saas">Total Apartamentos</div>
+                </div>
+            </div>
+            <div class="stat-card-saas">
+                <div class="stat-icon-saas" style="background: rgba(16, 185, 129, 0.15); color: #34d399;"><i class="bi bi-person-check"></i></div>
+                <div>
+                    <div class="stat-val-saas" id="adminAdjudicadosCount">0</div>
+                    <div class="stat-lbl-saas">Unidades Adjudicadas</div>
+                </div>
+            </div>
+            <div class="stat-card-saas">
+                <div class="stat-icon-saas" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;"><i class="bi bi-receipt-cutoff"></i></div>
+                <div>
+                    <div class="stat-val-saas" id="adminActiveCuotas">0</div>
+                    <div class="stat-lbl-saas">Cuotas Emitidas</div>
+                </div>
+            </div>
+            <div class="stat-card-saas">
+                <div class="stat-icon-saas" style="background: rgba(139, 92, 246, 0.15); color: #a78bfa;"><i class="bi bi-credit-card-2-front"></i></div>
+                <div>
+                    <div class="stat-val-saas" id="adminPagosRevision">0</div>
+                    <div class="stat-lbl-saas">Pagos por Auditar</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABS DE GESTIÓN -->
+        <div class="nav-tabs-saas">
+            <button class="tab-item-saas active" onclick="app.switchAdminTab('mapa', this)"><i class="bi bi-grid-fill"></i> Mapa de Pisos & Adjudicación</button>
+            <button class="tab-item-saas" onclick="app.switchAdminTab('cuotas', this)"><i class="bi bi-journal-text"></i> Historial de Cuotas</button>
+            <button class="tab-item-saas" onclick="app.switchAdminTab('pagos', this)"><i class="bi bi-cash-coin"></i> Auditoría de Pagos</button>
+            <button class="tab-item-saas" onclick="app.switchAdminTab('comunicados', this)"><i class="bi bi-megaphone"></i> Cartelera Informativa</button>
+            <button class="tab-item-saas" onclick="app.switchAdminTab('config', this)"><i class="bi bi-gear"></i> Bancos & Tasa BCV</button>
+        </div>
+
+        <!-- TAB 1: MAPA DE PISOS -->
+        <div id="adminTabMapa">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">Haga clic en cualquier unidad para <strong>adjudicar un propietario</strong>, registrar su cédula, teléfono o ver sus detalles.</p>
+                <div style="display: flex; gap: 0.75rem;">
+                    <span class="stat-badge"><i class="bi bi-square-fill" style="color: #10b981;"></i> Disponible / Sin asignar</span>
+                    <span class="stat-badge"><i class="bi bi-square-fill" style="color: #3b82f6;"></i> Adjudicado</span>
+                </div>
+            </div>
+            <div id="floorsContainer">
+                <!-- Generado dinámicamente -->
+            </div>
+        </div>
+
+        <!-- TAB 2: HISTORIAL DE CUOTAS -->
+        <div id="adminTabCuotas" style="display: none;">
+            <div class="condo-selector-card" style="padding: 1.25rem;">
+                <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 1rem;">Emisiones de Cuotas</h3>
+                <div style="overflow-x: auto;">
+                    <table class="table-saas">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Título / Concepto</th>
+                                <th>Tipo</th>
+                                <th>Monto Base USD</th>
+                                <th>Equivalente Bs (BCV)</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cuotasTableBody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No hay cuotas emitidas aún. Haga clic en "Emitir Cuota" para generar la primera.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: AUDITORÍA DE PAGOS -->
+        <div id="adminTabPagos" style="display: none;">
+            <div class="condo-selector-card" style="padding: 1.25rem;">
+                <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 1rem;">Comprobantes de Pago Reportados</h3>
+                <div style="overflow-x: auto;">
+                    <table class="table-saas">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Apartamento</th>
+                                <th>Método</th>
+                                <th>Referencia</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pagosTableBody">
+                            <tr>
+                                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">Sistema limpio: no hay pagos reportados pendientes por auditar.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: COMUNICADOS -->
+        <div id="adminTabComunicados" style="display: none;">
+            <div class="condo-selector-card" style="padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 style="font-size: 1.1rem; color: #fff;">Cartelera Digital</h3>
+                    <button class="btn-saas btn-primary-saas" style="width: auto;" onclick="app.showNuevoComunicadoModal()">
+                        <i class="bi bi-plus-lg"></i> Publicar Comunicado
+                    </button>
+                </div>
+                <div id="comunicadosContainer">
+                    <p style="color: var(--text-muted); text-align: center; padding: 2rem;">No hay comunicados publicados actualmente.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: CONFIGURACIÓN BANCARIA & BCV -->
+        <div id="adminTabConfig" style="display: none;">
+            <div class="condo-selector-card" style="padding: 1.5rem; max-width: 700px;">
+                <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 1.25rem;">Parámetros del Condominio</h3>
+                <div>
+                    <label style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Tasa de Cambio Oficial BCV (Bs por USD):</label>
+                    <input type="number" step="0.01" id="cfgTasaBcv" class="form-control-saas" value="72.40">
+
+                    <label style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Datos Pago Móvil:</label>
+                    <input type="text" id="cfgPagoMovil" class="form-control-saas" value="Banco Banesco (0134) | RIF: J-12345678-0 | Teléfono: 0414-1234567">
+
+                    <label style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Cuenta Transferencia Bancaria (Bs):</label>
+                    <input type="text" id="cfgTransferencia" class="form-control-saas" value="Banesco Cuenta Corriente: 0134-0000-00-0000000000 | RIF: J-12345678-0">
+
+                    <label style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Cuenta Zelle (USD):</label>
+                    <input type="text" id="cfgZelle" class="form-control-saas" value="condominio.samanes@gmail.com (Titular: Junta de Condominio)">
+
+                    <button class="btn-saas btn-primary-saas" style="margin-top: 0.5rem;" onclick="app.saveCondoSettings()">
+                        <i class="bi bi-save"></i> Guardar Configuración
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VISTA 3: PORTAL RESIDENTE -->
+    <section id="viewResident" class="dashboard-view">
+        <div class="dashboard-header">
+            <div>
+                <span class="stat-badge clean" style="margin-bottom: 0.5rem; display: inline-flex;"><i class="bi bi-person-check"></i> Residente Conectado</span>
+                <h2 style="font-size: 1.6rem; font-weight: 800; color: #fff; margin: 0;" id="residentUnitTitle">Apartamento 1A</h2>
+                <span style="font-size: 0.85rem; color: var(--text-secondary);" id="residentOwnerSubtitle">Propietario no registrado</span>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <button class="btn-saas btn-success-saas" style="width: auto;" onclick="app.showReportarPagoModal()">
+                    <i class="bi bi-send-check"></i> Reportar Pago
+                </button>
+                <button class="btn-saas btn-outline-saas" style="width: auto;" onclick="app.showHome()">
+                    <i class="bi bi-box-arrow-left"></i> Salir
+                </button>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 1.75rem;">
+            <div class="condo-selector-card" style="margin-bottom: 0;">
+                <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem;">Estado de Deuda Actual</div>
+                <div style="font-size: 2.2rem; font-weight: 800; color: #10b981;" id="residentDebtUSD">$0.00</div>
+                <div style="font-size: 0.95rem; color: var(--text-muted); margin-top: 0.25rem;" id="residentDebtBs">Equivalente: 0.00 Bs (BCV 72.40)</div>
+                <div class="stat-badge clean" style="margin-top: 1rem;"><i class="bi bi-check-circle"></i> Unidad Solvente / Sin Cuotas Pendientes</div>
+            </div>
+
+            <div class="condo-selector-card" style="margin-bottom: 0;">
+                <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem;">Datos para Transferir / Pago Móvil</div>
+                <div style="font-size: 0.85rem; color: #fff; line-height: 1.5;" id="residentBankInfo">
+                    <strong>Banesco Pago Móvil:</strong> 0134 | V-12345678 | 0414-1234567<br>
+                    <strong>Zelle:</strong> condominio.samanes@gmail.com
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestaña Perfil de Habitante -->
+        <div class="condo-selector-card" style="padding: 1.5rem; max-width: 800px;">
+            <h3 style="font-size: 1.15rem; color: #fff; margin-bottom: 1rem;"><i class="bi bi-person-lines-fill text-primary"></i> Mi Perfil de Copropietario</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--text-secondary);">Nombre Completo:</label>
+                    <input type="text" id="resProfileName" class="form-control-saas" placeholder="Ej. Juan Pérez">
+                </div>
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--text-secondary);">Cédula de Identidad:</label>
+                    <input type="text" id="resProfileCedula" class="form-control-saas" placeholder="Ej. V-18.456.789">
+                </div>
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--text-secondary);">Teléfono / WhatsApp:</label>
+                    <input type="text" id="resProfilePhone" class="form-control-saas" placeholder="Ej. 0414-1234567">
+                </div>
+                <div>
+                    <label style="font-size: 0.8rem; color: var(--text-secondary);">Correo Electrónico:</label>
+                    <input type="email" id="resProfileEmail" class="form-control-saas" placeholder="Ej. juan@correo.com">
+                </div>
+                <div style="grid-column: span 2;">
+                    <label style="font-size: 0.8rem; color: var(--text-secondary);">Vehículos / Placas / Puesto de Estacionamiento:</label>
+                    <input type="text" id="resProfileVehiculo" class="form-control-saas" placeholder="Ej. Toyota Corolla Gris Placa ABC-123, Puesto 14">
+                </div>
+            </div>
+            <button class="btn-saas btn-primary-saas" style="width: auto; margin-top: 0.5rem;" onclick="app.saveResidentProfile()">
+                <i class="bi bi-save"></i> Guardar Mi Perfil
+            </button>
+        </div>
+    </section>
+
+    <!-- MODAL: REGISTRAR NUEVO CONDOMINIO -->
+    <div id="modalNewCondo" class="modal-backdrop-saas">
+        <div class="modal-box-saas">
+            <div class="modal-header-saas">
+                <h3 style="font-size: 1.25rem; color: #fff; margin: 0;"><i class="bi bi-building-add text-primary"></i> Registrar Nuevo Condominio</h3>
+                <button class="close-btn" onclick="app.closeModal('modalNewCondo')">&times;</button>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 1.25rem;">
+                Cree un nuevo edificio con su propia cantidad de pisos, apartamentos y finanzas completamente aisladas.
+            </p>
+            <div>
+                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Nombre del Condominio / Edificio:</label>
+                <input type="text" id="newCondoNombre" class="form-control-saas" placeholder="Ej. Torre Residencial El Ávila">
+
+                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">RIF:</label>
+                <input type="text" id="newCondoRif" class="form-control-saas" placeholder="Ej. J-98765432-1">
+
+                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Dirección:</label>
+                <input type="text" id="newCondoDireccion" class="form-control-saas" placeholder="Ej. Calle 4, Urb. Los Palos Grandes">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Cantidad de Pisos:</label>
+                        <input type="number" id="newCondoPisos" class="form-control-saas" value="8" min="1" max="60">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Aptos por Piso:</label>
+                        <input type="number" id="newCondoAptosPiso" class="form-control-saas" value="4" min="1" max="20">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">¿Tiene Planta Baja (PB)?</label>
+                        <select id="newCondoTienePB" class="form-control-saas">
+                            <option value="1">Sí (Con apartamentos en PB)</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Aptos en PB:</label>
+                        <input type="number" id="newCondoAptosPB" class="form-control-saas" value="2" min="1" max="10">
+                    </div>
+                </div>
+
+                <div style="background: var(--bg-card); padding: 0.85rem; border-radius: 8px; margin-bottom: 1.25rem; font-size: 0.85rem; color: #10b981;">
+                    <i class="bi bi-magic"></i> Se generarán automáticamente las unidades y se calcularán alícuotas equitativas con sistema limpio.
+                </div>
+
+                <button class="btn-saas btn-primary-saas" onclick="app.createNewCondominio()">
+                    <i class="bi bi-check-lg"></i> Crear y Cargar Condominio
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADJUDICAR PROPIETARIO A APARTAMENTO -->
+    <div id="modalAdjudicar" class="modal-backdrop-saas">
+        <div class="modal-box-saas">
+            <div class="modal-header-saas">
+                <h3 style="font-size: 1.25rem; color: #fff; margin: 0;" id="adjModalTitle">Adjudicar Apartamento</h3>
+                <button class="close-btn" onclick="app.closeModal('modalAdjudicar')">&times;</button>
+            </div>
+            <div>
+                <input type="hidden" id="adjAptoCode">
+                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Nombre del Propietario / Adjudicatario:</label>
+                <input type="text" id="adjNombre" class="form-control-saas" placeholder="Ej. Carlos Mendoza">
+
+                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Cédula de Identidad / RIF:</label>
+                <input type="text" id="adjCedula" class="form-control-saas" placeholder="Ej. V-15.678.910">
+
+                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Teléfono / WhatsApp:</label>
+                <input type="text" id="adjTelefono" class="form-control-saas" placeholder="Ej. 0424-9876543">
+
+                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Correo Electrónico:</label>
+                <input type="email" id="adjEmail" class="form-control-saas" placeholder="Ej. carlos@empresa.com">
+
+                <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem;">
+                    <button class="btn-saas btn-primary-saas" onclick="app.saveAdjudicacion()">
+                        <i class="bi bi-check2"></i> Guardar Adjudicación
+                    </button>
+                    <button class="btn-saas btn-outline-saas" onclick="app.liberarApartamento()" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.4);">
+                        <i class="bi bi-trash"></i> Desadjudicar (Limpiar)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: EMITIR CUOTA -->
+    <div id="modalEmitirCuota" class="modal-backdrop-saas">
+        <div class="modal-box-saas">
+            <div class="modal-header-saas">
+                <h3 style="font-size: 1.25rem; color: #fff; margin: 0;"><i class="bi bi-receipt text-primary"></i> Emitir Cuota de Condominio</h3>
+                <button class="close-btn" onclick="app.closeModal('modalEmitirCuota')">&times;</button>
+            </div>
+            <div>
+                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Concepto / Título de la Cuota:</label>
+                <input type="text" id="cuotaTitulo" class="form-control-saas" value="Mantenimiento General - Octubre 2026">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Tipo de Cuota:</label>
+                        <select id="cuotaTipo" class="form-control-saas">
+                            <option value="ordinaria">Ordinaria</option>
+                            <option value="extraordinaria">Extraordinaria</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Monto Base (USD):</label>
+                        <input type="number" step="0.5" id="cuotaMonto" class="form-control-saas" value="35.00">
+                    </div>
+                </div>
+
+                <div style="background: var(--bg-card); padding: 0.85rem; border-radius: 8px; margin-bottom: 1.25rem; font-size: 0.85rem; color: var(--text-secondary);">
+                    La cuota se asignará a todos los apartamentos del edificio aplicando la tasa oficial BCV vigente.
+                </div>
+
+                <button class="btn-saas btn-primary-saas" onclick="app.executeEmitirCuota()">
+                    <i class="bi bi-broadcast"></i> Emitir a Todos los Apartamentos
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: REPORTAR PAGO (RESIDENTE) -->
+    <div id="modalReportarPago" class="modal-backdrop-saas">
+        <div class="modal-box-saas">
+            <div class="modal-header-saas">
+                <h3 style="font-size: 1.25rem; color: #fff; margin: 0;"><i class="bi bi-send-check text-success"></i> Reportar Pago de Cuota</h3>
+                <button class="close-btn" onclick="app.closeModal('modalReportarPago')">&times;</button>
+            </div>
+            <div>
+                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Método de Pago:</label>
+                <select id="pagoMetodo" class="form-control-saas">
+                    <option value="Pago Móvil">Pago Móvil (Bs)</option>
+                    <option value="Transferencia Bs">Transferencia Bancaria (Bs)</option>
+                    <option value="Zelle">Zelle (USD)</option>
+                    <option value="Efectivo USD">Efectivo USD</option>
+                </select>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Monto Pagado:</label>
+                        <input type="number" step="0.01" id="pagoMonto" class="form-control-saas" value="35.00">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Moneda:</label>
+                        <select id="pagoMoneda" class="form-control-saas">
+                            <option value="USD">USD ($)</option>
+                            <option value="BS">Bolívares (Bs)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Número de Referencia:</label>
+                <input type="text" id="pagoRef" class="form-control-saas" placeholder="Ej. 0134987654">
+
+                <button class="btn-saas btn-success-saas" style="margin-top: 0.5rem;" onclick="app.submitResidentPago()">
+                    <i class="bi bi-check-circle"></i> Enviar Comprobante
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: NUEVO COMUNICADO -->
+    <div id="modalNuevoComunicado" class="modal-backdrop-saas">
+        <div class="modal-box-saas">
+            <div class="modal-header-saas">
+                <h3 style="font-size: 1.25rem; color: #fff; margin: 0;"><i class="bi bi-megaphone text-primary"></i> Publicar en Cartelera</h3>
+                <button class="close-btn" onclick="app.closeModal('modalNuevoComunicado')">&times;</button>
+            </div>
+            <div>
+                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Título del Aviso:</label>
+                <input type="text" id="comunicadoTitulo" class="form-control-saas" placeholder="Ej. Mantenimiento Preventivo de Bomba de Agua">
+
+                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Detalle del Comunicado:</label>
+                <textarea id="comunicadoCuerpo" class="form-control-saas" rows="4" placeholder="Escriba el contenido del aviso para los copropietarios..."></textarea>
+
+                <button class="btn-saas btn-primary-saas" onclick="app.saveComunicado()">
+                    <i class="bi bi-send"></i> Publicar en Cartelera
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE LA APLICACIÓN -->
+    <script>
+        // ESTRUCTURA BASE INICIAL LIMPIA PARA "LOS SAMANES"
+        const INITIAL_STATE = {
+            activeCondoId: 1,
+            condominios: [
+                {
+                    id: 1,
+                    slug: 'los-samanes',
+                    nombre: 'Residencias Los Samanes',
+                    rif: 'J-12345678-0',
+                    direccion: 'Av. Principal Los Samanes, Caracas',
+                    pisos_cant: 12,
+                    tiene_pb: 1,
+                    aptos_pb_cant: 2,
+                    aptos_por_piso: 4,
+                    tasa_dolar: 72.40,
+                    banco_pago_movil: 'Banco Banesco (0134) | RIF: J-12345678-0 | Teléfono: 0414-1234567',
+                    banco_transferencia: 'Banesco Cta Corriente: 0134-0000-00-0000000000 | RIF: J-12345678-0',
+                    cuenta_zelle: 'condominio.samanes@gmail.com (Titular: Junta de Condominio)'
+                }
+            ],
+            // 50 Apartamentos limpios (sin adjudicatarios ficticios, sin pagos, sin deudas)
+            apartamentos: generateCleanUnits(1, 12, 4, true, 2),
+            cuotas: [],
+            pagos: [],
+            comunicados: []
+        };
+
+        // Generador de unidades limpias
+        function generateCleanUnits(condoId, pisos, porPiso, tienePB, aptosPB) {
+            let units = [];
+            // PB
+            if (tienePB) {
+                for (let i = 1; i <= aptosPB; i++) {
+                    let code = 'PB-' + String.fromCharCode(64 + i);
+                    units.push({
+                        condoId: condoId,
+                        piso: 0,
+                        codigo: code,
+                        alicuota: 2.00,
+                        propietario: null,
+                        cedula: null,
+                        telefono: null,
+                        email: null,
+                        vehiculo: null
+                    });
+                }
+            }
+            // Pisos 1 al N
+            for (let p = 1; p <= pisos; p++) {
+                for (let u = 1; u <= porPiso; u++) {
+                    let letter = String.fromCharCode(64 + u);
+                    let code = p + letter;
+                    units.push({
+                        condoId: condoId,
+                        piso: p,
+                        codigo: code,
+                        alicuota: 2.00,
+                        propietario: null,
+                        cedula: null,
+                        telefono: null,
+                        email: null,
+                        vehiculo: null
+                    });
+                }
+            }
+            return units;
+        }
+
+        // CONTROLADOR DE APLICACIÓN
+        const app = {
+            state: null,
+            currentRole: null,
+            currentResidentApto: null,
+
+            init() {
+                // Cargar desde localStorage o inicializar limpio
+                const saved = localStorage.getItem('condohub_saas_data');
+                if (saved) {
+                    try {
+                        this.state = JSON.parse(saved);
+                    } catch(e) {
+                        this.state = JSON.parse(JSON.stringify(INITIAL_STATE));
+                    }
+                } else {
+                    this.state = JSON.parse(JSON.stringify(INITIAL_STATE));
+                    this.save();
+                }
+
+                this.renderHome();
+            },
+
+            save() {
+                localStorage.setItem('condohub_saas_data', JSON.stringify(this.state));
+            },
+
+            toast(msg) {
+                const el = document.getElementById('toastNotification');
+                document.getElementById('toastMsg').innerText = msg;
+                el.style.display = 'flex';
+                setTimeout(() => { el.style.display = 'none'; }, 3200);
+            },
+
+            getActiveCondo() {
+                return this.state.condominios.find(c => c.id === this.state.activeCondoId) || this.state.condominios[0];
+            },
+
+            getCondoUnits(condoId) {
+                return this.state.apartamentos.filter(a => a.condoId === condoId);
+            },
+
+            renderHome() {
+                const condo = this.getActiveCondo();
+                const units = this.getCondoUnits(condo.id);
+                const assignedCount = units.filter(u => u.propietario).length;
+
+                // Actualizar encabezados
+                document.getElementById('currentCondoName').innerText = condo.nombre;
+                document.getElementById('currentCondoRif').innerHTML = `<i class="bi bi-file-earmark-text"></i> RIF: ${condo.rif || 'J-12345678-0'}`;
+                document.getElementById('currentCondoAddress').innerHTML = `<i class="bi bi-geo-alt"></i> ${condo.direccion || 'Caracas, Venezuela'}`;
+                document.getElementById('currentCondoStats').innerHTML = `<i class="bi bi-grid-3x3-gap"></i> ${condo.pisos_cant} Pisos • ${units.length} Unidades`;
+                document.getElementById('statAptosCount').innerText = `${units.length} Apartamentos Estructurados`;
+                document.getElementById('topBcvRate').innerText = (condo.tasa_dolar || 72.40).toFixed(2);
+
+                // Selector de condominios
+                const selectEl = document.getElementById('condoSelect');
+                selectEl.innerHTML = '';
+                this.state.condominios.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.innerText = c.nombre;
+                    if (c.id === condo.id) opt.selected = true;
+                    selectEl.appendChild(opt);
+                });
+
+                // Selector de residentes
+                const resSelect = document.getElementById('residentAptoSelect');
+                resSelect.innerHTML = '';
+                units.forEach(u => {
+                    const opt = document.createElement('option');
+                    opt.value = u.codigo;
+                    opt.innerText = `${u.codigo} ${u.propietario ? '(' + u.propietario + ')' : '(Disponible)'}`;
+                    resSelect.appendChild(opt);
+                });
+            },
+
+            switchCondominio(condoId) {
+                this.state.activeCondoId = parseInt(condoId);
+                this.save();
+                this.renderHome();
+                this.toast(`Cambiado a: ${this.getActiveCondo().nombre}`);
+            },
+
+            showHome() {
+                document.querySelectorAll('.dashboard-view').forEach(v => v.classList.remove('active'));
+                document.getElementById('viewHome').style.display = 'block';
+                this.renderHome();
+            },
+
+            // LOGINS
+            loginSuperadmin() {
+                const pass = document.getElementById('superPass').value;
+                if (pass !== 'glretsulc') {
+                    alert('Contraseña de superusuario incorrecta (glretsulc)');
+                    return;
+                }
+                this.toast('Bienvenido Superusuario Global (clusterlg)');
+                this.openAdminDashboard('Super-Admin');
+            },
+
+            loginAdmin() {
+                const pass = document.getElementById('adminPass').value;
+                if (pass !== 'admin123') {
+                    alert('Contraseña de administrador incorrecta (admin123)');
+                    return;
+                }
+                this.toast('Bienvenido Administrador');
+                this.openAdminDashboard('Admin');
+            },
+
+            loginResident() {
+                const aptoCode = document.getElementById('residentAptoSelect').value;
+                this.currentResidentApto = aptoCode;
+                this.openResidentDashboard(aptoCode);
+            },
+
+            // DASHBOARDS
+            openAdminDashboard(role) {
+                this.currentRole = role;
+                document.getElementById('viewHome').style.display = 'none';
+                document.getElementById('viewResident').classList.remove('active');
+                const adminView = document.getElementById('viewAdmin');
+                adminView.classList.add('active');
+
+                const condo = this.getActiveCondo();
+                document.getElementById('adminViewCondoTitle').innerText = `${condo.nombre} (${role})`;
+                this.renderAdminFloors();
+                this.renderAdminMetrics();
+            },
+
+            renderAdminMetrics() {
+                const condo = this.getActiveCondo();
+                const units = this.getCondoUnits(condo.id);
+                const assigned = units.filter(u => u.propietario).length;
+                const cuotas = this.state.cuotas.filter(c => c.condoId === condo.id).length;
+                const pagos = this.state.pagos.filter(p => p.condoId === condo.id && p.estado === 'pendiente').length;
+
+                document.getElementById('adminTotalUnits').innerText = units.length;
+                document.getElementById('adminAdjudicadosCount').innerText = assigned;
+                document.getElementById('adminActiveCuotas').innerText = cuotas;
+                document.getElementById('adminPagosRevision').innerText = pagos;
+            },
+
+            renderAdminFloors() {
+                const condo = this.getActiveCondo();
+                const units = this.getCondoUnits(condo.id);
+                const container = document.getElementById('floorsContainer');
+                container.innerHTML = '';
+
+                // Agrupar por piso
+                const floors = {};
+                units.forEach(u => {
+                    if (!floors[u.piso]) floors[u.piso] = [];
+                    floors[u.piso].push(u);
+                });
+
+                // Ordenar pisos descendentemente (del más alto a PB)
+                const sortedKeys = Object.keys(floors).map(Number).sort((a,b) => b - a);
+
+                sortedKeys.forEach(pisoNum => {
+                    const floorRow = document.createElement('div');
+                    floorRow.className = 'floor-row';
+
+                    const title = document.createElement('div');
+                    title.className = 'floor-title';
+                    title.innerHTML = pisoNum === 0 
+                        ? `<i class="bi bi-door-closed text-primary"></i> Planta Baja (PB)`
+                        : `<i class="bi bi-layers text-primary"></i> Piso ${pisoNum}`;
+                    floorRow.appendChild(title);
+
+                    const grid = document.createElement('div');
+                    grid.className = 'units-grid';
+
+                    floors[pisoNum].forEach(u => {
+                        const card = document.createElement('div');
+                        card.className = `unit-card ${u.propietario ? 'assigned' : 'clean'}`;
+                        card.onclick = () => app.openAdjudicarModal(u.codigo);
+
+                        card.innerHTML = `
+                            <div class="unit-code">
+                                <span>${u.codigo}</span>
+                                <span style="font-size: 0.72rem; color: ${u.propietario ? '#3b82f6' : '#10b981'}; font-weight: 600;">
+                                    ${u.propietario ? 'Adjudicado' : 'Disponible'}
+                                </span>
+                            </div>
+                            <div class="unit-owner">${u.propietario || 'Click para adjudicar'}</div>
+                            <div class="unit-alicuota">Alícuota: ${u.alicuota.toFixed(2)}%</div>
+                        `;
+                        grid.appendChild(card);
+                    });
+
+                    floorRow.appendChild(grid);
+                    container.appendChild(floorRow);
+                });
+            },
+
+            switchAdminTab(tabName, btnEl) {
+                document.querySelectorAll('.tab-item-saas').forEach(b => b.classList.remove('active'));
+                btnEl.classList.add('active');
+
+                document.getElementById('adminTabMapa').style.display = tabName === 'mapa' ? 'block' : 'none';
+                document.getElementById('adminTabCuotas').style.display = tabName === 'cuotas' ? 'block' : 'none';
+                document.getElementById('adminTabPagos').style.display = tabName === 'pagos' ? 'block' : 'none';
+                document.getElementById('adminTabComunicados').style.display = tabName === 'comunicados' ? 'block' : 'none';
+                document.getElementById('adminTabConfig').style.display = tabName === 'config' ? 'block' : 'none';
+
+                if (tabName === 'cuotas') this.renderCuotasTable();
+                if (tabName === 'pagos') this.renderPagosTable();
+                if (tabName === 'comunicados') this.renderComunicados();
+            },
+
+            // ADJUDICAR APARTAMENTO
+            openAdjudicarModal(aptoCode) {
+                const condo = this.getActiveCondo();
+                const u = this.getCondoUnits(condo.id).find(x => x.codigo === aptoCode);
+                if (!u) return;
+
+                document.getElementById('adjAptoCode').value = u.codigo;
+                document.getElementById('adjModalTitle').innerText = `Adjudicar Apartamento ${u.codigo}`;
+                document.getElementById('adjNombre').value = u.propietario || '';
+                document.getElementById('adjCedula').value = u.cedula || '';
+                document.getElementById('adjTelefono').value = u.telefono || '';
+                document.getElementById('adjEmail').value = u.email || '';
+
+                this.openModal('modalAdjudicar');
+            },
+
+            saveAdjudicacion() {
+                const code = document.getElementById('adjAptoCode').value;
+                const condo = this.getActiveCondo();
+                const u = this.getCondoUnits(condo.id).find(x => x.codigo === code);
+                if (!u) return;
+
+                u.propietario = document.getElementById('adjNombre').value.trim() || null;
+                u.cedula = document.getElementById('adjCedula').value.trim() || null;
+                u.telefono = document.getElementById('adjTelefono').value.trim() || null;
+                u.email = document.getElementById('adjEmail').value.trim() || null;
+
+                this.save();
+                this.closeModal('modalAdjudicar');
+                this.renderAdminFloors();
+                this.renderAdminMetrics();
+                this.toast(`Apartamento ${code} actualizado correctamente`);
+            },
+
+            liberarApartamento() {
+                const code = document.getElementById('adjAptoCode').value;
+                const condo = this.getActiveCondo();
+                const u = this.getCondoUnits(condo.id).find(x => x.codigo === code);
+                if (!u) return;
+
+                u.propietario = null;
+                u.cedula = null;
+                u.telefono = null;
+                u.email = null;
+                u.vehiculo = null;
+
+                this.save();
+                this.closeModal('modalAdjudicar');
+                this.renderAdminFloors();
+                this.renderAdminMetrics();
+                this.toast(`Apartamento ${code} liberado (disponible)`);
+            },
+
+            // CUOTAS
+            showEmitirCuotaModal() {
+                this.openModal('modalEmitirCuota');
+            },
+
+            executeEmitirCuota() {
+                const condo = this.getActiveCondo();
+                const titulo = document.getElementById('cuotaTitulo').value.trim();
+                const tipo = document.getElementById('cuotaTipo').value;
+                const monto = parseFloat(document.getElementById('cuotaMonto').value) || 35.0;
+
+                const nuevaCuota = {
+                    id: Date.now(),
+                    condoId: condo.id,
+                    titulo: titulo,
+                    tipo: tipo,
+                    monto_usd: monto,
+                    fecha: new Date().toISOString().split('T')[0]
+                };
+
+                this.state.cuotas.push(nuevaCuota);
+                this.save();
+                this.closeModal('modalEmitirCuota');
+                this.renderAdminMetrics();
+                this.toast(`Cuota "${titulo}" emitida a todo el edificio`);
+            },
+
+            renderCuotasTable() {
+                const condo = this.getActiveCondo();
+                const cuotas = this.state.cuotas.filter(c => c.condoId === condo.id);
+                const tbody = document.getElementById('cuotasTableBody');
+                if (cuotas.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No hay cuotas emitidas aún.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                cuotas.forEach(c => {
+                    const montoBs = (c.monto_usd * condo.tasa_dolar).toFixed(2);
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${c.fecha}</td>
+                        <td><strong>${c.titulo}</strong></td>
+                        <td><span class="stat-badge">${c.tipo}</span></td>
+                        <td>$${c.monto_usd.toFixed(2)}</td>
+                        <td>Bs. ${montoBs}</td>
+                        <td><span class="stat-badge clean"><i class="bi bi-broadcast"></i> Activa</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            },
+
+            // PAGOS
+            renderPagosTable() {
+                const condo = this.getActiveCondo();
+                const pagos = this.state.pagos.filter(p => p.condoId === condo.id);
+                const tbody = document.getElementById('pagosTableBody');
+                if (pagos.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">Sistema limpio: no hay pagos pendientes de auditoría.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                pagos.forEach(p => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${p.fecha}</td>
+                        <td><strong>${p.apto}</strong></td>
+                        <td>${p.metodo}</td>
+                        <td><code>${p.ref}</code></td>
+                        <td>${p.moneda === 'USD' ? '$' : 'Bs. '}${p.monto.toFixed(2)}</td>
+                        <td><span class="stat-badge ${p.estado === 'aprobado' ? 'clean' : ''}">${p.estado}</span></td>
+                        <td>
+                            ${p.estado === 'pendiente' ? `
+                                <button class="btn-saas btn-success-saas" style="width: auto; padding: 0.25rem 0.65rem; font-size: 0.78rem;" onclick="app.aprobarPago(${p.id})">Aprobar</button>
+                            ` : '<span style="color: #10b981;"><i class="bi bi-check-all"></i> Auditado</span>'}
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            },
+
+            aprobarPago(id) {
+                const p = this.state.pagos.find(x => x.id === id);
+                if (p) {
+                    p.estado = 'aprobado';
+                    this.save();
+                    this.renderPagosTable();
+                    this.renderAdminMetrics();
+                    this.toast('Pago aprobado y acreditado');
+                }
+            },
+
+            // COMUNICADOS
+            showNuevoComunicadoModal() {
+                this.openModal('modalNuevoComunicado');
+            },
+
+            saveComunicado() {
+                const condo = this.getActiveCondo();
+                const titulo = document.getElementById('comunicadoTitulo').value.trim();
+                const cuerpo = document.getElementById('comunicadoCuerpo').value.trim();
+                if (!titulo || !cuerpo) {
+                    alert('Complete título y contenido');
+                    return;
+                }
+
+                this.state.comunicados.push({
+                    id: Date.now(),
+                    condoId: condo.id,
+                    titulo: titulo,
+                    cuerpo: cuerpo,
+                    fecha: new Date().toISOString().split('T')[0]
+                });
+
+                this.save();
+                this.closeModal('modalNuevoComunicado');
+                this.renderComunicados();
+                this.toast('Comunicado publicado en cartelera');
+            },
+
+            renderComunicados() {
+                const condo = this.getActiveCondo();
+                const items = this.state.comunicados.filter(c => c.condoId === condo.id);
+                const box = document.getElementById('comunicadosContainer');
+                if (items.length === 0) {
+                    box.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 2rem;">No hay comunicados publicados actualmente.</p>`;
+                    return;
+                }
+
+                box.innerHTML = '';
+                items.forEach(c => {
+                    const div = document.createElement('div');
+                    div.style.background = 'var(--bg-card)';
+                    div.style.padding = '1rem 1.25rem';
+                    div.style.borderRadius = '10px';
+                    div.style.marginBottom = '0.85rem';
+                    div.style.border = '1px solid var(--border-color)';
+                    div.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                            <h4 style="color: #fff; font-size: 1rem; margin: 0;">${c.titulo}</h4>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">${c.fecha}</span>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.88rem; margin: 0; line-height: 1.4;">${c.cuerpo}</p>
+                    `;
+                    box.appendChild(div);
+                });
+            },
+
+            // CONFIGURACIÓN CONDOMINIO
+            saveCondoSettings() {
+                const condo = this.getActiveCondo();
+                condo.tasa_dolar = parseFloat(document.getElementById('cfgTasaBcv').value) || 72.40;
+                condo.banco_pago_movil = document.getElementById('cfgPagoMovil').value;
+                condo.banco_transferencia = document.getElementById('cfgTransferencia').value;
+                condo.cuenta_zelle = document.getElementById('cfgZelle').value;
+
+                this.save();
+                this.renderHome();
+                this.toast('Parámetros bancarios y tasa BCV guardados');
+            },
+
+            // RESIDENTE
+            openResidentDashboard(aptoCode) {
+                document.getElementById('viewHome').style.display = 'none';
+                document.getElementById('viewAdmin').classList.remove('active');
+                const residentView = document.getElementById('viewResident');
+                residentView.classList.add('active');
+
+                const condo = this.getActiveCondo();
+                const u = this.getCondoUnits(condo.id).find(x => x.codigo === aptoCode);
+
+                document.getElementById('residentUnitTitle').innerText = `Apartamento ${aptoCode}`;
+                document.getElementById('residentOwnerSubtitle').innerText = u && u.propietario ? `Propietario: ${u.propietario}` : 'Sin propietario adjudicado';
+
+                // Llenar formulario de perfil
+                if (u) {
+                    document.getElementById('resProfileName').value = u.propietario || '';
+                    document.getElementById('resProfileCedula').value = u.cedula || '';
+                    document.getElementById('resProfilePhone').value = u.telefono || '';
+                    document.getElementById('resProfileEmail').value = u.email || '';
+                    document.getElementById('resProfileVehiculo').value = u.vehiculo || '';
+                }
+
+                // Cuentas
+                document.getElementById('residentBankInfo').innerHTML = `
+                    <strong>Pago Móvil:</strong> ${condo.banco_pago_movil || 'No configurado'}<br>
+                    <strong>Transferencia Bs:</strong> ${condo.banco_transferencia || 'No configurado'}<br>
+                    <strong>Zelle:</strong> ${condo.cuenta_zelle || 'No configurado'}
+                `;
+
+                // Calcular deuda si hay cuotas
+                const cuotasCondo = this.state.cuotas.filter(c => c.condoId === condo.id);
+                let totalDeuda = cuotasCondo.reduce((acc, c) => acc + c.monto_usd, 0);
+                const pagosHechos = this.state.pagos.filter(p => p.condoId === condo.id && p.apto === aptoCode && p.estado === 'aprobado');
+                const totalPagado = pagosHechos.reduce((acc, p) => acc + (p.moneda === 'USD' ? p.monto : p.monto / condo.tasa_dolar), 0);
+
+                let balance = Math.max(0, totalDeuda - totalPagado);
+                document.getElementById('residentDebtUSD').innerText = `$${balance.toFixed(2)}`;
+                document.getElementById('residentDebtBs').innerText = `Equivalente: ${(balance * condo.tasa_dolar).toFixed(2)} Bs (Tasa BCV ${condo.tasa_dolar.toFixed(2)})`;
+            },
+
+            saveResidentProfile() {
+                const condo = this.getActiveCondo();
+                const u = this.getCondoUnits(condo.id).find(x => x.codigo === this.currentResidentApto);
+                if (!u) return;
+
+                u.propietario = document.getElementById('resProfileName').value.trim() || null;
+                u.cedula = document.getElementById('resProfileCedula').value.trim() || null;
+                u.telefono = document.getElementById('resProfilePhone').value.trim() || null;
+                u.email = document.getElementById('resProfileEmail').value.trim() || null;
+                u.vehiculo = document.getElementById('resProfileVehiculo').value.trim() || null;
+
+                this.save();
+                this.toast('Perfil de copropietario actualizado');
+                document.getElementById('residentOwnerSubtitle').innerText = u.propietario ? `Propietario: ${u.propietario}` : 'Sin propietario adjudicado';
+            },
+
+            showReportarPagoModal() {
+                this.openModal('modalReportarPago');
+            },
+
+            submitResidentPago() {
+                const condo = this.getActiveCondo();
+                const metodo = document.getElementById('pagoMetodo').value;
+                const monto = parseFloat(document.getElementById('pagoMonto').value) || 35.0;
+                const moneda = document.getElementById('pagoMoneda').value;
+                const ref = document.getElementById('pagoRef').value.trim();
+
+                if (!ref) {
+                    alert('Indique el número de referencia del comprobante');
+                    return;
+                }
+
+                this.state.pagos.push({
+                    id: Date.now(),
+                    condoId: condo.id,
+                    apto: this.currentResidentApto,
+                    metodo: metodo,
+                    monto: monto,
+                    moneda: moneda,
+                    ref: ref,
+                    fecha: new Date().toISOString().split('T')[0],
+                    estado: 'pendiente'
+                });
+
+                this.save();
+                this.closeModal('modalReportarPago');
+                this.toast('Pago reportado exitosamente. En proceso de verificación administrativa.');
+            },
+
+            // NUEVO CONDOMINIO
+            showNewCondoModal() {
+                this.openModal('modalNewCondo');
+            },
+
+            createNewCondominio() {
+                const nombre = document.getElementById('newCondoNombre').value.trim();
+                const rif = document.getElementById('newCondoRif').value.trim() || 'J-99999999-0';
+                const dir = document.getElementById('newCondoDireccion').value.trim() || 'Caracas, Venezuela';
+                const pisos = parseInt(document.getElementById('newCondoPisos').value) || 8;
+                const aptosPiso = parseInt(document.getElementById('newCondoAptosPiso').value) || 4;
+                const tienePB = parseInt(document.getElementById('newCondoTienePB').value) === 1;
+                const aptosPB = parseInt(document.getElementById('newCondoAptosPB').value) || 2;
+
+                if (!nombre) {
+                    alert('Indique el nombre del nuevo condominio');
+                    return;
+                }
+
+                const newId = this.state.condominios.length + 1;
+                const newCondo = {
+                    id: newId,
+                    slug: nombre.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+                    nombre: nombre,
+                    rif: rif,
+                    direccion: dir,
+                    pisos_cant: pisos,
+                    tiene_pb: tienePB ? 1 : 0,
+                    aptos_pb_cant: aptosPB,
+                    aptos_por_piso: aptosPiso,
+                    tasa_dolar: 72.40,
+                    banco_pago_movil: 'No configurado',
+                    banco_transferencia: 'No configurado',
+                    cuenta_zelle: 'No configurado'
+                };
+
+                const newUnits = generateCleanUnits(newId, pisos, aptosPiso, tienePB, aptosPB);
+                const alicuota = +(100.0 / newUnits.length).toFixed(2);
+                newUnits.forEach(u => u.alicuota = alicuota);
+
+                this.state.condominios.push(newCondo);
+                this.state.apartamentos = this.state.apartamentos.concat(newUnits);
+                this.state.activeCondoId = newId;
+
+                this.save();
+                this.closeModal('modalNewCondo');
+                this.renderHome();
+                this.toast(`¡Condominio "${nombre}" creado con ${newUnits.length} apartamentos limpios!`);
+            },
+
+            // REINICIAR A LIMPIO
+            resetSystemToClean() {
+                if (confirm('¿Desea restablecer el sistema a su estado inicial limpio de fábrica (Residencias Los Samanes sin adjudicatarios ni pagos)?')) {
+                    this.state = JSON.parse(JSON.stringify(INITIAL_STATE));
+                    this.save();
+                    this.showHome();
+                    this.toast('Sistema restablecido: Residencias Los Samanes 100% limpio');
+                }
+            },
+
+            // MODALES
+            openModal(id) {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('active');
+            },
+            closeModal(id) {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('active');
+            }
+        };
+
+        // Iniciar al cargar
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
+</body>
+</html>
