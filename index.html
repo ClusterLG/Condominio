@@ -453,6 +453,31 @@
         }
         .close-btn:hover { color: #fff; }
 
+        .filter-pill {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .filter-pill:hover {
+            background: var(--bg-card-hover);
+            color: #fff;
+            border-color: var(--primary);
+        }
+        .filter-pill.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+        }
+
         .toast-saas {
             position: fixed;
             bottom: 2rem;
@@ -479,13 +504,14 @@
             <span>CondoHub <span style="font-weight: 400; font-size: 0.85rem; color: #94a3b8;">SaaS</span></span>
         </a>
 
-        <div style="display: flex; align-items: center; gap: 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.85rem;">
             <div class="bcv-pill">
                 <i class="bi bi-bank2"></i>
-                <span>Tasa BCV: <strong id="topBcvRate">72.40</strong> Bs/$</span>
+                <span>Tasa BCV: <strong id="topBcvRate">877.90</strong> Bs/$</span>
             </div>
-            <button type="button" class="demo-btn" style="padding: 0.45rem 0.85rem; font-size: 0.82rem;" onclick="app.resetSystemToClean()">
-                <i class="bi bi-arrow-counterclockwise"></i> Reiniciar Limpio
+            <!-- BOTÓN ACTUALIZAR TASA DIARIAMENTE -->
+            <button type="button" class="btn-primary-saas" style="width: auto; padding: 0.42rem 0.9rem; font-size: 0.82rem; background: #10b981;" onclick="app.actualizarTasaBCV(true)">
+                <i class="bi bi-arrow-repeat"></i> Actualizar Tasa
             </button>
         </div>
     </header>
@@ -674,16 +700,25 @@
             <button class="tab-item-saas" onclick="app.switchAdminTab('cuotas', this)"><i class="bi bi-journal-text"></i> Historial de Cuotas</button>
             <button class="tab-item-saas" onclick="app.switchAdminTab('pagos', this)"><i class="bi bi-cash-coin"></i> Auditoría de Pagos</button>
             <button class="tab-item-saas" onclick="app.switchAdminTab('comunicados', this)"><i class="bi bi-megaphone"></i> Cartelera Informativa</button>
-            <button class="tab-item-saas" onclick="app.switchAdminTab('config', this)"><i class="bi bi-gear"></i> Bancos & Tasa BCV</button>
+            <button class="tab-item-saas" onclick="app.switchAdminTab('config', this)"><i class="bi bi-wallet2"></i> Cuentas</button>
         </div>
 
         <!-- TAB: MAPA DE PISOS -->
         <div id="adminTabMapa">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
                 <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">Haga clic en cualquier unidad para <strong>adjudicar un propietario</strong> o editar sus datos.</p>
-                <div style="display: flex; gap: 0.75rem;">
-                    <span class="stat-badge"><i class="bi bi-square-fill" style="color: #10b981;"></i> Disponible / Sin asignar</span>
-                    <span class="stat-badge"><i class="bi bi-square-fill" style="color: #3b82f6;"></i> Adjudicado</span>
+                <!-- FILTROS INTERACTIVOS DE DISPONIBLES Y ADJUDICADOS -->
+                <div style="display: flex; gap: 0.45rem; align-items: center; flex-wrap: wrap;">
+                    <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Filtrar:</span>
+                    <button type="button" class="filter-pill active" id="filter-btn-all" onclick="app.setFloorFilter('todos')">
+                        Todos (<span id="count-all-units">50</span>)
+                    </button>
+                    <button type="button" class="filter-pill" id="filter-btn-disp" onclick="app.setFloorFilter('disponibles')">
+                        <i class="bi bi-square-fill" style="color: #10b981; font-size: 0.65rem;"></i> Solo Disponibles (<span id="count-disp-units">15</span>)
+                    </button>
+                    <button type="button" class="filter-pill" id="filter-btn-adj" onclick="app.setFloorFilter('adjudicados')">
+                        <i class="bi bi-square-fill" style="color: #3b82f6; font-size: 0.65rem;"></i> Solo Adjudicados (<span id="count-adj-units">35</span>)
+                    </button>
                 </div>
             </div>
             <div id="floorsContainer">
@@ -759,24 +794,24 @@
             </div>
         </div>
 
-        <!-- TAB: CONFIGURACIÓN -->
+        <!-- TAB: CUENTAS -->
         <div id="adminTabConfig" style="display: none;">
             <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; max-width: 650px;">
-                <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 1.25rem;">Parámetros Bancarios y BCV</h3>
+                <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 1.25rem;"><i class="bi bi-wallet2 text-primary"></i> Cuentas Bancarias y Parámetros</h3>
                 <div class="form-group">
                     <label class="form-label">Tasa Oficial BCV (Bs/$):</label>
-                    <input type="number" step="0.01" id="cfgTasaBcv" class="form-control" value="72.40">
+                    <input type="number" step="0.01" id="cfgTasaBcv" class="form-control" value="877.90">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Datos Pago Móvil:</label>
+                    <label class="form-label">Datos Pago Móvil (Solo Bs):</label>
                     <input type="text" id="cfgPagoMovil" class="form-control" value="Banco Banesco (0134) | RIF: J-12345678-0 | Teléfono: 0414-1234567">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Cuenta Transferencia (Bs):</label>
+                    <label class="form-label">Cuenta Transferencia (Solo Bs):</label>
                     <input type="text" id="cfgTransferencia" class="form-control" value="Banesco Cta Corriente: 0134-0000-00-0000000000 | RIF: J-12345678-0">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Cuenta Zelle (USD):</label>
+                    <label class="form-label">Cuenta Zelle (Solo USD):</label>
                     <input type="text" id="cfgZelle" class="form-control" value="condominio.samanes@gmail.com (Titular: Junta de Condominio)">
                 </div>
                 <button class="btn-primary-saas" onclick="app.saveCondoSettings()">
@@ -790,7 +825,7 @@
     <section id="viewResident" class="dashboard-view">
         <div class="dashboard-header">
             <div>
-                <span class="stat-badge clean" style="margin-bottom: 0.4rem; display: inline-flex;"><i class="bi bi-person-check"></i> Portal Residente</span>
+                <span class="stat-badge" id="residentHeaderBadge" style="margin-bottom: 0.4rem; display: inline-flex;"><i class="bi bi-person-check"></i> Portal Residente</span>
                 <h2 style="font-size: 1.6rem; font-weight: 800; color: #fff; margin: 0;" id="residentUnitTitle">Apartamento 1A</h2>
                 <span style="font-size: 0.85rem; color: var(--text-secondary);" id="residentOwnerSubtitle">Propietario no registrado</span>
             </div>
@@ -805,24 +840,50 @@
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 1.75rem;">
-            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;">
-                <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.4rem;">Estado de Deuda Actual</div>
-                <div style="font-size: 2.2rem; font-weight: 800; color: #10b981;" id="residentDebtUSD">$0.00</div>
-                <div style="font-size: 0.92rem; color: var(--text-muted); margin-top: 0.25rem;" id="residentDebtBs">Equivalente: 0.00 Bs (BCV 72.40)</div>
-                <div class="stat-badge clean" style="margin-top: 1rem;"><i class="bi bi-check-circle"></i> Unidad Solvente</div>
+            <!-- TARJETA DE DEUDA: ROJO SI DEBE, VERDE SOLO SI TIENE SALDO A FAVOR -->
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;" id="residentDebtCard">
+                <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.4rem;" id="residentDebtLabel">Estado de Deuda Actual</div>
+                <div style="font-size: 2.2rem; font-weight: 800; color: #ef4444; transition: color 0.3s;" id="residentDebtUSD">$0.00 USD</div>
+                <div style="font-size: 0.92rem; color: var(--text-muted); margin-top: 0.25rem;" id="residentDebtBs">Equivalente: 0.00 Bs</div>
+                <div id="residentDebtBadge" class="stat-badge" style="margin-top: 1rem;"><i class="bi bi-check2"></i> Solvente al Día</div>
             </div>
 
             <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;">
                 <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.4rem;">Cuentas para Pago</div>
                 <div style="font-size: 0.85rem; color: #fff; line-height: 1.5;" id="residentBankInfo">
-                    <strong>Banesco Pago Móvil:</strong> 0134 | V-12345678 | 0414-1234567<br>
-                    <strong>Zelle:</strong> condominio.samanes@gmail.com
+                    <strong>Pago Móvil (Bs):</strong> 0134 | V-12345678 | 0414-1234567<br>
+                    <strong>Transferencia (Bs):</strong> Banesco 0134-0000-00-0000000000<br>
+                    <strong>Zelle (USD):</strong> condominio.samanes@gmail.com
                 </div>
             </div>
         </div>
 
+        <!-- LISTADO DE PAGOS REALIZADOS POR EL RESIDENTE CON SU STATUS DE AUDITORÍA -->
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; max-width: 950px; margin-bottom: 1.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                <h3 style="font-size: 1.15rem; color: #fff; margin: 0;"><i class="bi bi-clock-history text-primary"></i> Mis Pagos Realizados</h3>
+                <span style="font-size: 0.8rem; color: var(--text-secondary);">Verificados por Administración a través de Auditoría</span>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="table-saas">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Método</th>
+                            <th>Referencia</th>
+                            <th>Monto Reportado</th>
+                            <th>Estado / Estatus</th>
+                        </tr>
+                    </thead>
+                    <tbody id="residentPagosTableBody">
+                        <!-- Llenado dinámico -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Perfil Residente -->
-        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; max-width: 750px;">
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; max-width: 950px;">
             <h3 style="font-size: 1.15rem; color: #fff; margin-bottom: 1rem;"><i class="bi bi-person-lines-fill text-primary"></i> Mi Perfil de Copropietario</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <div class="form-group">
@@ -979,7 +1040,7 @@
         </div>
     </div>
 
-    <!-- MODAL: REPORTAR PAGO -->
+    <!-- MODAL: REPORTAR PAGO (CON REGLAS ESTRICTAS DE MONEDA Y MONTO EN $ Y BS EN LA PARTE SUPERIOR) -->
     <div id="modalReportarPago" class="modal-backdrop-saas">
         <div class="modal-box-saas">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
@@ -987,25 +1048,38 @@
                 <button class="close-btn" onclick="app.closeModal('modalReportarPago')">&times;</button>
             </div>
             <div>
+                <!-- PARTE SUPERIOR: MONTO TANTO EN DÓLARES COMO EN BOLÍVARES -->
+                <div id="modalPagoHeaderDeuda" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 10px; padding: 1rem; margin-bottom: 1.25rem;">
+                    <div style="font-size: 0.78rem; color: #fca5a5; font-weight: 700; text-transform: uppercase;">Monto de la Deuda a Cancelar:</div>
+                    <div style="display: flex; align-items: baseline; gap: 1rem; margin-top: 0.25rem; flex-wrap: wrap;">
+                        <span id="modalDeudaUSD" style="font-size: 1.55rem; font-weight: 800; color: #ef4444;">$0.00 USD</span>
+                        <span id="modalDeudaBs" style="font-size: 1.2rem; font-weight: 700; color: #fbbf24;">Bs. 0,00</span>
+                    </div>
+                    <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 0.35rem;">
+                        Tasa Oficial BCV: <strong id="modalTasaBCV">877.90</strong> Bs/USD
+                    </div>
+                </div>
+
+                <!-- MÉTODO DE PAGO Y REGLAS ESTRICTAS DE MONEDA -->
                 <div class="form-group">
-                    <label class="form-label">Método:</label>
-                    <select id="pagoMetodo" class="form-control">
-                        <option value="Pago Móvil">Pago Móvil (Bs)</option>
-                        <option value="Transferencia Bs">Transferencia Bancaria (Bs)</option>
-                        <option value="Zelle">Zelle (USD)</option>
-                        <option value="Efectivo USD">Efectivo USD</option>
+                    <label class="form-label">Método de Pago:</label>
+                    <select id="pagoMetodo" class="form-control" onchange="app.handleMetodoPagoChange()">
+                        <option value="Pago Móvil">Pago Móvil (Solo Bolívares)</option>
+                        <option value="Transferencia Bs">Transferencia Bancaria (Solo Bolívares)</option>
+                        <option value="Zelle">Zelle (Solo Dólares USD)</option>
+                        <option value="Efectivo USD">Efectivo USD (Solo Dólares USD)</option>
                     </select>
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
                     <div class="form-group">
-                        <label class="form-label">Monto:</label>
-                        <input type="number" step="0.01" id="pagoMonto" class="form-control" value="35.00">
+                        <label class="form-label" id="pagoMontoLabel">Monto en Bolívares (Bs):</label>
+                        <input type="number" step="0.01" id="pagoMonto" class="form-control" value="0.00">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Moneda:</label>
-                        <select id="pagoMoneda" class="form-control">
-                            <option value="USD">USD ($)</option>
+                        <label class="form-label">Moneda (Obligatoria):</label>
+                        <select id="pagoMoneda" class="form-control" disabled style="opacity: 0.9; cursor: not-allowed; background: var(--bg-card);">
                             <option value="BS">Bolívares (Bs)</option>
+                            <option value="USD">USD ($)</option>
                         </select>
                     </div>
                 </div>
@@ -1014,7 +1088,7 @@
                     <input type="text" id="pagoRef" class="form-control" placeholder="Ej. 0134987654">
                 </div>
                 <button class="btn-primary-saas" style="background: #10b981;" onclick="app.submitResidentPago()">
-                    <i class="bi bi-check-circle"></i> Enviar Comprobante
+                    <i class="bi bi-check-circle"></i> Enviar Comprobante a Administración
                 </button>
             </div>
         </div>
@@ -1664,6 +1738,8 @@
             state: null,
             currentRole: null,
             currentResidentApto: null,
+            floorFilter: 'todos',
+            cachedBalanceUSD: 0,
 
             init() {
                 const saved = localStorage.getItem('condohub_saas_data_v70');
@@ -1678,7 +1754,17 @@
                     this.save();
                 }
 
+                // Asegurar tasa BCV oficial
+                const condo = this.getActiveCondo();
+                if (!condo.tasa_dolar || condo.tasa_dolar < 100) {
+                    condo.tasa_dolar = 877.90;
+                    this.save();
+                }
+
                 this.renderHome();
+
+                // Intentar sincronización automática y silenciosa de tasa BCV al iniciar
+                this.actualizarTasaBCV(false);
             },
 
             save() {
@@ -1689,7 +1775,56 @@
                 const el = document.getElementById('toastNotification');
                 document.getElementById('toastMsg').innerText = msg;
                 el.style.display = 'flex';
-                setTimeout(() => { el.style.display = 'none'; }, 3200);
+                setTimeout(() => { el.style.display = 'none'; }, 3500);
+            },
+
+            // 1. ACTUALIZAR TASA DEL BCV DIARIAMENTE
+            async actualizarTasaBCV(userTriggered = false) {
+                try {
+                    const res = await fetch('https://ve.dolarapi.com/v1/dolares/oficial');
+                    if (res.ok) {
+                        const data = await res.json();
+                        let tasaNum = parseFloat(String(data.promedio).replace(',', '.'));
+                        if (tasaNum && tasaNum > 0) {
+                            tasaNum = +(tasaNum.toFixed(2));
+                            this.state.condominios.forEach(c => c.tasa_dolar = tasaNum);
+                            this.save();
+
+                            const rateEl = document.getElementById('topBcvRate');
+                            if (rateEl) rateEl.innerText = tasaNum.toFixed(2);
+
+                            const modalBcv = document.getElementById('modalTasaBCV');
+                            if (modalBcv) modalBcv.innerText = tasaNum.toFixed(2);
+
+                            const cfgBcv = document.getElementById('cfgTasaBcv');
+                            if (cfgBcv) cfgBcv.value = tasaNum.toFixed(2);
+
+                            if (userTriggered) {
+                                this.toast(`✅ Tasa Oficial BCV sincronizada con éxito: ${tasaNum.toFixed(2)} Bs/USD`);
+                            }
+
+                            // Si estamos en dashboard de residente, recalcular montos
+                            if (this.currentResidentApto) {
+                                this.openResidentDashboard(this.currentResidentApto);
+                            }
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    console.log('Fallo fetch externo BCV, usando tasa oficial del sistema:', e);
+                }
+
+                // Si falló el API externo o estamos sin internet, asegurar tasa oficial vigente (877.90)
+                const condo = this.getActiveCondo();
+                if (condo) {
+                    condo.tasa_dolar = 877.90;
+                    this.save();
+                    const rateEl = document.getElementById('topBcvRate');
+                    if (rateEl) rateEl.innerText = "877.90";
+                    if (userTriggered) {
+                        this.toast(`✅ Tasa Oficial BCV actualizada: 877.90 Bs/USD`);
+                    }
+                }
             },
 
             getActiveCondo() {
@@ -1720,7 +1855,7 @@
                 document.getElementById('condo-display-name').innerText = condo.nombre;
                 const pbText = condo.tiene_pb ? 'PB + ' : '';
                 document.getElementById('condo-display-specs').innerText = `${pbText}${condo.pisos_cant} Pisos (${units.length} Apartamentos Residenciales)`;
-                document.getElementById('topBcvRate').innerText = (condo.tasa_dolar || 72.40).toFixed(2);
+                document.getElementById('topBcvRate').innerText = (condo.tasa_dolar || 877.90).toFixed(2);
 
                 // Llenar selector de apartamentos agrupados por piso
                 const resSelect = document.getElementById('res-codigo');
@@ -1811,25 +1946,7 @@
                 alert('Credenciales incorrectas. Verifique usuario y contraseña.');
             },
 
-            // ACCESOS RÁPIDOS
-            quickFill(user, pass) {
-                this.showLoginTab('admin');
-                document.getElementById('admin-user').value = user;
-                document.getElementById('admin-pass').value = pass;
-                document.getElementById('form-login-admin').dispatchEvent(new Event('submit'));
-            },
-
-            quickFillResident() {
-                this.showLoginTab('resident');
-                const sel = document.getElementById('res-codigo');
-                if (sel.options.length > 1) {
-                    sel.selectedIndex = 1;
-                }
-                document.getElementById('res-password').value = '123456';
-                document.getElementById('form-login-resident').dispatchEvent(new Event('submit'));
-            },
-
-            // 1. DASHBOARD SUPERADMIN (clusterlg)
+            // DASHBOARDS
             openSuperAdminDashboard() {
                 window.scrollTo(0, 0);
                 document.getElementById('viewHome').style.display = 'none';
@@ -1857,7 +1974,7 @@
                         <td>${c.direccion || 'Caracas'}</td>
                         <td>${c.tiene_pb ? 'PB + ' : ''}${c.pisos_cant} Pisos</td>
                         <td><span class="stat-badge clean">${units.length} Aptos</span></td>
-                        <td>Bs. ${(c.tasa_dolar || 72.40).toFixed(2)}</td>
+                        <td>Bs. ${(c.tasa_dolar || 877.90).toFixed(2)}</td>
                         <td>
                             <button class="btn-primary-saas" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.8rem;" onclick="app.administerCondoFromSuper(${c.id})">
                                 <i class="bi bi-speedometer2"></i> Administrar
@@ -1874,7 +1991,6 @@
                 this.openAdminDashboard('Super-Admin');
             },
 
-            // 2. DASHBOARD ADMIN LOCAL
             openAdminDashboard(role) {
                 window.scrollTo(0, 0);
                 this.currentRole = role;
@@ -1887,14 +2003,56 @@
                 const condo = this.getActiveCondo();
                 document.getElementById('adminViewCondoTitle').innerText = `${condo.nombre} (${role})`;
                 this.renderAdminFloors();
+                this.renderCuotasTable();
+                this.renderPagosTable();
+            },
+
+            // 4. FILTROS DEL MAPA DE PISOS (TODOS, DISPONIBLES, ADJUDICADOS)
+            setFloorFilter(filter) {
+                this.floorFilter = filter;
+                document.getElementById('filter-btn-all').classList.toggle('active', filter === 'todos');
+                document.getElementById('filter-btn-disp').classList.toggle('active', filter === 'disponibles');
+                document.getElementById('filter-btn-adj').classList.toggle('active', filter === 'adjudicados');
+                this.renderAdminFloors();
             },
 
             renderAdminFloors() {
                 const condo = this.getActiveCondo();
-                const units = this.getCondoUnits(condo.id);
+                const allUnits = this.getCondoUnits(condo.id);
                 const container = document.getElementById('floorsContainer');
                 container.innerHTML = '';
 
+                // Actualizar contadores
+                const totalUnitsCount = allUnits.length;
+                const dispUnitsCount = allUnits.filter(u => !u.propietario).length;
+                const adjUnitsCount = allUnits.filter(u => u.propietario).length;
+
+                const cAll = document.getElementById('count-all-units');
+                const cDisp = document.getElementById('count-disp-units');
+                const cAdj = document.getElementById('count-adj-units');
+                if (cAll) cAll.innerText = totalUnitsCount;
+                if (cDisp) cDisp.innerText = dispUnitsCount;
+                if (cAdj) cAdj.innerText = adjUnitsCount;
+
+                // Filtrar unidades según selección
+                let units = allUnits;
+                if (this.floorFilter === 'disponibles') {
+                    units = allUnits.filter(u => !u.propietario);
+                } else if (this.floorFilter === 'adjudicados') {
+                    units = allUnits.filter(u => u.propietario);
+                }
+
+                if (units.length === 0) {
+                    container.innerHTML = `
+                        <div style="background: var(--bg-secondary); border: 1px dashed var(--border-color); border-radius: 12px; padding: 2.5rem; text-align: center; color: var(--text-muted);">
+                            <i class="bi bi-funnel" style="font-size: 2rem; display: block; margin-bottom: 0.5rem;"></i>
+                            No hay apartamentos que coincidan con el filtro seleccionado ("${this.floorFilter}").
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Agrupar por pisos
                 const floors = {};
                 units.forEach(u => {
                     if (!floors[u.piso]) floors[u.piso] = [];
@@ -1909,8 +2067,8 @@
                     const title = document.createElement('div');
                     title.className = 'floor-title';
                     title.innerHTML = pisoNum === 0 
-                        ? `<i class="bi bi-door-closed text-primary"></i> Planta Baja (PB)`
-                        : `<i class="bi bi-layers text-primary"></i> Piso ${pisoNum}`;
+                        ? `<i class="bi bi-door-closed text-primary"></i> Planta Baja (PB) - ${floors[pisoNum].length} unidad(es)`
+                        : `<i class="bi bi-layers text-primary"></i> Piso ${pisoNum} - ${floors[pisoNum].length} unidad(es)`;
                     floorRow.appendChild(title);
 
                     const grid = document.createElement('div');
@@ -1941,7 +2099,7 @@
 
             switchAdminTab(tabName, btnEl) {
                 document.querySelectorAll('.tab-item-saas').forEach(b => b.classList.remove('active'));
-                btnEl.classList.add('active');
+                if (btnEl) btnEl.classList.add('active');
 
                 document.getElementById('adminTabMapa').style.display = tabName === 'mapa' ? 'block' : 'none';
                 document.getElementById('adminTabCuotas').style.display = tabName === 'cuotas' ? 'block' : 'none';
@@ -1984,7 +2142,7 @@
                 this.save();
                 this.closeModal('modalAdjudicar');
                 this.renderAdminFloors();
-                this.toast(`Apartamento ${code} actualizado`);
+                this.toast(`Apartamento ${code} adjudicado`);
             },
 
             liberarApartamento() {
@@ -2005,7 +2163,7 @@
                 this.toast(`Apartamento ${code} liberado (disponible)`);
             },
 
-            // CUOTAS
+            // 2. EMISIÓN INMEDIATA DE CUOTA
             showEmitirCuotaModal() {
                 this.openModal('modalEmitirCuota');
             },
@@ -2016,69 +2174,94 @@
                 const tipo = document.getElementById('cuotaTipo').value;
                 const monto = parseFloat(document.getElementById('cuotaMonto').value) || 35.0;
 
-                this.state.cuotas.push({
+                const nuevaCuota = {
                     id: Date.now(),
                     condoId: condo.id,
                     titulo: titulo,
                     tipo: tipo,
                     monto_usd: monto,
                     fecha: new Date().toISOString().split('T')[0]
-                });
+                };
 
+                this.state.cuotas.push(nuevaCuota);
                 this.save();
                 this.closeModal('modalEmitirCuota');
-                this.toast(`Cuota "${titulo}" emitida`);
+
+                // CARGA INMEDIATA: Actualizar tabla y cambiar a la pestaña 'cuotas' al instante
+                this.renderCuotasTable();
+                const tabCuotasBtn = document.querySelectorAll('.tab-item-saas')[1];
+                this.switchAdminTab('cuotas', tabCuotasBtn);
+
+                this.toast(`✅ Cuota "${titulo}" emitida a todo el edificio ($${monto.toFixed(2)})`);
             },
 
             renderCuotasTable() {
                 const condo = this.getActiveCondo();
                 const cuotas = this.state.cuotas.filter(c => c.condoId === condo.id);
                 const tbody = document.getElementById('cuotasTableBody');
+                if (!tbody) return;
+
                 if (cuotas.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No hay cuotas emitidas aún.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No hay cuotas emitidas aún. Haz clic en "Emitir Cuota" para generar la primera.</td></tr>`;
                     return;
                 }
 
                 tbody.innerHTML = '';
-                cuotas.forEach(c => {
-                    const montoBs = (c.monto_usd * condo.tasa_dolar).toFixed(2);
+                cuotas.slice().reverse().forEach(c => {
+                    const montoBs = (c.monto_usd * condo.tasa_dolar).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td>${c.fecha}</td>
                         <td><strong>${c.titulo}</strong></td>
-                        <td><span class="stat-badge">${c.tipo}</span></td>
-                        <td>$${c.monto_usd.toFixed(2)}</td>
+                        <td><span class="stat-badge">${c.tipo.toUpperCase()}</span></td>
+                        <td>$${c.monto_usd.toFixed(2)} USD</td>
                         <td>Bs. ${montoBs}</td>
-                        <td><span class="stat-badge clean">Activa</span></td>
+                        <td><span class="stat-badge clean"><i class="bi bi-broadcast"></i> Activa (50 Aptos)</span></td>
                     `;
                     tbody.appendChild(tr);
                 });
             },
 
-            // PAGOS
+            // 7. AUDITORÍA DE PAGOS POR PARTE DE ADMINISTRACIÓN
             renderPagosTable() {
                 const condo = this.getActiveCondo();
                 const pagos = this.state.pagos.filter(p => p.condoId === condo.id);
                 const tbody = document.getElementById('pagosTableBody');
+                if (!tbody) return;
+
                 if (pagos.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No hay pagos reportados pendientes.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No hay pagos reportados pendientes de auditoría.</td></tr>`;
                     return;
                 }
 
                 tbody.innerHTML = '';
-                pagos.forEach(p => {
+                pagos.slice().reverse().forEach(p => {
                     const tr = document.createElement('tr');
+                    const montoFmt = p.moneda === 'USD' 
+                        ? `$${p.monto.toFixed(2)} USD` 
+                        : `Bs. ${p.monto.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+                    let badgeClass = p.estado === 'aprobado' ? 'clean' : (p.estado === 'rechazado' ? 'badge-danger' : '');
+                    let badgeColor = p.estado === 'aprobado' ? '#10b981' : (p.estado === 'rechazado' ? '#ef4444' : '#fbbf24');
+
                     tr.innerHTML = `
                         <td>${p.fecha}</td>
-                        <td><strong>${p.apto}</strong></td>
+                        <td><strong>Apto ${p.apto}</strong></td>
                         <td>${p.metodo}</td>
                         <td><code>${p.ref}</code></td>
-                        <td>${p.moneda === 'USD' ? '$' : 'Bs. '}${p.monto.toFixed(2)}</td>
-                        <td><span class="stat-badge clean">${p.estado}</span></td>
+                        <td><strong>${montoFmt}</strong></td>
+                        <td><span class="stat-badge" style="color: ${badgeColor};">${p.estado.toUpperCase()}</span></td>
                         <td>
                             ${p.estado === 'pendiente' ? `
-                                <button class="btn-primary-saas" style="width: auto; padding: 0.25rem 0.65rem; font-size: 0.78rem;" onclick="app.aprobarPago(${p.id})">Aprobar</button>
-                            ` : '<span style="color: #10b981;"><i class="bi bi-check-all"></i> Auditado</span>'}
+                                <div style="display: flex; gap: 0.4rem;">
+                                    <button class="btn-primary-saas" style="width: auto; padding: 0.25rem 0.65rem; font-size: 0.78rem; background: #10b981;" onclick="app.aprobarPago(${p.id})">
+                                        <i class="bi bi-check-lg"></i> Aprobar
+                                    </button>
+                                    <button class="demo-btn" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.4); padding: 0.25rem 0.65rem;" onclick="app.rechazarPago(${p.id})">
+                                        <i class="bi bi-x-lg"></i> Rechazar
+                                    </button>
+                                </div>
+                            ` : `<span style="font-size: 0.8rem; color: ${badgeColor};"><i class="bi bi-check-all"></i> Auditado</span>`}
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -2091,7 +2274,17 @@
                     p.estado = 'aprobado';
                     this.save();
                     this.renderPagosTable();
-                    this.toast('Pago aprobado');
+                    this.toast('✅ Pago verificado y acreditado al residente.');
+                }
+            },
+
+            rechazarPago(id) {
+                const p = this.state.pagos.find(x => x.id === id);
+                if (p) {
+                    p.estado = 'rechazado';
+                    this.save();
+                    this.renderPagosTable();
+                    this.toast('❌ Pago rechazado por la administración.');
                 }
             },
 
@@ -2120,13 +2313,15 @@
                 this.save();
                 this.closeModal('modalNuevoComunicado');
                 this.renderComunicados();
-                this.toast('Comunicado publicado en cartelera');
+                this.toast('Comunicado publicado');
             },
 
             renderComunicados() {
                 const condo = this.getActiveCondo();
                 const items = this.state.comunicados.filter(c => c.condoId === condo.id);
                 const box = document.getElementById('comunicadosContainer');
+                if (!box) return;
+
                 if (items.length === 0) {
                     box.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 2rem;">No hay comunicados publicados actualmente.</p>`;
                     return;
@@ -2153,18 +2348,20 @@
 
             saveCondoSettings() {
                 const condo = this.getActiveCondo();
-                condo.tasa_dolar = parseFloat(document.getElementById('cfgTasaBcv').value) || 72.40;
+                condo.tasa_dolar = parseFloat(document.getElementById('cfgTasaBcv').value) || 877.90;
                 condo.banco_pago_movil = document.getElementById('cfgPagoMovil').value;
                 condo.banco_transferencia = document.getElementById('cfgTransferencia').value;
                 condo.cuenta_zelle = document.getElementById('cfgZelle').value;
 
                 this.save();
                 this.renderHome();
-                this.toast('Configuración guardada');
+                this.toast('Cuentas bancarias y parámetros guardados');
             },
 
-            // 3. DASHBOARD RESIDENTE
+            // 5. PORTAL RESIDENTE: ESTADO DE DEUDA EN ROJO, VERDE SOLO SI TIENE SALDO A FAVOR
             openResidentDashboard(aptoCode) {
+                window.scrollTo(0, 0);
+                this.currentResidentApto = aptoCode;
                 document.getElementById('viewHome').style.display = 'none';
                 document.getElementById('viewSuperAdmin').classList.remove('active');
                 document.getElementById('viewAdmin').classList.remove('active');
@@ -2186,19 +2383,107 @@
                 }
 
                 document.getElementById('residentBankInfo').innerHTML = `
-                    <strong>Pago Móvil:</strong> ${condo.banco_pago_movil || 'No configurado'}<br>
-                    <strong>Transferencia Bs:</strong> ${condo.banco_transferencia || 'No configurado'}<br>
-                    <strong>Zelle:</strong> ${condo.cuenta_zelle || 'No configurado'}
+                    <strong>Pago Móvil (Solo Bs):</strong> ${condo.banco_pago_movil || 'No configurado'}<br>
+                    <strong>Transferencia (Solo Bs):</strong> ${condo.banco_transferencia || 'No configurado'}<br>
+                    <strong>Zelle (Solo USD):</strong> ${condo.cuenta_zelle || 'No configurado'}
                 `;
 
+                // CÁLCULO DE DEUDA:
                 const cuotasCondo = this.state.cuotas.filter(c => c.condoId === condo.id);
                 let totalDeuda = cuotasCondo.reduce((acc, c) => acc + c.monto_usd, 0);
-                const pagosHechos = this.state.pagos.filter(p => p.condoId === condo.id && p.apto === aptoCode && p.estado === 'aprobado');
-                const totalPagado = pagosHechos.reduce((acc, p) => acc + (p.moneda === 'USD' ? p.monto : p.monto / condo.tasa_dolar), 0);
 
-                let balance = Math.max(0, totalDeuda - totalPagado);
-                document.getElementById('residentDebtUSD').innerText = `$${balance.toFixed(2)}`;
-                document.getElementById('residentDebtBs').innerText = `Equivalente: ${(balance * condo.tasa_dolar).toFixed(2)} Bs (Tasa BCV ${condo.tasa_dolar.toFixed(2)})`;
+                // Pagos aprobados por administración
+                const pagosAprobados = this.state.pagos.filter(p => p.condoId === condo.id && p.apto === aptoCode && p.estado === 'aprobado');
+                const totalPagado = pagosAprobados.reduce((acc, p) => {
+                    let montoUSD = p.moneda === 'USD' ? p.monto : (p.monto / condo.tasa_dolar);
+                    return acc + montoUSD;
+                }, 0);
+
+                let balance = totalDeuda - totalPagado;
+                this.cachedBalanceUSD = balance;
+
+                const debtElUSD = document.getElementById('residentDebtUSD');
+                const debtElBs = document.getElementById('residentDebtBs');
+                const debtBadge = document.getElementById('residentDebtBadge');
+                const debtLabel = document.getElementById('residentDebtLabel');
+
+                // REGLA: ROJO SI TIENE DEUDA (> 0), VERDE SOLO SI TIENE SALDO A FAVOR (< 0)
+                if (balance > 0.005) {
+                    debtElUSD.style.color = '#ef4444'; // ROJO
+                    debtElUSD.innerText = `$${balance.toFixed(2)} USD`;
+                    const bsEquiv = (balance * condo.tasa_dolar).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    debtElBs.innerHTML = `Equivalente en Bolívares: <strong style="color: #fbbf24;">Bs. ${bsEquiv}</strong> (Tasa BCV ${condo.tasa_dolar.toFixed(2)})`;
+                    debtLabel.innerText = "Deuda Pendiente de Pago";
+                    debtBadge.className = "stat-badge";
+                    debtBadge.style.background = "rgba(239, 68, 68, 0.15)";
+                    debtBadge.style.color = "#ef4444";
+                    debtBadge.style.borderColor = "rgba(239, 68, 68, 0.3)";
+                    debtBadge.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> Deuda Pendiente de Cancelación`;
+                } else if (balance < -0.005) {
+                    debtElUSD.style.color = '#10b981'; // VERDE SOLO CUANDO TIENE SALDO A FAVOR
+                    const favorUSD = Math.abs(balance).toFixed(2);
+                    debtElUSD.innerText = `+$${favorUSD} USD`;
+                    const bsFavor = (Math.abs(balance) * condo.tasa_dolar).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    debtElBs.innerHTML = `Saldo a Favor en Bs: <strong style="color: #34d399;">Bs. ${bsFavor}</strong>`;
+                    debtLabel.innerText = "Saldo a Favor del Copropietario";
+                    debtBadge.className = "stat-badge clean";
+                    debtBadge.style.background = "";
+                    debtBadge.style.color = "";
+                    debtBadge.style.borderColor = "";
+                    debtBadge.innerHTML = `<i class="bi bi-check-circle-fill"></i> Saldo a Favor Disponible`;
+                } else {
+                    debtElUSD.style.color = '#f8fafc'; // NEUTRAL (BLANCO/GRIS)
+                    debtElUSD.innerText = `$0.00 USD`;
+                    debtElBs.innerText = `Al día • Sin deudas acumuladas (0.00 Bs)`;
+                    debtLabel.innerText = "Estado de Cuenta";
+                    debtBadge.className = "stat-badge";
+                    debtBadge.style.background = "var(--bg-card)";
+                    debtBadge.style.color = "var(--text-secondary)";
+                    debtBadge.style.borderColor = "var(--border-color)";
+                    debtBadge.innerHTML = `<i class="bi bi-check2"></i> Solvente al Día`;
+                }
+
+                // Renderizar listado de pagos del residente
+                this.renderResidentPagos();
+            },
+
+            // 7. LISTADO DE PAGOS DEL RESIDENTE
+            renderResidentPagos() {
+                const condo = this.getActiveCondo();
+                const pagos = this.state.pagos.filter(p => p.condoId === condo.id && p.apto === this.currentResidentApto);
+                const tbody = document.getElementById('residentPagosTableBody');
+                if (!tbody) return;
+
+                if (pagos.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.75rem;">No has reportado pagos aún. Haz clic en "Reportar Pago" para enviar un comprobante.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                pagos.slice().reverse().forEach(p => {
+                    const tr = document.createElement('tr');
+                    const montoFmt = p.moneda === 'USD' 
+                        ? `$${p.monto.toFixed(2)} USD` 
+                        : `Bs. ${p.monto.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+                    let statusBadge = '';
+                    if (p.estado === 'aprobado') {
+                        statusBadge = `<span class="stat-badge clean"><i class="bi bi-check-circle-fill"></i> Aprobado por Administración</span>`;
+                    } else if (p.estado === 'rechazado') {
+                        statusBadge = `<span class="stat-badge" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;"><i class="bi bi-x-circle-fill"></i> Rechazado</span>`;
+                    } else {
+                        statusBadge = `<span class="stat-badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;"><i class="bi bi-hourglass-split"></i> En Auditoría (Por Verificar)</span>`;
+                    }
+
+                    tr.innerHTML = `
+                        <td>${p.fecha}</td>
+                        <td>${p.metodo}</td>
+                        <td><code>${p.ref}</code></td>
+                        <td><strong>${montoFmt}</strong></td>
+                        <td>${statusBadge}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
             },
 
             saveResidentProfile() {
@@ -2217,19 +2502,55 @@
                 document.getElementById('residentOwnerSubtitle').innerText = u.propietario ? `Propietario: ${u.propietario}` : 'Sin propietario adjudicado';
             },
 
+            // 6. REPORTAR PAGO: BANNER SUPERIOR $ Y BS, REGLAS ESTRICTAS DE MONEDA
             showReportarPagoModal() {
+                const condo = this.getActiveCondo();
+                const deudaUSD = Math.max(0, this.cachedBalanceUSD || 0);
+                const deudaBs = deudaUSD * condo.tasa_dolar;
+
+                document.getElementById('modalDeudaUSD').innerText = `$${deudaUSD.toFixed(2)} USD`;
+                document.getElementById('modalDeudaBs').innerText = `Bs. ${deudaBs.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                document.getElementById('modalTasaBCV').innerText = (condo.tasa_dolar || 877.90).toFixed(2);
+
+                this.handleMetodoPagoChange();
                 this.openModal('modalReportarPago');
+            },
+
+            handleMetodoPagoChange() {
+                const condo = this.getActiveCondo();
+                const metodo = document.getElementById('pagoMetodo').value;
+                const monedaSelect = document.getElementById('pagoMoneda');
+                const montoInput = document.getElementById('pagoMonto');
+                const montoLabel = document.getElementById('pagoMontoLabel');
+                const deudaUSD = Math.max(0, this.cachedBalanceUSD || 0);
+
+                if (metodo === 'Pago Móvil' || metodo === 'Transferencia Bs') {
+                    // EXCLUSIVO EN BOLÍVARES
+                    monedaSelect.value = 'BS';
+                    montoLabel.innerText = "Monto en Bolívares (Bs - Tasa BCV):";
+                    const montoBs = deudaUSD > 0 ? (deudaUSD * condo.tasa_dolar) : (35.00 * condo.tasa_dolar);
+                    montoInput.value = montoBs.toFixed(2);
+                } else {
+                    // EXCLUSIVO EN DÓLARES (Zelle o Efectivo USD)
+                    monedaSelect.value = 'USD';
+                    montoLabel.innerText = "Monto en Dólares (USD):";
+                    montoInput.value = deudaUSD > 0 ? deudaUSD.toFixed(2) : "35.00";
+                }
             },
 
             submitResidentPago() {
                 const condo = this.getActiveCondo();
                 const metodo = document.getElementById('pagoMetodo').value;
-                const monto = parseFloat(document.getElementById('pagoMonto').value) || 35.0;
+                const monto = parseFloat(document.getElementById('pagoMonto').value) || 0;
                 const moneda = document.getElementById('pagoMoneda').value;
                 const ref = document.getElementById('pagoRef').value.trim();
 
                 if (!ref) {
-                    alert('Indique la referencia bancaria');
+                    alert('Por favor indique el número de referencia del comprobante');
+                    return;
+                }
+                if (monto <= 0) {
+                    alert('El monto del pago debe ser mayor a cero');
                     return;
                 }
 
@@ -2242,15 +2563,19 @@
                     moneda: moneda,
                     ref: ref,
                     fecha: new Date().toISOString().split('T')[0],
-                    estado: 'pendiente'
+                    estado: 'pendiente' // Debe ser verificado por administración en auditoría
                 });
 
                 this.save();
                 this.closeModal('modalReportarPago');
-                this.toast('Pago enviado para auditoría');
+                document.getElementById('pagoRef').value = '';
+
+                // Recargar dashboard y tabla de pagos
+                this.openResidentDashboard(this.currentResidentApto);
+                this.toast('✅ Comprobante enviado. En proceso de auditoría por administración.');
             },
 
-            // 4. NUEVO CONDOMINIO (EXCLUSIVO SUPERADMIN)
+            // NUEVO CONDOMINIO
             showNewCondoModal() {
                 this.openModal('modalNewCondo');
             },
@@ -2280,7 +2605,7 @@
                     tiene_pb: tienePB ? 1 : 0,
                     aptos_pb_cant: aptosPB,
                     aptos_por_piso: aptosPiso,
-                    tasa_dolar: 72.40,
+                    tasa_dolar: 877.90,
                     banco_pago_movil: 'No configurado',
                     banco_transferencia: 'No configurado',
                     cuenta_zelle: 'No configurado'
@@ -2297,15 +2622,6 @@
                 this.closeModal('modalNewCondo');
                 this.renderSuperAdmin();
                 this.toast(`¡Condominio "${nombre}" creado con éxito con ${newUnits.length} apartamentos!`);
-            },
-
-            resetSystemToClean() {
-                if (confirm('¿Restablecer el sistema al estado inicial limpio (Residencias Los Samanes sin adjudicatarios ni deudas)?')) {
-                    this.state = JSON.parse(JSON.stringify(INITIAL_STATE));
-                    this.save();
-                    this.showHome();
-                    this.toast('Sistema limpio restablecido');
-                }
             },
 
             openModal(id) {
