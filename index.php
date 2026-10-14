@@ -274,19 +274,6 @@ ksort($pisosAgrupados);
                 <i class="bi bi-shield-check"></i> Ingresar al Dashboard
             </button>
         </form>
-
-        <!-- Accesos rápidos demostrativos -->
-        <div class="demo-badges" id="demo-badges-container">
-            <span style="font-size: 0.74rem; color: var(--text-muted); width: 100%;">Accesos rápidos de demostración:</span>
-            <button type="button" class="demo-btn" style="border-color: rgba(139, 92, 246, 0.4); color: #c084fc;" onclick="quickFillSuperAdmin()">👑 Superusuario (clusterlg)</button>
-            <button type="button" class="demo-btn" onclick="quickFillAdmin()">🏢 Admin Edificio</button>
-            <?php 
-                $demoAptos = array_slice($aptos, 0, 4);
-                foreach ($demoAptos as $da):
-            ?>
-                <button type="button" class="demo-btn" onclick="quickFillResident('<?= $da['codigo'] ?>')">🔑 Apto <?= $da['codigo'] ?></button>
-            <?php endforeach; ?>
-        </div>
     </div>
 </div>
 
