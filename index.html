@@ -1995,6 +1995,7 @@
             state: null,
             currentRole: null,
             currentResidentApto: null,
+            currentResidentTab: 'finanzas',
             currentAdminTab: 'mapa',
             floorFilter: 'todos',
             cachedBalanceUSD: 0,
@@ -2158,7 +2159,7 @@
                             if (curTab === 'tickets') this.renderAdminTickets();
                             if (curTab === 'comunicados') this.renderComunicados();
                         } else if (residentView && residentView.classList.contains('active') && this.currentResidentApto) {
-                            this.openResidentDashboard(this.currentResidentApto);
+                            this.openResidentDashboard(this.currentResidentApto, false);
                         } else if (superView && superView.classList.contains('active')) {
                             this.renderSuperAdmin();
                         }
@@ -2232,7 +2233,7 @@
 
                             // Si estamos en dashboard de residente, recalcular montos
                             if (this.currentResidentApto) {
-                                this.openResidentDashboard(this.currentResidentApto);
+                                this.openResidentDashboard(this.currentResidentApto, false);
                             }
                             return;
                         }
@@ -3059,8 +3060,11 @@
             },
 
             // 5. PORTAL RESIDENTE: ESTADO DE DEUDA EN ROJO, VERDE SOLO SI TIENE SALDO A FAVOR
-            openResidentDashboard(aptoCode) {
-                window.scrollTo(0, 0);
+            openResidentDashboard(aptoCode, resetTab = true) {
+                if (resetTab) {
+                    window.scrollTo(0, 0);
+                    this.currentResidentTab = 'finanzas';
+                }
                 this.currentResidentApto = aptoCode;
                 document.getElementById('viewHome').style.display = 'none';
                 document.getElementById('viewSuperAdmin').classList.remove('active');
@@ -3074,7 +3078,7 @@
                 document.getElementById('residentUnitTitle').innerText = `Apartamento ${aptoCode}`;
                 document.getElementById('residentOwnerSubtitle').innerText = u && u.propietario ? `Propietario: ${u.propietario}` : 'Sin propietario adjudicado';
 
-                if (u) {
+                if (u && !['resProfileName', 'resProfileCedula', 'resProfilePhone', 'resProfileEmail', 'resProfileVehiculo'].includes(document.activeElement?.id)) {
                     document.getElementById('resProfileName').value = u.propietario || '';
                     document.getElementById('resProfileCedula').value = u.cedula || '';
                     document.getElementById('resProfilePhone').value = u.telefono || '';
@@ -3138,13 +3142,20 @@
                 this.renderResidentTickets();
                 this.renderResidentCartelera();
 
-                // Regresar a la pestaña de finanzas por defecto
-                const firstTabBtn = document.querySelector('#viewResident .tab-item-saas');
-                if (firstTabBtn) this.switchResidentTab('finanzas', firstTabBtn);
+                // Mantener la pestaña que el usuario tiene abierta actualmente
+                const activeTab = this.currentResidentTab || 'finanzas';
+                const tabBtns = document.querySelectorAll('#viewResident .tab-item-saas');
+                let targetBtn = tabBtns[0];
+                if (activeTab === 'tickets') targetBtn = tabBtns[1];
+                else if (activeTab === 'cartelera') targetBtn = tabBtns[2];
+                else if (activeTab === 'perfil') targetBtn = tabBtns[3];
+
+                this.switchResidentTab(activeTab, targetBtn);
             },
 
             // PESTAÑAS DEL PORTAL DEL RESIDENTE
             switchResidentTab(tabName, btnEl) {
+                this.currentResidentTab = tabName;
                 document.querySelectorAll('#viewResident .tab-item-saas').forEach(b => b.classList.remove('active'));
                 if (btnEl) btnEl.classList.add('active');
 
