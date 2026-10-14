@@ -104,15 +104,13 @@ function generarEstructuraCondominio(PDO $pdo, int $condominioId, array $config 
 
     $generados = [];
     foreach ($unidades as $u) {
-        $email = strtolower(str_replace(['-', ' '], '', $u['codigo'])) . '@condominio.com';
-        $telefono = '0414-' . sprintf('%07d', mt_rand(1000000, 9999999));
         $stmtInsert->execute([
             $condominioId,
             $u['piso'],
             $u['codigo'],
-            $u['nombre'],
-            $telefono,
-            $email,
+            null, // Limpio para que el administrador adjudique
+            null,
+            null,
             $passwordHash,
             $alicuota
         ]);
