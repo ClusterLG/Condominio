@@ -367,11 +367,44 @@
         }
 
         .unit-card.clean {
+            border-left: 3px dashed #64748b;
+        }
+
+        .unit-card.solvente {
             border-left: 3px solid #10b981;
         }
 
-        .unit-card.assigned {
-            border-left: 3px solid #3b82f6;
+        .unit-card.moroso {
+            border-left: 3px solid #ef4444;
+            background: rgba(239, 68, 68, 0.04);
+        }
+
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.28rem;
+            padding: 0.18rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .badge-moroso {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .badge-solvente {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge-disponible {
+            background: rgba(148, 163, 184, 0.12);
+            color: #94a3b8;
+            border: 1px solid rgba(148, 163, 184, 0.22);
         }
 
         .unit-code {
@@ -699,6 +732,7 @@
             <button class="tab-item-saas active" onclick="app.switchAdminTab('mapa', this)"><i class="bi bi-grid-fill"></i> Mapa de Pisos & Adjudicación</button>
             <button class="tab-item-saas" onclick="app.switchAdminTab('cuotas', this)"><i class="bi bi-journal-text"></i> Historial de Cuotas</button>
             <button class="tab-item-saas" onclick="app.switchAdminTab('pagos', this)"><i class="bi bi-cash-coin"></i> Auditoría de Pagos</button>
+            <button class="tab-item-saas" onclick="app.switchAdminTab('tickets', this)"><i class="bi bi-chat-square-dots"></i> Solicitudes & Quejas <span id="adminTicketsBadge" style="background:#ef4444; color:#fff; font-size:0.68rem; padding: 1px 6px; border-radius:10px; margin-left:3px; display:none;">0</span></button>
             <button class="tab-item-saas" onclick="app.switchAdminTab('comunicados', this)"><i class="bi bi-megaphone"></i> Cartelera Informativa</button>
             <button class="tab-item-saas" onclick="app.switchAdminTab('config', this)"><i class="bi bi-wallet2"></i> Cuentas</button>
         </div>
@@ -706,18 +740,24 @@
         <!-- TAB: MAPA DE PISOS -->
         <div id="adminTabMapa">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
-                <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">Haga clic en cualquier unidad para <strong>adjudicar un propietario</strong> o editar sus datos.</p>
-                <!-- FILTROS INTERACTIVOS DE DISPONIBLES Y ADJUDICADOS -->
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">Haga clic en cualquier unidad para <strong>adjudicar un propietario</strong> o consultar sus datos y solvencia.</p>
+                <!-- FILTROS INTERACTIVOS: TODOS, DISPONIBLES, ADJUDICADOS, AL DÍA, MOROSOS -->
                 <div style="display: flex; gap: 0.45rem; align-items: center; flex-wrap: wrap;">
                     <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Filtrar:</span>
                     <button type="button" class="filter-pill active" id="filter-btn-all" onclick="app.setFloorFilter('todos')">
                         Todos (<span id="count-all-units">50</span>)
                     </button>
                     <button type="button" class="filter-pill" id="filter-btn-disp" onclick="app.setFloorFilter('disponibles')">
-                        <i class="bi bi-square-fill" style="color: #10b981; font-size: 0.65rem;"></i> Solo Disponibles (<span id="count-disp-units">15</span>)
+                        <i class="bi bi-dash-circle" style="color: #94a3b8; font-size: 0.7rem;"></i> Disponibles (<span id="count-disp-units">15</span>)
                     </button>
                     <button type="button" class="filter-pill" id="filter-btn-adj" onclick="app.setFloorFilter('adjudicados')">
-                        <i class="bi bi-square-fill" style="color: #3b82f6; font-size: 0.65rem;"></i> Solo Adjudicados (<span id="count-adj-units">35</span>)
+                        <i class="bi bi-person-check" style="color: #3b82f6; font-size: 0.7rem;"></i> Adjudicados (<span id="count-adj-units">35</span>)
+                    </button>
+                    <button type="button" class="filter-pill" id="filter-btn-solvente" onclick="app.setFloorFilter('solventes')">
+                        <i class="bi bi-check-circle-fill" style="color: #10b981; font-size: 0.7rem;"></i> Al Día (<span id="count-solvente-units">0</span>)
+                    </button>
+                    <button type="button" class="filter-pill" id="filter-btn-moroso" onclick="app.setFloorFilter('morosos')">
+                        <i class="bi bi-exclamation-circle-fill" style="color: #ef4444; font-size: 0.7rem;"></i> Morosos (<span id="count-moroso-units">0</span>)
                     </button>
                 </div>
             </div>
@@ -773,6 +813,45 @@
                             <tr>
                                 <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No hay pagos pendientes de auditoría (Sistema Limpio).</td>
                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: SOLICITUDES & QUEJAS (ADMIN) -->
+        <div id="adminTabTickets" style="display: none;">
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+                    <div>
+                        <h3 style="font-size: 1.15rem; color: #fff; margin: 0;"><i class="bi bi-chat-left-dots text-primary"></i> Buzón de Solicitudes y Quejas</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0.25rem 0 0 0;">Gestione, atienda y responda solicitudes, averías o quejas de convivencia enviadas por los copropietarios.</p>
+                    </div>
+                    <div style="display: flex; gap: 0.4rem; align-items: center;">
+                        <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 700;">FILTRO:</span>
+                        <select id="adminTicketFilter" class="form-control" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.82rem;" onchange="app.renderAdminTickets()">
+                            <option value="todos">Todos los Estados</option>
+                            <option value="pendiente">Solo Pendientes</option>
+                            <option value="en_proceso">En Proceso</option>
+                            <option value="resuelto">Atendidos / Resueltos</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="table-saas">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Apto / Copropietario</th>
+                                <th>Tipo</th>
+                                <th>Prioridad</th>
+                                <th>Asunto & Detalle</th>
+                                <th>Estado</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTicketsTableBody">
+                            <!-- Dinámico -->
                         </tbody>
                     </table>
                 </div>
@@ -839,77 +918,142 @@
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 1.75rem;">
-            <!-- TARJETA DE DEUDA: ROJO SI DEBE, VERDE SOLO SI TIENE SALDO A FAVOR -->
-            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;" id="residentDebtCard">
-                <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.4rem;" id="residentDebtLabel">Estado de Deuda Actual</div>
-                <div style="font-size: 2.2rem; font-weight: 800; color: #ef4444; transition: color 0.3s;" id="residentDebtUSD">$0.00 USD</div>
-                <div style="font-size: 0.92rem; color: var(--text-muted); margin-top: 0.25rem;" id="residentDebtBs">Equivalente: 0.00 Bs</div>
-                <div id="residentDebtBadge" class="stat-badge" style="margin-top: 1rem;"><i class="bi bi-check2"></i> Solvente al Día</div>
-            </div>
-
-            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;">
-                <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.4rem;">Cuentas para Pago</div>
-                <div style="font-size: 0.85rem; color: #fff; line-height: 1.5;" id="residentBankInfo">
-                    <strong>Pago Móvil (Bs):</strong> 0134 | V-12345678 | 0414-1234567<br>
-                    <strong>Transferencia (Bs):</strong> Banesco 0134-0000-00-0000000000<br>
-                    <strong>Zelle (USD):</strong> condominio.samanes@gmail.com
-                </div>
-            </div>
-        </div>
-
-        <!-- LISTADO DE PAGOS REALIZADOS POR EL RESIDENTE CON SU STATUS DE AUDITORÍA -->
-        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; max-width: 950px; margin-bottom: 1.75rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
-                <h3 style="font-size: 1.15rem; color: #fff; margin: 0;"><i class="bi bi-clock-history text-primary"></i> Mis Pagos Realizados</h3>
-                <span style="font-size: 0.8rem; color: var(--text-secondary);">Verificados por Administración a través de Auditoría</span>
-            </div>
-            <div style="overflow-x: auto;">
-                <table class="table-saas">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Método</th>
-                            <th>Referencia</th>
-                            <th>Monto Reportado</th>
-                            <th>Estado / Estatus</th>
-                        </tr>
-                    </thead>
-                    <tbody id="residentPagosTableBody">
-                        <!-- Llenado dinámico -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Perfil Residente -->
-        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; max-width: 950px;">
-            <h3 style="font-size: 1.15rem; color: #fff; margin-bottom: 1rem;"><i class="bi bi-person-lines-fill text-primary"></i> Mi Perfil de Copropietario</h3>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <div class="form-group">
-                    <label class="form-label">Nombre Completo:</label>
-                    <input type="text" id="resProfileName" class="form-control" placeholder="Ej. Juan Pérez">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Cédula de Identidad:</label>
-                    <input type="text" id="resProfileCedula" class="form-control" placeholder="Ej. V-18.456.789">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Teléfono / WhatsApp:</label>
-                    <input type="text" id="resProfilePhone" class="form-control" placeholder="Ej. 0414-1234567">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Correo Electrónico:</label>
-                    <input type="email" id="resProfileEmail" class="form-control" placeholder="Ej. juan@correo.com">
-                </div>
-                <div class="form-group" style="grid-column: span 2;">
-                    <label class="form-label">Vehículo / Placa / Puesto:</label>
-                    <input type="text" id="resProfileVehiculo" class="form-control" placeholder="Ej. Toyota Corolla Gris Placa ABC-123, Puesto 14">
-                </div>
-            </div>
-            <button class="btn-primary-saas" style="width: auto; padding: 0.65rem 1.25rem;" onclick="app.saveResidentProfile()">
-                <i class="bi bi-save"></i> Guardar Mi Perfil
+        <!-- TABS DE NAVEGACIÓN DEL RESIDENTE -->
+        <div class="nav-tabs-saas" style="margin-bottom: 1.5rem;">
+            <button class="tab-item-saas active" onclick="app.switchResidentTab('finanzas', this)">
+                <i class="bi bi-wallet2"></i> Mis Pagos & Deuda
             </button>
+            <button class="tab-item-saas" onclick="app.switchResidentTab('tickets', this)">
+                <i class="bi bi-chat-left-dots"></i> Solicitudes & Quejas (<span id="count-my-tickets">0</span>)
+            </button>
+            <button class="tab-item-saas" onclick="app.switchResidentTab('cartelera', this)">
+                <i class="bi bi-megaphone"></i> Cartelera Digital
+            </button>
+            <button class="tab-item-saas" onclick="app.switchResidentTab('perfil', this)">
+                <i class="bi bi-person-lines-fill"></i> Mi Perfil
+            </button>
+        </div>
+
+        <!-- SECCIÓN 1: FINANZAS Y PAGOS -->
+        <div id="residentTabFinanzas">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 1.75rem;">
+                <!-- TARJETA DE DEUDA: ROJO SI DEBE, VERDE SOLO SI TIENE SALDO A FAVOR -->
+                <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;" id="residentDebtCard">
+                    <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.4rem;" id="residentDebtLabel">Estado de Deuda Actual</div>
+                    <div style="font-size: 2.2rem; font-weight: 800; color: #ef4444; transition: color 0.3s;" id="residentDebtUSD">$0.00 USD</div>
+                    <div style="font-size: 0.92rem; color: var(--text-muted); margin-top: 0.25rem;" id="residentDebtBs">Equivalente: 0.00 Bs</div>
+                    <div id="residentDebtBadge" class="stat-badge" style="margin-top: 1rem;"><i class="bi bi-check2"></i> Solvente al Día</div>
+                </div>
+
+                <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;">
+                    <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.4rem;">Cuentas para Pago</div>
+                    <div style="font-size: 0.85rem; color: #fff; line-height: 1.5;" id="residentBankInfo">
+                        <strong>Pago Móvil (Solo Bs):</strong> 0134 | V-12345678 | 0414-1234567<br>
+                        <strong>Transferencia (Solo Bs):</strong> Banesco 0134-0000-00-0000000000<br>
+                        <strong>Zelle (Solo USD):</strong> condominio.samanes@gmail.com
+                    </div>
+                </div>
+            </div>
+
+            <!-- LISTADO DE PAGOS REALIZADOS POR EL RESIDENTE CON SU STATUS DE AUDITORÍA -->
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; max-width: 950px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                    <h3 style="font-size: 1.15rem; color: #fff; margin: 0;"><i class="bi bi-clock-history text-primary"></i> Mis Pagos Realizados</h3>
+                    <span style="font-size: 0.8rem; color: var(--text-secondary);">Verificados por Administración a través de Auditoría</span>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="table-saas">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Método</th>
+                                <th>Referencia</th>
+                                <th>Monto Reportado</th>
+                                <th>Estado / Estatus</th>
+                            </tr>
+                        </thead>
+                        <tbody id="residentPagosTableBody">
+                            <!-- Llenado dinámico -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: BUZÓN DE SOLICITUDES Y QUEJAS -->
+        <div id="residentTabTickets" style="display: none;">
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; max-width: 950px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+                    <div>
+                        <h3 style="font-size: 1.15rem; color: #fff; margin: 0;"><i class="bi bi-chat-left-dots text-primary"></i> Buzón de Solicitudes y Quejas</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0.25rem 0 0 0;">Comuníquese directamente con la administración del condominio y reciba respuestas oficiales.</p>
+                    </div>
+                    <button class="btn-primary-saas" style="width: auto; background: #3b82f6;" onclick="app.openModal('modalNuevoTicket')">
+                        <i class="bi bi-plus-lg"></i> Redactar Solicitud / Queja
+                    </button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="table-saas">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Asunto & Respuesta de Administración</th>
+                                <th>Prioridad</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="residentTicketsTableBody">
+                            <!-- Llenado dinámico -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: CARTELERA DIGITAL -->
+        <div id="residentTabCartelera" style="display: none;">
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; max-width: 950px;">
+                <div style="margin-bottom: 1.25rem;">
+                    <h3 style="font-size: 1.15rem; color: #fff; margin: 0;"><i class="bi bi-megaphone text-primary"></i> Cartelera Digital del Edificio</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0.25rem 0 0 0;">Avisos, comunicados y convocatorias oficiales de la Junta de Condominio.</p>
+                </div>
+                <div id="residentCarteleraContainer">
+                    <!-- Dinámico -->
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 4: MI PERFIL DE COPROPIETARIO -->
+        <div id="residentTabPerfil" style="display: none;">
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; max-width: 950px;">
+                <h3 style="font-size: 1.15rem; color: #fff; margin-bottom: 1rem;"><i class="bi bi-person-lines-fill text-primary"></i> Mi Perfil de Copropietario</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">Nombre Completo:</label>
+                        <input type="text" id="resProfileName" class="form-control" placeholder="Ej. Juan Pérez">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Cédula de Identidad:</label>
+                        <input type="text" id="resProfileCedula" class="form-control" placeholder="Ej. V-18.456.789">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Teléfono / WhatsApp:</label>
+                        <input type="text" id="resProfilePhone" class="form-control" placeholder="Ej. 0414-1234567">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Correo Electrónico:</label>
+                        <input type="email" id="resProfileEmail" class="form-control" placeholder="Ej. juan@correo.com">
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label class="form-label">Vehículo / Placa / Puesto:</label>
+                        <input type="text" id="resProfileVehiculo" class="form-control" placeholder="Ej. Toyota Corolla Gris Placa ABC-123, Puesto 14">
+                    </div>
+                </div>
+                <button class="btn-primary-saas" style="width: auto; padding: 0.65rem 1.25rem;" onclick="app.saveResidentProfile()">
+                    <i class="bi bi-save"></i> Guardar Mi Perfil
+                </button>
+            </div>
         </div>
     </section>
 
@@ -1113,6 +1257,93 @@
                 <button class="btn-primary-saas" onclick="app.saveComunicado()">
                     <i class="bi bi-send"></i> Publicar en Cartelera
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: NUEVA SOLICITUD O QUEJA (RESIDENTE) -->
+    <div id="modalNuevoTicket" class="modal-backdrop-saas">
+        <div class="modal-box-saas">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                <h3 style="font-size: 1.2rem; color: #fff; margin: 0;"><i class="bi bi-chat-left-dots text-primary"></i> Redactar Solicitud o Queja</h3>
+                <button class="close-btn" onclick="app.closeModal('modalNuevoTicket')">&times;</button>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 1.25rem;">
+                Envíe su requerimiento, queja de convivencia o aviso de avería directamente a la Junta de Condominio y Administración.
+            </p>
+            <div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Requerimiento:</label>
+                        <select id="ticketTipo" class="form-control">
+                            <option value="solicitud">Solicitud Administrativa</option>
+                            <option value="queja">Queja / Reclamo de Convivencia</option>
+                            <option value="averia">Reporte de Avería / Mantenimiento</option>
+                            <option value="sugerencia">Sugerencia para el Edificio</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nivel de Prioridad:</label>
+                        <select id="ticketPrioridad" class="form-control">
+                            <option value="normal">Normal</option>
+                            <option value="alta">Alta</option>
+                            <option value="urgente">Urgente</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Asunto / Título Resumido:</label>
+                    <input type="text" id="ticketTitulo" class="form-control" placeholder="Ej. Filtración en pared o Ruido en horas de descanso">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Descripción Detallada:</label>
+                    <textarea id="ticketDescripcion" class="form-control" rows="4" placeholder="Explique con detalle su requerimiento, fechas, piso o circunstancias pertinentes..."></textarea>
+                </div>
+                <button class="btn-primary-saas" onclick="app.submitResidentTicket()">
+                    <i class="bi bi-send-fill"></i> Enviar Solicitud a Administración
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: GESTIONAR Y RESPONDER SOLICITUD (ADMIN) -->
+    <div id="modalGestionarTicket" class="modal-backdrop-saas">
+        <div class="modal-box-saas">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                <h3 style="font-size: 1.2rem; color: #fff; margin: 0;"><i class="bi bi-reply-fill text-primary"></i> Atender Solicitud / Queja</h3>
+                <button class="close-btn" onclick="app.closeModal('modalGestionarTicket')">&times;</button>
+            </div>
+            <input type="hidden" id="manageTicketId">
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                    <span id="manageTicketApto" style="font-weight: 700; color: #fff;"></span>
+                    <span id="manageTicketFecha" style="font-size: 0.8rem; color: var(--text-muted);"></span>
+                </div>
+                <div id="manageTicketTitulo" style="font-weight: 600; color: var(--primary); margin-bottom: 0.4rem;"></div>
+                <div id="manageTicketDesc" style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.4;"></div>
+            </div>
+            <div>
+                <div class="form-group">
+                    <label class="form-label">Estado de la Solicitud:</label>
+                    <select id="manageTicketEstado" class="form-control">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="en_proceso">En Proceso / En Revisión</option>
+                        <option value="resuelto">Atendido / Resuelto</option>
+                        <option value="rechazado">Rechazado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Respuesta Oficial para el Residente:</label>
+                    <textarea id="manageTicketRespuesta" class="form-control" rows="4" placeholder="Escriba la resolución técnica, fecha de visita o comentarios de la administración..."></textarea>
+                </div>
+                <div style="display: flex; justify-content: space-between; gap: 0.75rem;">
+                    <button type="button" class="btn-primary-saas" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); width: auto;" onclick="app.eliminarTicket()">
+                        <i class="bi bi-trash3"></i> Eliminar
+                    </button>
+                    <button type="button" class="btn-primary-saas" style="width: auto; background: #10b981;" onclick="app.saveTicketGestion()">
+                        <i class="bi bi-check2-circle"></i> Guardar Respuesta
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1693,7 +1924,8 @@
 ],
             cuotas: [],
             pagos: [],
-            comunicados: []
+            comunicados: [],
+            tickets: []
         };
 
         function generateCleanUnits(condoId, pisos, porPiso, tienePB, aptosPB) {
@@ -1754,6 +1986,11 @@
                     this.save();
                 }
 
+                if (!this.state.tickets) this.state.tickets = [];
+                if (!this.state.comunicados) this.state.comunicados = [];
+                if (!this.state.pagos) this.state.pagos = [];
+                if (!this.state.cuotas) this.state.cuotas = [];
+
                 // Asegurar tasa BCV oficial
                 const condo = this.getActiveCondo();
                 if (!condo.tasa_dolar || condo.tasa_dolar < 100) {
@@ -1765,6 +2002,21 @@
 
                 // Intentar sincronización automática y silenciosa de tasa BCV al iniciar
                 this.actualizarTasaBCV(false);
+            },
+
+            // Helper centralizado para balance de apartamento
+            getAptoBalance(condoId, aptoCode) {
+                const condo = this.state.condominios.find(c => c.id === condoId) || this.getActiveCondo();
+                const cuotasCondo = this.state.cuotas.filter(c => c.condoId === condoId);
+                const totalDeudaUSD = cuotasCondo.reduce((acc, c) => acc + c.monto_usd, 0);
+
+                const pagosAprobados = this.state.pagos.filter(p => p.condoId === condoId && p.apto === aptoCode && p.estado === 'aprobado');
+                const totalPagadoUSD = pagosAprobados.reduce((acc, p) => {
+                    let montoUSD = p.moneda === 'USD' ? p.monto : (p.monto / condo.tasa_dolar);
+                    return acc + montoUSD;
+                }, 0);
+
+                return totalDeudaUSD - totalPagadoUSD;
             },
 
             save() {
@@ -2007,12 +2259,16 @@
                 this.renderPagosTable();
             },
 
-            // 4. FILTROS DEL MAPA DE PISOS (TODOS, DISPONIBLES, ADJUDICADOS)
+            // 4. FILTROS DEL MAPA DE PISOS (TODOS, DISPONIBLES, ADJUDICADOS, AL DÍA, MOROSOS)
             setFloorFilter(filter) {
                 this.floorFilter = filter;
                 document.getElementById('filter-btn-all').classList.toggle('active', filter === 'todos');
                 document.getElementById('filter-btn-disp').classList.toggle('active', filter === 'disponibles');
                 document.getElementById('filter-btn-adj').classList.toggle('active', filter === 'adjudicados');
+                const btnSolv = document.getElementById('filter-btn-solvente');
+                const btnMoro = document.getElementById('filter-btn-moroso');
+                if (btnSolv) btnSolv.classList.toggle('active', filter === 'solventes');
+                if (btnMoro) btnMoro.classList.toggle('active', filter === 'morosos');
                 this.renderAdminFloors();
             },
 
@@ -2022,24 +2278,45 @@
                 const container = document.getElementById('floorsContainer');
                 container.innerHTML = '';
 
+                // Calcular balance y solvencia para cada unidad
+                const unitsWithStatus = allUnits.map(u => {
+                    let balance = 0;
+                    let status = 'disponible';
+                    if (u.propietario) {
+                        balance = this.getAptoBalance(condo.id, u.codigo);
+                        status = balance > 0.005 ? 'moroso' : 'solvente';
+                    }
+                    return { ...u, balance, status };
+                });
+
                 // Actualizar contadores
                 const totalUnitsCount = allUnits.length;
-                const dispUnitsCount = allUnits.filter(u => !u.propietario).length;
-                const adjUnitsCount = allUnits.filter(u => u.propietario).length;
+                const dispUnitsCount = unitsWithStatus.filter(u => u.status === 'disponible').length;
+                const adjUnitsCount = unitsWithStatus.filter(u => u.status !== 'disponible').length;
+                const solventeUnitsCount = unitsWithStatus.filter(u => u.status === 'solvente').length;
+                const morosoUnitsCount = unitsWithStatus.filter(u => u.status === 'moroso').length;
 
                 const cAll = document.getElementById('count-all-units');
                 const cDisp = document.getElementById('count-disp-units');
                 const cAdj = document.getElementById('count-adj-units');
+                const cSolv = document.getElementById('count-solvente-units');
+                const cMoro = document.getElementById('count-moroso-units');
                 if (cAll) cAll.innerText = totalUnitsCount;
                 if (cDisp) cDisp.innerText = dispUnitsCount;
                 if (cAdj) cAdj.innerText = adjUnitsCount;
+                if (cSolv) cSolv.innerText = solventeUnitsCount;
+                if (cMoro) cMoro.innerText = morosoUnitsCount;
 
                 // Filtrar unidades según selección
-                let units = allUnits;
+                let units = unitsWithStatus;
                 if (this.floorFilter === 'disponibles') {
-                    units = allUnits.filter(u => !u.propietario);
+                    units = unitsWithStatus.filter(u => u.status === 'disponible');
                 } else if (this.floorFilter === 'adjudicados') {
-                    units = allUnits.filter(u => u.propietario);
+                    units = unitsWithStatus.filter(u => u.status !== 'disponible');
+                } else if (this.floorFilter === 'solventes') {
+                    units = unitsWithStatus.filter(u => u.status === 'solvente');
+                } else if (this.floorFilter === 'morosos') {
+                    units = unitsWithStatus.filter(u => u.status === 'moroso');
                 }
 
                 if (units.length === 0) {
@@ -2076,18 +2353,33 @@
 
                     floors[pisoNum].forEach(u => {
                         const card = document.createElement('div');
-                        card.className = `unit-card ${u.propietario ? 'assigned' : 'clean'}`;
+                        const cardClass = u.status === 'disponible' 
+                            ? 'unit-card clean' 
+                            : (u.status === 'moroso' ? 'unit-card moroso' : 'unit-card solvente');
+                        card.className = cardClass;
                         card.onclick = () => app.openAdjudicarModal(u.codigo);
+
+                        let badgeHtml = '';
+                        if (u.status === 'disponible') {
+                            badgeHtml = `<span class="badge-status badge-disponible"><i class="bi bi-dash-circle"></i> Disponible</span>`;
+                        } else if (u.status === 'moroso') {
+                            badgeHtml = `<span class="badge-status badge-moroso"><i class="bi bi-exclamation-circle-fill"></i> Moroso ($${u.balance.toFixed(2)})</span>`;
+                        } else {
+                            badgeHtml = `<span class="badge-status badge-solvente"><i class="bi bi-check-circle-fill"></i> Al Día</span>`;
+                        }
 
                         card.innerHTML = `
                             <div class="unit-code">
                                 <span>${u.codigo}</span>
-                                <span style="font-size: 0.72rem; color: ${u.propietario ? '#3b82f6' : '#10b981'}; font-weight: 600;">
-                                    ${u.propietario ? 'Adjudicado' : 'Disponible'}
-                                </span>
+                                ${badgeHtml}
                             </div>
-                            <div class="unit-owner">${u.propietario || 'Click para adjudicar'}</div>
-                            <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.2rem;">Alícuota: ${u.alicuota.toFixed(2)}%</div>
+                            <div class="unit-owner" title="${u.propietario || 'Click para adjudicar'}">
+                                ${u.propietario || '<em style="color:var(--text-muted);">Sin adjudicar</em>'}
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.74rem; color: var(--text-muted); margin-top: 0.35rem;">
+                                <span>Alícuota: ${u.alicuota.toFixed(2)}%</span>
+                                ${u.propietario && u.status === 'moroso' ? `<span style="color:#ef4444; font-weight:700;">Deuda: $${u.balance.toFixed(2)}</span>` : (u.propietario ? `<span style="color:#10b981; font-weight:600;">Solvente</span>` : '')}
+                            </div>
                         `;
                         grid.appendChild(card);
                     });
@@ -2098,17 +2390,20 @@
             },
 
             switchAdminTab(tabName, btnEl) {
-                document.querySelectorAll('.tab-item-saas').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('#viewAdmin .tab-item-saas').forEach(b => b.classList.remove('active'));
                 if (btnEl) btnEl.classList.add('active');
 
                 document.getElementById('adminTabMapa').style.display = tabName === 'mapa' ? 'block' : 'none';
                 document.getElementById('adminTabCuotas').style.display = tabName === 'cuotas' ? 'block' : 'none';
                 document.getElementById('adminTabPagos').style.display = tabName === 'pagos' ? 'block' : 'none';
+                document.getElementById('adminTabTickets').style.display = tabName === 'tickets' ? 'block' : 'none';
                 document.getElementById('adminTabComunicados').style.display = tabName === 'comunicados' ? 'block' : 'none';
                 document.getElementById('adminTabConfig').style.display = tabName === 'config' ? 'block' : 'none';
 
+                if (tabName === 'mapa') this.renderAdminFloors();
                 if (tabName === 'cuotas') this.renderCuotasTable();
                 if (tabName === 'pagos') this.renderPagosTable();
+                if (tabName === 'tickets') this.renderAdminTickets();
                 if (tabName === 'comunicados') this.renderComunicados();
             },
 
@@ -2316,9 +2611,17 @@
                 this.toast('Comunicado publicado');
             },
 
+            eliminarComunicado(id) {
+                if (!confirm('¿Está seguro de eliminar este aviso de la cartelera?')) return;
+                this.state.comunicados = (this.state.comunicados || []).filter(c => c.id !== id);
+                this.save();
+                this.renderComunicados();
+                this.toast('Comunicado eliminado de la cartelera');
+            },
+
             renderComunicados() {
                 const condo = this.getActiveCondo();
-                const items = this.state.comunicados.filter(c => c.condoId === condo.id);
+                const items = (this.state.comunicados || []).filter(c => c.condoId === condo.id);
                 const box = document.getElementById('comunicadosContainer');
                 if (!box) return;
 
@@ -2328,7 +2631,7 @@
                 }
 
                 box.innerHTML = '';
-                items.forEach(c => {
+                items.slice().reverse().forEach(c => {
                     const div = document.createElement('div');
                     div.style.background = 'var(--bg-card)';
                     div.style.padding = '1rem 1.25rem';
@@ -2336,14 +2639,121 @@
                     div.style.marginBottom = '0.85rem';
                     div.style.border = '1px solid var(--border-color)';
                     div.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-                            <h4 style="color: #fff; font-size: 1rem; margin: 0;">${c.titulo}</h4>
-                            <span style="font-size: 0.75rem; color: var(--text-muted);">${c.fecha}</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; flex-wrap: wrap; gap: 0.5rem;">
+                            <h4 style="color: #fff; font-size: 1rem; margin: 0;"><i class="bi bi-megaphone text-primary"></i> ${c.titulo}</h4>
+                            <div style="display: flex; align-items: center; gap: 0.65rem;">
+                                <span style="font-size: 0.75rem; color: var(--text-muted);">${c.fecha}</span>
+                                <button type="button" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #ef4444; border-radius: 6px; padding: 0.25rem 0.55rem; font-size: 0.75rem; cursor: pointer;" onclick="app.eliminarComunicado(${c.id})" title="Eliminar aviso">
+                                    <i class="bi bi-trash3"></i> Eliminar
+                                </button>
+                            </div>
                         </div>
                         <p style="color: var(--text-secondary); font-size: 0.88rem; margin: 0; line-height: 1.4;">${c.cuerpo}</p>
                     `;
                     box.appendChild(div);
                 });
+            },
+
+            // SOLICITUDES Y QUEJAS (ADMIN)
+            renderAdminTickets() {
+                const condo = this.getActiveCondo();
+                let tickets = (this.state.tickets || []).filter(t => t.condoId === condo.id);
+                const filter = document.getElementById('adminTicketFilter') ? document.getElementById('adminTicketFilter').value : 'todos';
+
+                const pendientesCount = tickets.filter(t => t.estado === 'pendiente').length;
+                const badgeEl = document.getElementById('adminTicketsBadge');
+                if (badgeEl) {
+                    badgeEl.innerText = pendientesCount;
+                    badgeEl.style.display = pendientesCount > 0 ? 'inline-block' : 'none';
+                }
+
+                if (filter !== 'todos') {
+                    tickets = tickets.filter(t => t.estado === filter);
+                }
+
+                const tbody = document.getElementById('adminTicketsTableBody');
+                if (!tbody) return;
+
+                if (tickets.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">No hay solicitudes registradas con este filtro.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                tickets.slice().reverse().forEach(t => {
+                    let badgeEstado = '';
+                    if (t.estado === 'pendiente') {
+                        badgeEstado = `<span class="stat-badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3);"><i class="bi bi-hourglass-split"></i> Pendiente</span>`;
+                    } else if (t.estado === 'en_proceso') {
+                        badgeEstado = `<span class="stat-badge" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6; border-color: rgba(59, 130, 246, 0.3);"><i class="bi bi-gear-wide-connected"></i> En Proceso</span>`;
+                    } else if (t.estado === 'resuelto') {
+                        badgeEstado = `<span class="stat-badge clean"><i class="bi bi-check-circle-fill"></i> Atendido</span>`;
+                    } else {
+                        badgeEstado = `<span class="stat-badge" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border-color: rgba(239, 68, 68, 0.3);"><i class="bi bi-x-circle"></i> Rechazado</span>`;
+                    }
+
+                    let tipoNombre = t.tipo === 'queja' ? 'Queja' : (t.tipo === 'averia' ? 'Avería' : (t.tipo === 'sugerencia' ? 'Sugerencia' : 'Solicitud'));
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><code>${t.fecha}</code></td>
+                        <td><strong>Apto ${t.apto}</strong><br><span style="font-size: 0.78rem; color: var(--text-muted);">${t.propietario}</span></td>
+                        <td><span class="stat-badge" style="background: var(--bg-card);">${tipoNombre}</span></td>
+                        <td><span style="font-size: 0.8rem; text-transform: capitalize; color: ${t.prioridad === 'urgente' ? '#ef4444' : (t.prioridad === 'alta' ? '#fbbf24' : 'var(--text-secondary)')}; font-weight: 600;">${t.prioridad}</span></td>
+                        <td>
+                            <strong>${t.titulo}</strong>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary); max-width: 320px; white-space: normal;">${t.descripcion}</div>
+                            ${t.respuestaAdmin ? `<div style="font-size: 0.75rem; color: #60a5fa; margin-top: 0.25rem;"><i class="bi bi-reply-fill"></i> Respondido: ${t.respuestaAdmin}</div>` : ''}
+                        </td>
+                        <td>${badgeEstado}</td>
+                        <td>
+                            <button class="btn-primary-saas" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.8rem;" onclick="app.openGestionarTicketModal(${t.id})">
+                                <i class="bi bi-reply-fill"></i> Atender
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            },
+
+            openGestionarTicketModal(ticketId) {
+                const t = (this.state.tickets || []).find(x => x.id === ticketId);
+                if (!t) return;
+
+                document.getElementById('manageTicketId').value = t.id;
+                document.getElementById('manageTicketApto').innerText = `Apartamento ${t.apto} - ${t.propietario}`;
+                document.getElementById('manageTicketFecha').innerText = `Fecha: ${t.fecha} | Prioridad: ${t.prioridad.toUpperCase()}`;
+                document.getElementById('manageTicketTitulo').innerText = `${t.tipo.toUpperCase()}: ${t.titulo}`;
+                document.getElementById('manageTicketDesc').innerText = t.descripcion;
+                document.getElementById('manageTicketEstado').value = t.estado;
+                document.getElementById('manageTicketRespuesta').value = t.respuestaAdmin || '';
+
+                this.openModal('modalGestionarTicket');
+            },
+
+            saveTicketGestion() {
+                const id = parseInt(document.getElementById('manageTicketId').value);
+                const t = (this.state.tickets || []).find(x => x.id === id);
+                if (!t) return;
+
+                t.estado = document.getElementById('manageTicketEstado').value;
+                t.respuestaAdmin = document.getElementById('manageTicketRespuesta').value.trim() || null;
+                t.fechaRespuesta = new Date().toISOString().split('T')[0];
+
+                this.save();
+                this.closeModal('modalGestionarTicket');
+                this.renderAdminTickets();
+                this.toast('✓ Solicitud actualizada y respuesta oficial enviada');
+            },
+
+            eliminarTicket() {
+                const id = parseInt(document.getElementById('manageTicketId').value);
+                if (!confirm('¿Desea eliminar esta solicitud del sistema?')) return;
+                this.state.tickets = (this.state.tickets || []).filter(t => t.id !== id);
+                this.save();
+                this.closeModal('modalGestionarTicket');
+                this.renderAdminTickets();
+                this.toast('Solicitud eliminada');
             },
 
             saveCondoSettings() {
@@ -2388,18 +2798,8 @@
                     <strong>Zelle (Solo USD):</strong> ${condo.cuenta_zelle || 'No configurado'}
                 `;
 
-                // CÁLCULO DE DEUDA:
-                const cuotasCondo = this.state.cuotas.filter(c => c.condoId === condo.id);
-                let totalDeuda = cuotasCondo.reduce((acc, c) => acc + c.monto_usd, 0);
-
-                // Pagos aprobados por administración
-                const pagosAprobados = this.state.pagos.filter(p => p.condoId === condo.id && p.apto === aptoCode && p.estado === 'aprobado');
-                const totalPagado = pagosAprobados.reduce((acc, p) => {
-                    let montoUSD = p.moneda === 'USD' ? p.monto : (p.monto / condo.tasa_dolar);
-                    return acc + montoUSD;
-                }, 0);
-
-                let balance = totalDeuda - totalPagado;
+                // CÁLCULO CENTRALIZADO DE DEUDA:
+                const balance = this.getAptoBalance(condo.id, aptoCode);
                 this.cachedBalanceUSD = balance;
 
                 const debtElUSD = document.getElementById('residentDebtUSD');
@@ -2443,8 +2843,151 @@
                     debtBadge.innerHTML = `<i class="bi bi-check2"></i> Solvente al Día`;
                 }
 
-                // Renderizar listado de pagos del residente
+                // Renderizar listado de pagos, tickets y cartelera del residente
                 this.renderResidentPagos();
+                this.renderResidentTickets();
+                this.renderResidentCartelera();
+
+                // Regresar a la pestaña de finanzas por defecto
+                const firstTabBtn = document.querySelector('#viewResident .tab-item-saas');
+                if (firstTabBtn) this.switchResidentTab('finanzas', firstTabBtn);
+            },
+
+            // PESTAÑAS DEL PORTAL DEL RESIDENTE
+            switchResidentTab(tabName, btnEl) {
+                document.querySelectorAll('#viewResident .tab-item-saas').forEach(b => b.classList.remove('active'));
+                if (btnEl) btnEl.classList.add('active');
+
+                document.getElementById('residentTabFinanzas').style.display = tabName === 'finanzas' ? 'block' : 'none';
+                document.getElementById('residentTabTickets').style.display = tabName === 'tickets' ? 'block' : 'none';
+                document.getElementById('residentTabCartelera').style.display = tabName === 'cartelera' ? 'block' : 'none';
+                document.getElementById('residentTabPerfil').style.display = tabName === 'perfil' ? 'block' : 'none';
+
+                if (tabName === 'tickets') this.renderResidentTickets();
+                if (tabName === 'cartelera') this.renderResidentCartelera();
+            },
+
+            // REDACTAR SOLICITUD / QUEJA (RESIDENTE)
+            submitResidentTicket() {
+                const condo = this.getActiveCondo();
+                const aptoCode = this.currentResidentApto;
+                const u = this.getCondoUnits(condo.id).find(x => x.codigo === aptoCode);
+                const tipo = document.getElementById('ticketTipo').value;
+                const prioridad = document.getElementById('ticketPrioridad').value;
+                const titulo = document.getElementById('ticketTitulo').value.trim();
+                const descripcion = document.getElementById('ticketDescripcion').value.trim();
+
+                if (!titulo || !descripcion) {
+                    alert('Por favor ingrese el asunto y la descripción detallada.');
+                    return;
+                }
+
+                if (!this.state.tickets) this.state.tickets = [];
+
+                const nuevoTicket = {
+                    id: Date.now(),
+                    condoId: condo.id,
+                    apto: aptoCode,
+                    propietario: u && u.propietario ? u.propietario : 'Residente ' + aptoCode,
+                    tipo: tipo,
+                    prioridad: prioridad,
+                    titulo: titulo,
+                    descripcion: descripcion,
+                    estado: 'pendiente',
+                    respuestaAdmin: null,
+                    fecha: new Date().toISOString().split('T')[0],
+                    fechaRespuesta: null
+                };
+
+                this.state.tickets.push(nuevoTicket);
+                this.save();
+                this.closeModal('modalNuevoTicket');
+                document.getElementById('ticketTitulo').value = '';
+                document.getElementById('ticketDescripcion').value = '';
+                this.renderResidentTickets();
+                this.toast('✓ Su solicitud ha sido enviada a la administración');
+            },
+
+            renderResidentTickets() {
+                const condo = this.getActiveCondo();
+                const aptoCode = this.currentResidentApto;
+                const tickets = (this.state.tickets || []).filter(t => t.condoId === condo.id && t.apto === aptoCode);
+                const countEl = document.getElementById('count-my-tickets');
+                if (countEl) countEl.innerText = tickets.length;
+
+                const tbody = document.getElementById('residentTicketsTableBody');
+                if (!tbody) return;
+
+                if (tickets.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No ha enviado ninguna solicitud o queja hasta el momento.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                tickets.slice().reverse().forEach(t => {
+                    let badgeEstado = '';
+                    if (t.estado === 'pendiente') {
+                        badgeEstado = `<span class="stat-badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3);"><i class="bi bi-hourglass-split"></i> Pendiente</span>`;
+                    } else if (t.estado === 'en_proceso') {
+                        badgeEstado = `<span class="stat-badge" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6; border-color: rgba(59, 130, 246, 0.3);"><i class="bi bi-gear-wide-connected"></i> En Proceso</span>`;
+                    } else if (t.estado === 'resuelto') {
+                        badgeEstado = `<span class="stat-badge clean"><i class="bi bi-check-circle-fill"></i> Atendido</span>`;
+                    } else {
+                        badgeEstado = `<span class="stat-badge" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border-color: rgba(239, 68, 68, 0.3);"><i class="bi bi-x-circle"></i> Rechazado</span>`;
+                    }
+
+                    let tipoNombre = t.tipo === 'queja' ? 'Queja' : (t.tipo === 'averia' ? 'Avería' : (t.tipo === 'sugerencia' ? 'Sugerencia' : 'Solicitud'));
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><code>${t.fecha}</code></td>
+                        <td><span class="stat-badge" style="background: var(--bg-card);">${tipoNombre}</span></td>
+                        <td>
+                            <strong>${t.titulo}</strong>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem;">${t.descripcion}</div>
+                            ${t.respuestaAdmin ? `
+                                <div style="background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; border-radius: 4px; padding: 0.5rem 0.75rem; margin-top: 0.5rem; font-size: 0.82rem;">
+                                    <strong style="color: #60a5fa;"><i class="bi bi-reply-fill"></i> Respuesta de Administración (${t.fechaRespuesta || 'Oficial'}):</strong>
+                                    <div style="color: #fff; margin-top: 0.2rem;">${t.respuestaAdmin}</div>
+                                </div>
+                            ` : ''}
+                        </td>
+                        <td><span style="font-size: 0.8rem; text-transform: capitalize; color: ${t.prioridad === 'urgente' ? '#ef4444' : (t.prioridad === 'alta' ? '#fbbf24' : 'var(--text-secondary)')}; font-weight: 600;">${t.prioridad}</span></td>
+                        <td>${badgeEstado}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            },
+
+            // CARTELERA DIGITAL DEL EDIFICIO (RESIDENTE)
+            renderResidentCartelera() {
+                const condo = this.getActiveCondo();
+                const items = (this.state.comunicados || []).filter(c => c.condoId === condo.id);
+                const box = document.getElementById('residentCarteleraContainer');
+                if (!box) return;
+
+                if (items.length === 0) {
+                    box.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 2.5rem; border: 1px dashed var(--border-color); border-radius: 12px;">No hay comunicados publicados en la cartelera por la administración.</div>`;
+                    return;
+                }
+
+                box.innerHTML = '';
+                items.slice().reverse().forEach(c => {
+                    const div = document.createElement('div');
+                    div.style.background = 'var(--bg-card)';
+                    div.style.padding = '1.25rem 1.5rem';
+                    div.style.borderRadius = '12px';
+                    div.style.marginBottom = '1rem';
+                    div.style.border = '1px solid var(--border-color)';
+                    div.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <h4 style="color: #fff; font-size: 1.1rem; margin: 0;"><i class="bi bi-megaphone text-primary"></i> ${c.titulo}</h4>
+                            <span class="stat-badge" style="background: var(--bg-secondary);"><i class="bi bi-calendar3"></i> ${c.fecha}</span>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.92rem; margin: 0; line-height: 1.5;">${c.cuerpo}</p>
+                    `;
+                    box.appendChild(div);
+                });
             },
 
             // 7. LISTADO DE PAGOS DEL RESIDENTE
