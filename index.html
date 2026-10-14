@@ -14,6 +14,8 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --bg-primary: #0b0f19;
@@ -529,6 +531,14 @@
             align-items: center;
             gap: 0.6rem;
         }
+
+        .spin {
+            animation: spinAnimation 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spinAnimation {
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -540,7 +550,12 @@
             <span>CondoHub <span style="font-weight: 400; font-size: 0.85rem; color: #94a3b8;">SaaS</span></span>
         </a>
 
-        <div style="display: flex; align-items: center; gap: 0.85rem;">
+        <div style="display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;">
+            <!-- Indicador Supabase Nube Sincronizado -->
+            <div id="cloudStatusBadge" class="bcv-pill" style="cursor: pointer; background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.3); color: #34d399;" onclick="app.syncFromSupabase(true)" title="Base de datos multi-dispositivo en la nube Supabase. Clic para forzar sincronización">
+                <i id="cloudStatusIcon" class="bi bi-cloud-check-fill" style="color: #10b981;"></i>
+                <span id="cloudStatusText">Supabase Online</span>
+            </div>
             <div class="bcv-pill">
                 <i class="bi bi-bank2"></i>
                 <span>Tasa BCV: <strong id="topBcvRate">877.90</strong> Bs/$</span>
@@ -1353,6 +1368,17 @@
 
     <!-- CONTROLADOR JAVASCRIPT -->
     <script>
+        const SUPABASE_URL = 'https://xlyfbwsfojzmcgjgcsrw.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhseWZid3Nmb2p6bWNnamdjc3J3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMTAzNjYsImV4cCI6MjEwNzU4NjM2Nn0.reJ5Iv8rjpKXfbsGChqX4-roeEGXhr2zOCOTt5RwTUY';
+        let sbClient = null;
+        try {
+            if (window.supabase && typeof window.supabase.createClient === 'function') {
+                sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            }
+        } catch (e) {
+            console.warn('Supabase client error:', e);
+        }
+
         const INITIAL_STATE = {
             activeCondoId: 1,
             condominios: [
@@ -1366,7 +1392,7 @@
                     tiene_pb: 1,
                     aptos_pb_cant: 2,
                     aptos_por_piso: 4,
-                    tasa_dolar: 72.40,
+                    tasa_dolar: 877.90,
                     banco_pago_movil: 'Banco Banesco (0134) | RIF: J-12345678-0 | Teléfono: 0414-1234567',
                     banco_transferencia: 'Banesco Cta Corriente: 0134-0000-00-0000000000 | RIF: J-12345678-0',
                     cuenta_zelle: 'condominio.samanes@gmail.com (Titular: Junta de Condominio)'
@@ -1973,6 +1999,7 @@
             state: null,
             currentRole: null,
             currentResidentApto: null,
+            currentAdminTab: 'mapa',
             floorFilter: 'todos',
             cachedBalanceUSD: 0,
 
@@ -2003,8 +2030,157 @@
 
                 this.renderHome();
 
-                // Intentar sincronización automática y silenciosa de tasa BCV al iniciar
+                // 1. Sincronización inmediata con Supabase en la nube
+                this.syncFromSupabase(false);
+
+                // 2. Polling periódico de sincronización automática cada 8 segundos (sincroniza automáticamente entre dispositivos)
+                setInterval(() => {
+                    this.syncFromSupabase(false);
+                }, 8000);
+
+                // 3. Resincronizar cuando el usuario regrese o cambie a esta pestaña
+                window.addEventListener('focus', () => {
+                    this.syncFromSupabase(false);
+                });
+
+                // 4. Intentar sincronización automática y silenciosa de tasa BCV al iniciar
                 this.actualizarTasaBCV(false);
+            },
+
+            async syncFromSupabase(isManual = false) {
+                if (!sbClient) return;
+
+                const icon = document.getElementById('cloudStatusIcon');
+                const text = document.getElementById('cloudStatusText');
+                if (icon) icon.className = 'bi bi-arrow-repeat spin';
+                if (text) text.innerText = 'Sincronizando...';
+
+                try {
+                    const [resCondos, resAptos, resCuotas, resPagos, resComunicados, resTickets] = await Promise.all([
+                        sbClient.from('condominios').select('*').order('id'),
+                        sbClient.from('apartamentos').select('*').order('id'),
+                        sbClient.from('cuotas').select('*').order('id'),
+                        sbClient.from('pagos').select('*').order('id'),
+                        sbClient.from('comunicados').select('*').order('id'),
+                        sbClient.from('tickets').select('*').order('id')
+                    ]);
+
+                    let updated = false;
+
+                    if (resCondos.data && resCondos.data.length > 0) {
+                        this.state.condominios = resCondos.data;
+                        updated = true;
+                    }
+
+                    if (resAptos.data && resAptos.data.length > 0) {
+                        this.state.apartamentos = resAptos.data.map(u => ({
+                            id: u.id,
+                            condoId: u.condominio_id,
+                            piso: u.piso,
+                            codigo: u.codigo,
+                            alicuota: parseFloat(u.alicuota) || 2.0,
+                            propietario: u.propietario,
+                            cedula: u.cedula,
+                            telefono: u.telefono,
+                            email: u.email,
+                            vehiculo: u.vehiculo
+                        }));
+                        updated = true;
+                    }
+
+                    if (resCuotas.data) {
+                        this.state.cuotas = resCuotas.data.map(c => ({
+                            id: c.id,
+                            condoId: c.condominio_id,
+                            titulo: c.titulo,
+                            tipo: c.tipo,
+                            monto_usd: parseFloat(c.monto_usd) || 0,
+                            fecha: c.fecha
+                        }));
+                        updated = true;
+                    }
+
+                    if (resPagos.data) {
+                        this.state.pagos = resPagos.data.map(p => ({
+                            id: p.id,
+                            condoId: p.condominio_id,
+                            apto: p.apto,
+                            metodo: p.metodo,
+                            monto: parseFloat(p.monto) || 0,
+                            moneda: p.moneda,
+                            ref: p.ref,
+                            fecha: p.fecha,
+                            estado: p.estado
+                        }));
+                        updated = true;
+                    }
+
+                    if (resComunicados.data) {
+                        this.state.comunicados = resComunicados.data.map(c => ({
+                            id: c.id,
+                            condoId: c.condominio_id,
+                            titulo: c.titulo,
+                            cuerpo: c.cuerpo,
+                            fecha: c.fecha
+                        }));
+                        updated = true;
+                    }
+
+                    if (resTickets.data) {
+                        this.state.tickets = resTickets.data.map(t => ({
+                            id: t.id,
+                            condoId: t.condominio_id,
+                            apto: t.apto,
+                            propietario: t.propietario,
+                            tipo: t.tipo,
+                            prioridad: t.prioridad,
+                            titulo: t.titulo,
+                            descripcion: t.descripcion,
+                            estado: t.estado,
+                            respuestaAdmin: t.respuesta_admin,
+                            fecha: t.fecha,
+                            fechaRespuesta: t.fecha_respuesta
+                        }));
+                        updated = true;
+                    }
+
+                    if (updated) {
+                        this.save();
+                        // Refrescar vistas activas
+                        const homeView = document.getElementById('viewHome');
+                        const adminView = document.getElementById('viewAdmin');
+                        const residentView = document.getElementById('viewResident');
+                        const superView = document.getElementById('viewSuperAdmin');
+
+                        if (homeView && homeView.style.display !== 'none') {
+                            this.renderHome();
+                        } else if (adminView && adminView.classList.contains('active')) {
+                            const curTab = this.currentAdminTab || 'mapa';
+                            if (curTab === 'mapa') this.renderAdminFloors();
+                            if (curTab === 'cuotas') this.renderCuotasTable();
+                            if (curTab === 'pagos') this.renderPagosTable();
+                            if (curTab === 'tickets') this.renderAdminTickets();
+                            if (curTab === 'comunicados') this.renderComunicados();
+                        } else if (residentView && residentView.classList.contains('active') && this.currentResidentApto) {
+                            this.openResidentDashboard(this.currentResidentApto);
+                        } else if (superView && superView.classList.contains('active')) {
+                            this.renderSuperAdmin();
+                        }
+                    }
+
+                    if (icon) icon.className = 'bi bi-cloud-check-fill';
+                    if (text) text.innerText = 'Supabase Online';
+                    if (isManual) {
+                        this.toast('✅ Base de datos sincronizada con la nube');
+                    }
+                } catch (err) {
+                    console.error('Error sincronizando con Supabase:', err);
+                    if (icon) icon.className = 'bi bi-cloud-slash-fill';
+                    if (text) text.innerText = 'Modo Local';
+                    if (isManual) {
+                        this.toast('⚠️ Conexión local activa');
+                    }
+                }
             },
 
             // Helper centralizado para balance de apartamento
@@ -2393,6 +2569,7 @@
             },
 
             switchAdminTab(tabName, btnEl) {
+                this.currentAdminTab = tabName;
                 document.querySelectorAll('#viewAdmin .tab-item-saas').forEach(b => b.classList.remove('active'));
                 if (btnEl) btnEl.classList.add('active');
 
@@ -2426,7 +2603,7 @@
                 this.openModal('modalAdjudicar');
             },
 
-            saveAdjudicacion() {
+            async saveAdjudicacion() {
                 const code = document.getElementById('adjAptoCode').value;
                 const condo = this.getActiveCondo();
                 const u = this.getCondoUnits(condo.id).find(x => x.codigo === code);
@@ -2441,9 +2618,22 @@
                 this.closeModal('modalAdjudicar');
                 this.renderAdminFloors();
                 this.toast(`Apartamento ${code} adjudicado`);
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('apartamentos').update({
+                            propietario: u.propietario,
+                            cedula: u.cedula,
+                            telefono: u.telefono,
+                            email: u.email
+                        }).match({ condominio_id: condo.id, codigo: code });
+                    } catch (e) {
+                        console.error('Error adjudicando en Supabase:', e);
+                    }
+                }
             },
 
-            liberarApartamento() {
+            async liberarApartamento() {
                 const code = document.getElementById('adjAptoCode').value;
                 const condo = this.getActiveCondo();
                 const u = this.getCondoUnits(condo.id).find(x => x.codigo === code);
@@ -2459,6 +2649,20 @@
                 this.closeModal('modalAdjudicar');
                 this.renderAdminFloors();
                 this.toast(`Apartamento ${code} liberado (disponible)`);
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('apartamentos').update({
+                            propietario: null,
+                            cedula: null,
+                            telefono: null,
+                            email: null,
+                            vehiculo: null
+                        }).match({ condominio_id: condo.id, codigo: code });
+                    } catch (e) {
+                        console.error('Error liberando en Supabase:', e);
+                    }
+                }
             },
 
             // 2. EMISIÓN INMEDIATA DE CUOTA
@@ -2466,7 +2670,7 @@
                 this.openModal('modalEmitirCuota');
             },
 
-            executeEmitirCuota() {
+            async executeEmitirCuota() {
                 const condo = this.getActiveCondo();
                 const titulo = document.getElementById('cuotaTitulo').value.trim();
                 const tipo = document.getElementById('cuotaTipo').value;
@@ -2491,6 +2695,21 @@
                 this.switchAdminTab('cuotas', tabCuotasBtn);
 
                 this.toast(`✅ Cuota "${titulo}" emitida a todo el edificio ($${monto.toFixed(2)})`);
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('cuotas').insert([{
+                            id: nuevaCuota.id,
+                            condominio_id: condo.id,
+                            titulo: nuevaCuota.titulo,
+                            tipo: nuevaCuota.tipo,
+                            monto_usd: nuevaCuota.monto_usd,
+                            fecha: nuevaCuota.fecha
+                        }]);
+                    } catch (e) {
+                        console.error('Error guardando cuota en Supabase:', e);
+                    }
+                }
             },
 
             renderCuotasTable() {
@@ -2566,23 +2785,39 @@
                 });
             },
 
-            aprobarPago(id) {
+            async aprobarPago(id) {
                 const p = this.state.pagos.find(x => x.id === id);
                 if (p) {
                     p.estado = 'aprobado';
                     this.save();
                     this.renderPagosTable();
                     this.toast('✅ Pago verificado y acreditado al residente.');
+
+                    if (sbClient) {
+                        try {
+                            await sbClient.from('pagos').update({ estado: 'aprobado' }).eq('id', id);
+                        } catch (e) {
+                            console.error('Error aprobando pago en Supabase:', e);
+                        }
+                    }
                 }
             },
 
-            rechazarPago(id) {
+            async rechazarPago(id) {
                 const p = this.state.pagos.find(x => x.id === id);
                 if (p) {
                     p.estado = 'rechazado';
                     this.save();
                     this.renderPagosTable();
                     this.toast('❌ Pago rechazado por la administración.');
+
+                    if (sbClient) {
+                        try {
+                            await sbClient.from('pagos').update({ estado: 'rechazado' }).eq('id', id);
+                        } catch (e) {
+                            console.error('Error rechazando pago en Supabase:', e);
+                        }
+                    }
                 }
             },
 
@@ -2591,7 +2826,7 @@
                 this.openModal('modalNuevoComunicado');
             },
 
-            saveComunicado() {
+            async saveComunicado() {
                 const condo = this.getActiveCondo();
                 const titulo = document.getElementById('comunicadoTitulo').value.trim();
                 const cuerpo = document.getElementById('comunicadoCuerpo').value.trim();
@@ -2600,26 +2835,49 @@
                     return;
                 }
 
-                this.state.comunicados.push({
+                const nuevoComunicado = {
                     id: Date.now(),
                     condoId: condo.id,
                     titulo: titulo,
                     cuerpo: cuerpo,
                     fecha: new Date().toISOString().split('T')[0]
-                });
+                };
 
+                this.state.comunicados.push(nuevoComunicado);
                 this.save();
                 this.closeModal('modalNuevoComunicado');
                 this.renderComunicados();
                 this.toast('Comunicado publicado');
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('comunicados').insert([{
+                            id: nuevoComunicado.id,
+                            condominio_id: condo.id,
+                            titulo: nuevoComunicado.titulo,
+                            cuerpo: nuevoComunicado.cuerpo,
+                            fecha: nuevoComunicado.fecha
+                        }]);
+                    } catch (e) {
+                        console.error('Error comunicados Supabase:', e);
+                    }
+                }
             },
 
-            eliminarComunicado(id) {
+            async eliminarComunicado(id) {
                 if (!confirm('¿Está seguro de eliminar este aviso de la cartelera?')) return;
                 this.state.comunicados = (this.state.comunicados || []).filter(c => c.id !== id);
                 this.save();
                 this.renderComunicados();
                 this.toast('Comunicado eliminado de la cartelera');
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('comunicados').delete().eq('id', id);
+                    } catch (e) {
+                        console.error('Error eliminando comunicado en Supabase:', e);
+                    }
+                }
             },
 
             renderComunicados() {
@@ -2734,7 +2992,7 @@
                 this.openModal('modalGestionarTicket');
             },
 
-            saveTicketGestion() {
+            async saveTicketGestion() {
                 const id = parseInt(document.getElementById('manageTicketId').value);
                 const t = (this.state.tickets || []).find(x => x.id === id);
                 if (!t) return;
@@ -2747,9 +3005,21 @@
                 this.closeModal('modalGestionarTicket');
                 this.renderAdminTickets();
                 this.toast('✓ Solicitud actualizada y respuesta oficial enviada');
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('tickets').update({
+                            estado: t.estado,
+                            respuesta_admin: t.respuestaAdmin,
+                            fecha_respuesta: t.fechaRespuesta
+                        }).eq('id', id);
+                    } catch (e) {
+                        console.error('Error tickets Supabase:', e);
+                    }
+                }
             },
 
-            eliminarTicket() {
+            async eliminarTicket() {
                 const id = parseInt(document.getElementById('manageTicketId').value);
                 if (!confirm('¿Desea eliminar esta solicitud del sistema?')) return;
                 this.state.tickets = (this.state.tickets || []).filter(t => t.id !== id);
@@ -2757,9 +3027,17 @@
                 this.closeModal('modalGestionarTicket');
                 this.renderAdminTickets();
                 this.toast('Solicitud eliminada');
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('tickets').delete().eq('id', id);
+                    } catch (e) {
+                        console.error('Error eliminando ticket Supabase:', e);
+                    }
+                }
             },
 
-            saveCondoSettings() {
+            async saveCondoSettings() {
                 const condo = this.getActiveCondo();
                 condo.tasa_dolar = parseFloat(document.getElementById('cfgTasaBcv').value) || 877.90;
                 condo.banco_pago_movil = document.getElementById('cfgPagoMovil').value;
@@ -2769,6 +3047,19 @@
                 this.save();
                 this.renderHome();
                 this.toast('Cuentas bancarias y parámetros guardados');
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('condominios').update({
+                            tasa_dolar: condo.tasa_dolar,
+                            banco_pago_movil: condo.banco_pago_movil,
+                            banco_transferencia: condo.banco_transferencia,
+                            cuenta_zelle: condo.cuenta_zelle
+                        }).eq('id', condo.id);
+                    } catch (e) {
+                        console.error('Error cuentas Supabase:', e);
+                    }
+                }
             },
 
             // 5. PORTAL RESIDENTE: ESTADO DE DEUDA EN ROJO, VERDE SOLO SI TIENE SALDO A FAVOR
@@ -2871,7 +3162,7 @@
             },
 
             // REDACTAR SOLICITUD / QUEJA (RESIDENTE)
-            submitResidentTicket() {
+            async submitResidentTicket() {
                 const condo = this.getActiveCondo();
                 const aptoCode = this.currentResidentApto;
                 const u = this.getCondoUnits(condo.id).find(x => x.codigo === aptoCode);
@@ -2909,6 +3200,25 @@
                 document.getElementById('ticketDescripcion').value = '';
                 this.renderResidentTickets();
                 this.toast('✓ Su solicitud ha sido enviada a la administración');
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('tickets').insert([{
+                            id: nuevoTicket.id,
+                            condominio_id: condo.id,
+                            apto: nuevoTicket.apto,
+                            propietario: nuevoTicket.propietario,
+                            tipo: nuevoTicket.tipo,
+                            prioridad: nuevoTicket.prioridad,
+                            titulo: nuevoTicket.titulo,
+                            descripcion: nuevoTicket.descripcion,
+                            estado: nuevoTicket.estado,
+                            fecha: nuevoTicket.fecha
+                        }]);
+                    } catch (e) {
+                        console.error('Error ticket Supabase:', e);
+                    }
+                }
             },
 
             renderResidentTickets() {
@@ -3032,7 +3342,7 @@
                 });
             },
 
-            saveResidentProfile() {
+            async saveResidentProfile() {
                 const condo = this.getActiveCondo();
                 const u = this.getCondoUnits(condo.id).find(x => x.codigo === this.currentResidentApto);
                 if (!u) return;
@@ -3046,6 +3356,20 @@
                 this.save();
                 this.toast('Perfil actualizado');
                 document.getElementById('residentOwnerSubtitle').innerText = u.propietario ? `Propietario: ${u.propietario}` : 'Sin propietario adjudicado';
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('apartamentos').update({
+                            propietario: u.propietario,
+                            cedula: u.cedula,
+                            telefono: u.telefono,
+                            email: u.email,
+                            vehiculo: u.vehiculo
+                        }).match({ condominio_id: condo.id, codigo: this.currentResidentApto });
+                    } catch (e) {
+                        console.error('Error perfil Supabase:', e);
+                    }
+                }
             },
 
             // 6. REPORTAR PAGO: BANNER SUPERIOR $ Y BS, REGLAS ESTRICTAS DE MONEDA
@@ -3084,7 +3408,7 @@
                 }
             },
 
-            submitResidentPago() {
+            async submitResidentPago() {
                 const condo = this.getActiveCondo();
                 const metodo = document.getElementById('pagoMetodo').value;
                 const monto = parseFloat(document.getElementById('pagoMonto').value) || 0;
@@ -3100,7 +3424,7 @@
                     return;
                 }
 
-                this.state.pagos.push({
+                const nuevoPago = {
                     id: Date.now(),
                     condoId: condo.id,
                     apto: this.currentResidentApto,
@@ -3110,8 +3434,9 @@
                     ref: ref,
                     fecha: new Date().toISOString().split('T')[0],
                     estado: 'pendiente' // Debe ser verificado por administración en auditoría
-                });
+                };
 
+                this.state.pagos.push(nuevoPago);
                 this.save();
                 this.closeModal('modalReportarPago');
                 document.getElementById('pagoRef').value = '';
@@ -3119,6 +3444,24 @@
                 // Recargar dashboard y tabla de pagos
                 this.openResidentDashboard(this.currentResidentApto);
                 this.toast('✅ Comprobante enviado. En proceso de auditoría por administración.');
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('pagos').insert([{
+                            id: nuevoPago.id,
+                            condominio_id: condo.id,
+                            apto: nuevoPago.apto,
+                            metodo: nuevoPago.metodo,
+                            monto: nuevoPago.monto,
+                            moneda: nuevoPago.moneda,
+                            ref: nuevoPago.ref,
+                            fecha: nuevoPago.fecha,
+                            estado: nuevoPago.estado
+                        }]);
+                    } catch (e) {
+                        console.error('Error enviando pago Supabase:', e);
+                    }
+                }
             },
 
             // NUEVO CONDOMINIO
@@ -3126,7 +3469,7 @@
                 this.openModal('modalNewCondo');
             },
 
-            createNewCondominio() {
+            async createNewCondominio() {
                 const nombre = document.getElementById('newCondoNombre').value.trim();
                 const rif = document.getElementById('newCondoRif').value.trim() || 'J-99999999-0';
                 const dir = document.getElementById('newCondoDireccion').value.trim() || 'Caracas, Venezuela';
@@ -3168,6 +3511,26 @@
                 this.closeModal('modalNewCondo');
                 this.renderSuperAdmin();
                 this.toast(`¡Condominio "${nombre}" creado con éxito con ${newUnits.length} apartamentos!`);
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('condominios').insert([newCondo]);
+                        const rows = newUnits.map(u => ({
+                            condominio_id: newCondo.id,
+                            piso: u.piso,
+                            codigo: u.codigo,
+                            alicuota: u.alicuota,
+                            propietario: null,
+                            cedula: null,
+                            telefono: null,
+                            email: null,
+                            vehiculo: null
+                        }));
+                        await sbClient.from('apartamentos').insert(rows);
+                    } catch (e) {
+                        console.error('Error insertando nuevo condominio en Supabase:', e);
+                    }
+                }
             },
 
             openModal(id) {
