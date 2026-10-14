@@ -14,6 +14,8 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --bg-primary: #0b0f19;
@@ -529,6 +531,14 @@
             align-items: center;
             gap: 0.6rem;
         }
+
+        .spin {
+            animation: spinAnimation 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spinAnimation {
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -540,7 +550,12 @@
             <span>CondoHub <span style="font-weight: 400; font-size: 0.85rem; color: #94a3b8;">SaaS</span></span>
         </a>
 
-        <div style="display: flex; align-items: center; gap: 0.85rem;">
+        <div style="display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;">
+            <!-- Indicador Data Center Online Sincronizado -->
+            <div id="cloudStatusBadge" class="bcv-pill" style="cursor: pointer; background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.3); color: #34d399;" onclick="app.syncFromSupabase(true)" title="Data Center en la nube. Clic para forzar sincronización">
+                <i id="cloudStatusIcon" class="bi bi-hdd-network-fill" style="color: #10b981;"></i>
+                <span id="cloudStatusText">Data Center Online</span>
+            </div>
             <div class="bcv-pill">
                 <i class="bi bi-bank2"></i>
                 <span>Tasa BCV: <strong id="topBcvRate">877.90</strong> Bs/$</span>
@@ -621,16 +636,12 @@
             <form id="form-login-admin" style="display: none;" onsubmit="app.handleAdminSubmit(event)">
                 <div class="form-group">
                     <label class="form-label"><i class="bi bi-person-badge"></i> Usuario Administrador:</label>
-                    <input type="text" id="admin-user" class="form-control" placeholder="Ej: admin o clusterlg" required>
+                    <input type="text" id="admin-user" class="form-control" placeholder="Usuario administrador" required autocomplete="username">
                 </div>
 
                 <div class="form-group">
                     <label class="form-label"><i class="bi bi-key"></i> Contraseña:</label>
-                    <input type="password" id="admin-pass" class="form-control" placeholder="Contraseña" required>
-                    <small style="color: var(--text-muted); font-size: 0.74rem; margin-top: 0.35rem; display: block; line-height: 1.4;">
-                        👑 Superusuario Global: <code style="color: #c084fc;">clusterlg</code> (clave: <code style="color: #c084fc;">glretsulc</code>)<br>
-                        🏢 Admin del Edificio: <code style="color: var(--primary);">admin</code> (clave: <code style="color: var(--primary);">admin123</code>)
-                    </small>
+                    <input type="password" id="admin-pass" class="form-control" placeholder="Contraseña" required autocomplete="current-password">
                 </div>
 
                 <button type="submit" class="btn-primary-saas">
@@ -641,74 +652,299 @@
     </main>
 
     <!-- VISTA: DASHBOARD SUPERADMINISTRADOR GLOBAL (clusterlg) -->
-    <!-- SOLO AQUÍ EXISTE LA OPCIÓN DE CREAR NUEVOS CONDOMINIOS -->
     <section id="viewSuperAdmin" class="dashboard-view">
         <div class="dashboard-header">
             <div>
                 <span class="stat-badge" style="border-color: rgba(139, 92, 246, 0.4); color: #c084fc; margin-bottom: 0.4rem; display: inline-flex;">
-                    <i class="bi bi-gem"></i> Portal Exclusivo Super-Administrador Global
+                    <i class="bi bi-shield-lock-fill"></i> Consola Central Super-Administrador Global (clusterlg)
                 </span>
-                <h2 style="font-size: 1.6rem; font-weight: 800; color: #fff; margin: 0;">Gestión Global de Condominios (clusterlg)</h2>
+                <h2 style="font-size: 1.6rem; font-weight: 800; color: #fff; margin: 0;">Fiscalización y Auditoría Global de Residencias</h2>
             </div>
-            <div style="display: flex; gap: 0.75rem;">
-                <!-- BOTÓN EXCLUSIVO DEL SUPERADMIN PARA CREAR NUEVOS CONDOMINIOS -->
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
                 <button class="btn-primary-saas" style="width: auto; background: #8b5cf6;" onclick="app.showNewCondoModal()">
                     <i class="bi bi-plus-circle"></i> + Registrar Nuevo Condominio
                 </button>
                 <button class="demo-btn" style="padding: 0.6rem 1rem; font-size: 0.88rem;" onclick="app.showHome()">
-                    <i class="bi bi-box-arrow-left"></i> Cerrar Sesión
+                    <i class="bi bi-box-arrow-left"></i> Salir del Sistema
                 </button>
             </div>
         </div>
 
-        <!-- Métricas Globales -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-            <div class="stat-card-saas">
-                <div class="stat-icon-saas" style="background: rgba(139, 92, 246, 0.15); color: #c084fc;"><i class="bi bi-buildings"></i></div>
-                <div>
-                    <div style="font-size: 1.5rem; font-weight: 800; color: #fff;" id="superTotalCondos">1</div>
-                    <div style="font-size: 0.82rem; color: var(--text-secondary);">Condominios Registrados</div>
+        <!-- TABS DE NAVEGACIÓN SUPERADMIN -->
+        <div class="nav-tabs-saas" style="margin-bottom: 1.5rem;">
+            <button id="superTabBtnCondos" class="tab-item-saas active" onclick="app.switchSuperTab('condos', this)">
+                <i class="bi bi-buildings"></i> Directorio de Residencias
+            </button>
+            <button id="superTabBtnAudit" class="tab-item-saas" onclick="app.switchSuperTab('audit', this)">
+                <i class="bi bi-search"></i> Auditoría Detallada de Residencia
+            </button>
+            <button id="superTabBtnLogs" class="tab-item-saas" onclick="app.switchSuperTab('logs', this)">
+                <i class="bi bi-journal-text"></i> Registro de Logs del Sistema <span id="superLogsCountBadge" style="background: #8b5cf6; color: #fff; font-size: 0.7rem; padding: 2px 7px; border-radius: 10px; margin-left: 4px;">0</span>
+            </button>
+        </div>
+
+        <!-- SUB-TAB 1: DIRECTORIO DE CONDOMINIOS -->
+        <div id="superTabCondosContent">
+            <!-- Métricas Globales -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                <div class="stat-card-saas">
+                    <div class="stat-icon-saas" style="background: rgba(139, 92, 246, 0.15); color: #c084fc;"><i class="bi bi-buildings"></i></div>
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: 800; color: #fff;" id="superTotalCondos">0</div>
+                        <div style="font-size: 0.82rem; color: var(--text-secondary);">Condominios Registrados</div>
+                    </div>
+                </div>
+                <div class="stat-card-saas">
+                    <div class="stat-icon-saas" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;"><i class="bi bi-houses"></i></div>
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: 800; color: #fff;" id="superTotalUnits">0</div>
+                        <div style="font-size: 0.82rem; color: var(--text-secondary);">Unidades Globales Totales</div>
+                    </div>
+                </div>
+                <div class="stat-card-saas">
+                    <div class="stat-icon-saas" style="background: rgba(16, 185, 129, 0.15); color: #34d399;"><i class="bi bi-people-fill"></i></div>
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: 800; color: #fff;" id="superGlobalOccupancy">0%</div>
+                        <div style="font-size: 0.82rem; color: var(--text-secondary);">Tasa de Ocupación Promedio</div>
+                    </div>
+                </div>
+                <div class="stat-card-saas">
+                    <div class="stat-icon-saas" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;"><i class="bi bi-activity"></i></div>
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: 800; color: #fff;" id="superTotalLogsStat">0</div>
+                        <div style="font-size: 0.82rem; color: var(--text-secondary);">Movimientos Auditados</div>
+                    </div>
                 </div>
             </div>
-            <div class="stat-card-saas">
-                <div class="stat-icon-saas" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;"><i class="bi bi-houses"></i></div>
-                <div>
-                    <div style="font-size: 1.5rem; font-weight: 800; color: #fff;" id="superTotalUnits">50</div>
-                    <div style="font-size: 0.82rem; color: var(--text-secondary);">Unidades Totales Globales</div>
+
+            <!-- Tabla de Condominios Registrados -->
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+                    <div>
+                        <h3 style="font-size: 1.15rem; color: #fff; margin: 0;"><i class="bi bi-list-columns-reverse text-primary"></i> Directorio de Residencias y Complejos</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.82rem; margin: 0.25rem 0 0 0;">Haga clic en "Inspeccionar Residencia" para auditar copropietarios, contraseñas, pagos y solvencias sin ingresar como administrador.</p>
+                    </div>
                 </div>
-            </div>
-            <div class="stat-card-saas">
-                <div class="stat-icon-saas" style="background: rgba(16, 185, 129, 0.15); color: #34d399;"><i class="bi bi-shield-check"></i></div>
-                <div>
-                    <div style="font-size: 1.5rem; font-weight: 800; color: #fff;">100%</div>
-                    <div style="font-size: 0.82rem; color: var(--text-secondary);">Estado de Sistema Limpio</div>
+                <div style="overflow-x: auto;">
+                    <table class="table-saas">
+                        <thead>
+                            <tr>
+                                <th>Nombre del Condominio</th>
+                                <th>RIF & Ubicación</th>
+                                <th>Estructura</th>
+                                <th>Ocupación</th>
+                                <th>Balance & Solvencia</th>
+                                <th>Tasa BCV</th>
+                                <th>Acción de Auditoría</th>
+                            </tr>
+                        </thead>
+                        <tbody id="superCondosTableBody">
+                            <!-- Llenado dinámico -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
-        <!-- Tabla de Condominios Registrados -->
-        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3 style="font-size: 1.15rem; color: #fff; margin: 0;"><i class="bi bi-list-columns-reverse text-primary"></i> Directorio de Edificios / Proyectos</h3>
-                <span style="font-size: 0.82rem; color: var(--text-secondary);">Seleccione "Administrar" para abrir el mapa del edificio</span>
+        <!-- SUB-TAB 2: AUDITORÍA DETALLADA DE RESIDENCIA -->
+        <div id="superTabAuditContent" style="display: none;">
+            <!-- Selector de Condominio y Volver -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                    <label style="color: #c084fc; font-weight: 700; font-size: 0.92rem; display: flex; align-items: center; gap: 0.4rem;">
+                        <i class="bi bi-building-check"></i> Inspeccionando Residencia:
+                    </label>
+                    <select id="superAuditCondoSelector" class="form-control" style="width: auto; min-width: 260px; font-weight: 700; background: var(--bg-secondary); border-color: rgba(139, 92, 246, 0.4); color: #fff;" onchange="app.handleSuperCondoSelectChange(this.value)">
+                        <!-- Opciones dinámicas -->
+                    </select>
+                </div>
+                <button class="demo-btn" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="app.switchSuperTab('condos', document.getElementById('superTabBtnCondos'))">
+                    <i class="bi bi-arrow-left"></i> Volver al Directorio
+                </button>
             </div>
-            <div style="overflow-x: auto;">
-                <table class="table-saas">
-                    <thead>
-                        <tr>
-                            <th>Nombre del Condominio</th>
-                            <th>RIF</th>
-                            <th>Dirección</th>
-                            <th>Estructura</th>
-                            <th>Unidades</th>
-                            <th>Tasa BCV</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="superCondosTableBody">
-                        <!-- Llenado dinámico -->
-                    </tbody>
-                </table>
+
+            <!-- Ficha Técnica y Tarjetas de Métricas de la Residencia -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                <div class="stat-card-saas">
+                    <div class="stat-icon-saas" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;"><i class="bi bi-door-open"></i></div>
+                    <div>
+                        <div style="font-size: 1.45rem; font-weight: 800; color: #fff;" id="auditCardUnits">0</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Total Apartamentos</div>
+                    </div>
+                </div>
+                <div class="stat-card-saas">
+                    <div class="stat-icon-saas" style="background: rgba(139, 92, 246, 0.15); color: #c084fc;"><i class="bi bi-people-fill"></i></div>
+                    <div>
+                        <div style="font-size: 1.45rem; font-weight: 800; color: #fff;" id="auditCardOcupacion">0%</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);" id="auditCardOcupacionLabel">Ocupación Adjudicada</div>
+                    </div>
+                </div>
+                <div class="stat-card-saas">
+                    <div class="stat-icon-saas" style="background: rgba(16, 185, 129, 0.15); color: #34d399;"><i class="bi bi-check2-circle"></i></div>
+                    <div>
+                        <div style="font-size: 1.45rem; font-weight: 800; color: #34d399;" id="auditCardSolventes">0</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Pagos Solventes (Al Día)</div>
+                    </div>
+                </div>
+                <div class="stat-card-saas">
+                    <div class="stat-icon-saas" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;"><i class="bi bi-exclamation-octagon"></i></div>
+                    <div>
+                        <div style="font-size: 1.45rem; font-weight: 800; color: #ef4444;" id="auditCardMorosos">0</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Residentes Morosos</div>
+                    </div>
+                </div>
+                <div class="stat-card-saas">
+                    <div class="stat-icon-saas" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;"><i class="bi bi-cash-stack"></i></div>
+                    <div>
+                        <div style="font-size: 1.35rem; font-weight: 800; color: #fbbf24;" id="auditCardDeudaTotal">$0.00 USD</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);" id="auditCardDeudaTotalBs">Total Deuda Acumulada</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ficha de Datos Bancarios y Tasa BCV de la Residencia -->
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+                    <strong style="color: #fff;"><i class="bi bi-info-circle-fill text-primary"></i> Datos del Inmueble:</strong>
+                    <span id="auditCondoInfoText" style="margin-left: 0.4rem;"></span>
+                </div>
+                <div style="font-size: 0.85rem; background: var(--bg-card); padding: 0.4rem 0.85rem; border-radius: 6px; border: 1px solid var(--border-color);">
+                    <span style="color: var(--text-muted);">Tasa Oficial BCV:</span>
+                    <strong style="color: #fbbf24; margin-left: 0.3rem;" id="auditCondoRateText">877.90 Bs/USD</strong>
+                </div>
+            </div>
+
+            <!-- Tabla de Apartamentos, Usuarios, Contraseñas y Solvencias -->
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h3 style="font-size: 1.15rem; color: #fff; margin: 0;"><i class="bi bi-shield-check text-primary"></i> Padrón Detallado de Copropietarios & Credenciales</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.82rem; margin: 0.25rem 0 0 0;">Inspección total de usuarios, contraseñas, datos personales, solvencia financiera e historial de pagos.</p>
+                    </div>
+
+                    <!-- Filtros Rápidos y Buscador -->
+                    <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                        <input type="text" id="superAuditSearchInput" class="form-control" placeholder="Buscar por apto, nombre, cédula..." style="width: 220px; padding: 0.45rem 0.75rem; font-size: 0.82rem;" oninput="app.handleSuperAuditSearch(this.value)">
+                        <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                            <button id="superAuditFilterAll" class="demo-btn active" onclick="app.setSuperAuditFilter('todos')">Todos</button>
+                            <button id="superAuditFilterOcup" class="demo-btn" onclick="app.setSuperAuditFilter('ocupados')">Ocupados</button>
+                            <button id="superAuditFilterDisp" class="demo-btn" onclick="app.setSuperAuditFilter('disponibles')">Disponibles</button>
+                            <button id="superAuditFilterSolv" class="demo-btn" style="color: #34d399;" onclick="app.setSuperAuditFilter('solventes')">🟢 Solventes</button>
+                            <button id="superAuditFilterMoro" class="demo-btn" style="color: #ef4444;" onclick="app.setSuperAuditFilter('morosos')">🔴 Morosos</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="table-saas">
+                        <thead>
+                            <tr>
+                                <th>Apto / Nivel</th>
+                                <th>Estado Ocupación</th>
+                                <th>Copropietario Adjudicado</th>
+                                <th>Cédula & Contacto</th>
+                                <th>Vehículo</th>
+                                <th>Usuario & Contraseña</th>
+                                <th>Estado Financiero</th>
+                                <th>Historial de Pagos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="superAuditTableBody">
+                            <!-- Llenado dinámico -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUB-TAB 3: REGISTRO DE LOGS DEL SISTEMA (AUDIT TRAIL) -->
+        <div id="superTabLogsContent" style="display: none;">
+            <!-- Tarjetas de Estadísticas de Logs -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                <div class="stat-card-saas">
+                    <div class="stat-icon-saas" style="background: rgba(139, 92, 246, 0.15); color: #c084fc;"><i class="bi bi-card-checklist"></i></div>
+                    <div>
+                        <div style="font-size: 1.45rem; font-weight: 800; color: #fff;" id="logsStatTotal">0</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Total Registros en Bitácora</div>
+                    </div>
+                </div>
+                <div class="stat-card-saas">
+                    <div class="stat-icon-saas" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;"><i class="bi bi-box-arrow-in-right"></i></div>
+                    <div>
+                        <div style="font-size: 1.45rem; font-weight: 800; color: #60a5fa;" id="logsStatLogins">0</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Inicios de Sesión</div>
+                    </div>
+                </div>
+                <div class="stat-card-saas">
+                    <div class="stat-icon-saas" style="background: rgba(16, 185, 129, 0.15); color: #34d399;"><i class="bi bi-cash-coin"></i></div>
+                    <div>
+                        <div style="font-size: 1.45rem; font-weight: 800; color: #34d399;" id="logsStatPagos">0</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Operaciones de Pagos</div>
+                    </div>
+                </div>
+                <div class="stat-card-saas">
+                    <div class="stat-icon-saas" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;"><i class="bi bi-sliders"></i></div>
+                    <div>
+                        <div style="font-size: 1.45rem; font-weight: 800; color: #fbbf24;" id="logsStatAdmin">0</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Gestiones Administrativas</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controles de Filtros y Búsqueda de Logs -->
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h3 style="font-size: 1.15rem; color: #fff; margin: 0;"><i class="bi bi-journal-bookmark-fill text-primary"></i> Bitácora Inmutable de Actividades y Auditoría</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.82rem; margin: 0.25rem 0 0 0;">Registro detallado de todo evento en la plataforma (inicios de sesión, pagos, aprobaciones, cuotas, tickets, etc.).</p>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                        <button class="demo-btn" style="padding: 0.45rem 0.85rem; font-size: 0.82rem;" onclick="app.exportSuperLogs()">
+                            <i class="bi bi-download"></i> Descargar Bitácora (JSON)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Barra de Filtros de Logs -->
+                <div style="display: flex; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; align-items: center; background: var(--bg-card); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="flex: 1; min-width: 220px;">
+                        <input type="text" id="superLogSearchInput" class="form-control" placeholder="Buscar en logs por usuario, acción o detalle..." style="font-size: 0.85rem;" oninput="app.filterSuperLogs()">
+                    </div>
+                    <div style="width: 200px;">
+                        <select id="superLogCondoFilter" class="form-control" style="font-size: 0.85rem;" onchange="app.filterSuperLogs()">
+                            <option value="todos">Todos los Condominios</option>
+                        </select>
+                    </div>
+                    <div style="width: 200px;">
+                        <select id="superLogTipoFilter" class="form-control" style="font-size: 0.85rem;" onchange="app.filterSuperLogs()">
+                            <option value="todos">Todos los Tipos de Acción</option>
+                            <option value="LOGIN">Inicios de Sesión (LOGIN)</option>
+                            <option value="PAGO">Pagos (Reporte / Aprobación)</option>
+                            <option value="CUOTA">Emisión de Cuotas</option>
+                            <option value="ADJUDICACION">Adjudicaciones de Aptos</option>
+                            <option value="COMUNICADO">Cartelera / Comunicados</option>
+                            <option value="TICKET">Solicitudes / Quejas</option>
+                            <option value="CONDOMINIO">Gestión de Condominios</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="table-saas">
+                        <thead>
+                            <tr>
+                                <th>Fecha & Hora</th>
+                                <th>Condominio</th>
+                                <th>Usuario / Rol</th>
+                                <th>Tipo de Acción</th>
+                                <th>Detalle de la Actividad</th>
+                            </tr>
+                        </thead>
+                        <tbody id="superLogsTableBody">
+                            <!-- Llenado dinámico -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </section>
@@ -1349,10 +1585,73 @@
                 </div>
             </div>
         </div>
+    <!-- MODAL: HISTORIAL DE PAGOS DE APARTAMENTO PARA SUPERADMIN -->
+    <div id="modalSuperAptoPagos" class="modal-backdrop-saas">
+        <div class="modal-box-saas" style="max-width: 750px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                <div>
+                    <span class="stat-badge" style="border-color: rgba(139, 92, 246, 0.4); color: #c084fc; margin-bottom: 0.25rem; display: inline-flex;">
+                        <i class="bi bi-shield-check"></i> Auditoría Financiera de Unidad
+                    </span>
+                    <h3 style="font-size: 1.25rem; color: #fff; margin: 0;" id="superModalAptoTitle">Apartamento PB-A</h3>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;" id="superModalAptoOwner">Propietario: -</div>
+                </div>
+                <button class="close-btn" onclick="app.closeModal('modalSuperAptoPagos')">&times;</button>
+            </div>
+
+            <!-- Resumen de Balance del Apto -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem;">
+                <div style="background: var(--bg-card); padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Estado de Solvencia</div>
+                    <div id="superModalAptoSolvencia" style="font-weight: 700; font-size: 1rem; margin-top: 0.2rem;">-</div>
+                </div>
+                <div style="background: var(--bg-card); padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Total Pagado Aprobado</div>
+                    <div id="superModalAptoTotalPagado" style="font-weight: 700; font-size: 1rem; color: #34d399; margin-top: 0.2rem;">$0.00 USD</div>
+                </div>
+                <div style="background: var(--bg-card); padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Balance / Deuda</div>
+                    <div id="superModalAptoBalance" style="font-weight: 700; font-size: 1rem; margin-top: 0.2rem;">$0.00 USD</div>
+                </div>
+            </div>
+
+            <!-- Tabla de Pagos de la Unidad -->
+            <div style="max-height: 350px; overflow-y: auto;">
+                <table class="table-saas" style="font-size: 0.85rem;">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Método</th>
+                            <th>Referencia</th>
+                            <th>Monto</th>
+                            <th>Estado Auditado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="superModalAptoPagosBody">
+                        <!-- Llenado dinámico -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem;">
+                <button class="demo-btn" onclick="app.closeModal('modalSuperAptoPagos')">Cerrar Inspección</button>
+            </div>
+        </div>
     </div>
 
     <!-- CONTROLADOR JAVASCRIPT -->
     <script>
+        const SUPABASE_URL = 'https://xlyfbwsfojzmcgjgcsrw.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhseWZid3Nmb2p6bWNnamdjc3J3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMTAzNjYsImV4cCI6MjEwNzU4NjM2Nn0.reJ5Iv8rjpKXfbsGChqX4-roeEGXhr2zOCOTt5RwTUY';
+        let sbClient = null;
+        try {
+            if (window.supabase && typeof window.supabase.createClient === 'function') {
+                sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            }
+        } catch (e) {
+            console.warn('Supabase client error:', e);
+        }
+
         const INITIAL_STATE = {
             activeCondoId: 1,
             condominios: [
@@ -1366,7 +1665,7 @@
                     tiene_pb: 1,
                     aptos_pb_cant: 2,
                     aptos_por_piso: 4,
-                    tasa_dolar: 72.40,
+                    tasa_dolar: 877.90,
                     banco_pago_movil: 'Banco Banesco (0134) | RIF: J-12345678-0 | Teléfono: 0414-1234567',
                     banco_transferencia: 'Banesco Cta Corriente: 0134-0000-00-0000000000 | RIF: J-12345678-0',
                     cuenta_zelle: 'condominio.samanes@gmail.com (Titular: Junta de Condominio)'
@@ -1928,7 +2227,81 @@
             cuotas: [],
             pagos: [],
             comunicados: [],
-            tickets: []
+            tickets: [],
+            logs: [
+                {
+                    id: 1792000001,
+                    fecha: '14/10/2026, 05:45:10 PM',
+                    condominio: 'Residencia Chichi Suggar',
+                    usuario: 'Admin (Auditor)',
+                    accion: 'PAGO_APROBADO',
+                    detalle: 'Aprobación de pago de Apto 7A por $120.00 USD (Ref: 981240, Zelle)'
+                },
+                {
+                    id: 1792000002,
+                    fecha: '14/10/2026, 05:40:22 PM',
+                    condominio: 'Residencia Chichi Suggar',
+                    usuario: 'Admin (Auditor)',
+                    accion: 'PAGO_APROBADO',
+                    detalle: 'Aprobación de pago de Apto 2A por $140.00 USD (Ref: 541092, Zelle - Saldo a Favor: +$20 USD)'
+                },
+                {
+                    id: 1792000003,
+                    fecha: '14/10/2026, 05:30:15 PM',
+                    condominio: 'Residencia Chichi Suggar',
+                    usuario: 'Admin (Auditor)',
+                    accion: 'PAGO_APROBADO',
+                    detalle: 'Aprobación de pago de Apto 1A por $120.00 USD (Ref: 771204, Efectivo USD)'
+                },
+                {
+                    id: 1792000004,
+                    fecha: '14/10/2026, 05:25:01 PM',
+                    condominio: 'Residencia Chichi Suggar',
+                    usuario: 'Admin',
+                    accion: 'CUOTA_EMITIDA',
+                    detalle: 'Emisión de cuota "Extraordinaria Hidroneumático y Bomba" (extraordinaria) por $50.00 USD a todo el edificio'
+                },
+                {
+                    id: 1792000005,
+                    fecha: '14/10/2026, 05:20:30 PM',
+                    condominio: 'Residencia Chichi Suggar',
+                    usuario: 'Admin',
+                    accion: 'CUOTA_EMITIDA',
+                    detalle: 'Emisión de cuota "Fondo de Reserva Operativo" (reserva) por $25.00 USD a todo el edificio'
+                },
+                {
+                    id: 1792000006,
+                    fecha: '14/10/2026, 05:15:10 PM',
+                    condominio: 'Residencia Chichi Suggar',
+                    usuario: 'Admin',
+                    accion: 'CUOTA_EMITIDA',
+                    detalle: 'Emisión de cuota "Mantenimiento Ordinario Mensual" (ordinaria) por $45.00 USD a todo el edificio'
+                },
+                {
+                    id: 1792000007,
+                    fecha: '14/10/2026, 05:00:00 PM',
+                    condominio: 'Residencia Chichi Suggar',
+                    usuario: 'clusterlg (Superadmin)',
+                    accion: 'ADJUDICACION',
+                    detalle: 'Adjudicación y carga del 65% del padrón residencial (18 apartamentos ocupados con copropietarios y contactos)'
+                },
+                {
+                    id: 1792000008,
+                    fecha: '14/10/2026, 04:30:00 PM',
+                    condominio: 'Residencia Chichi Suggar',
+                    usuario: 'clusterlg (Superadmin)',
+                    accion: 'CONDOMINIO',
+                    detalle: 'Registro y alta en plataforma del condominio "Residencia Chichi Suggar" (8 Pisos + PB, 27 Apartamentos)'
+                },
+                {
+                    id: 1792000009,
+                    fecha: '14/10/2026, 04:00:00 PM',
+                    condominio: 'Residencias Los Samanes',
+                    usuario: 'clusterlg (Superadmin)',
+                    accion: 'CONDOMINIO',
+                    detalle: 'Inicialización de plataforma base y arquitectura multiresidencial'
+                }
+            ]
         };
 
         function generateCleanUnits(condoId, pisos, porPiso, tienePB, aptosPB) {
@@ -1973,8 +2346,19 @@
             state: null,
             currentRole: null,
             currentResidentApto: null,
+            currentResidentTab: 'finanzas',
+            currentAdminTab: 'mapa',
             floorFilter: 'todos',
             cachedBalanceUSD: 0,
+
+            // Variables de control del Superadmin
+            superActiveTab: 'condos',
+            superAuditCondoId: 2,
+            superAuditFilter: 'todos',
+            superAuditSearch: '',
+            superLogCondoFilter: 'todos',
+            superLogTipoFilter: 'todos',
+            superLogSearch: '',
 
             init() {
                 const saved = localStorage.getItem('condohub_saas_data_v70');
@@ -1993,6 +2377,10 @@
                 if (!this.state.comunicados) this.state.comunicados = [];
                 if (!this.state.pagos) this.state.pagos = [];
                 if (!this.state.cuotas) this.state.cuotas = [];
+                if (!this.state.logs || this.state.logs.length === 0) {
+                    this.state.logs = JSON.parse(JSON.stringify(INITIAL_STATE.logs));
+                    this.save();
+                }
 
                 // Asegurar tasa BCV oficial
                 const condo = this.getActiveCondo();
@@ -2003,8 +2391,159 @@
 
                 this.renderHome();
 
-                // Intentar sincronización automática y silenciosa de tasa BCV al iniciar
+                // 1. Sincronización inmediata con Supabase en la nube
+                this.syncFromSupabase(false);
+
+                // 2. Polling periódico de sincronización automática cada 8 segundos (sincroniza automáticamente entre dispositivos)
+                setInterval(() => {
+                    this.syncFromSupabase(false);
+                }, 8000);
+
+                // 3. Resincronizar cuando el usuario regrese o cambie a esta pestaña
+                window.addEventListener('focus', () => {
+                    this.syncFromSupabase(false);
+                });
+
+                // 4. Intentar sincronización automática y silenciosa de tasa BCV al iniciar
                 this.actualizarTasaBCV(false);
+            },
+
+            async syncFromSupabase(isManual = false) {
+                if (!sbClient) return;
+
+                const icon = document.getElementById('cloudStatusIcon');
+                const text = document.getElementById('cloudStatusText');
+                if (icon) icon.className = 'bi bi-arrow-repeat spin';
+                if (text) text.innerText = 'Sincronizando...';
+
+                try {
+                    const [resCondos, resAptos, resCuotas, resPagos, resComunicados, resTickets] = await Promise.all([
+                        sbClient.from('condominios').select('*').order('id'),
+                        sbClient.from('apartamentos').select('*').order('id'),
+                        sbClient.from('cuotas').select('*').order('id'),
+                        sbClient.from('pagos').select('*').order('id'),
+                        sbClient.from('comunicados').select('*').order('id'),
+                        sbClient.from('tickets').select('*').order('id')
+                    ]);
+
+                    let updated = false;
+
+                    if (resCondos.data && resCondos.data.length > 0) {
+                        this.state.condominios = resCondos.data;
+                        updated = true;
+                    }
+
+                    if (resAptos.data && resAptos.data.length > 0) {
+                        this.state.apartamentos = resAptos.data.map(u => ({
+                            id: u.id,
+                            condoId: u.condominio_id,
+                            piso: u.piso,
+                            codigo: u.codigo,
+                            alicuota: parseFloat(u.alicuota) || 2.0,
+                            propietario: u.propietario,
+                            cedula: u.cedula,
+                            telefono: u.telefono,
+                            email: u.email,
+                            vehiculo: u.vehiculo
+                        }));
+                        updated = true;
+                    }
+
+                    if (resCuotas.data) {
+                        this.state.cuotas = resCuotas.data.map(c => ({
+                            id: c.id,
+                            condoId: c.condominio_id,
+                            titulo: c.titulo,
+                            tipo: c.tipo,
+                            monto_usd: parseFloat(c.monto_usd) || 0,
+                            fecha: c.fecha
+                        }));
+                        updated = true;
+                    }
+
+                    if (resPagos.data) {
+                        this.state.pagos = resPagos.data.map(p => ({
+                            id: p.id,
+                            condoId: p.condominio_id,
+                            apto: p.apto,
+                            metodo: p.metodo,
+                            monto: parseFloat(p.monto) || 0,
+                            moneda: p.moneda,
+                            ref: p.ref,
+                            fecha: p.fecha,
+                            estado: p.estado
+                        }));
+                        updated = true;
+                    }
+
+                    if (resComunicados.data) {
+                        this.state.comunicados = resComunicados.data.map(c => ({
+                            id: c.id,
+                            condoId: c.condominio_id,
+                            titulo: c.titulo,
+                            cuerpo: c.cuerpo,
+                            fecha: c.fecha
+                        }));
+                        updated = true;
+                    }
+
+                    if (resTickets.data) {
+                        this.state.tickets = resTickets.data.map(t => ({
+                            id: t.id,
+                            condoId: t.condominio_id,
+                            apto: t.apto,
+                            propietario: t.propietario,
+                            tipo: t.tipo,
+                            prioridad: t.prioridad,
+                            titulo: t.titulo,
+                            descripcion: t.descripcion,
+                            estado: t.estado,
+                            respuestaAdmin: t.respuesta_admin,
+                            fecha: t.fecha,
+                            fechaRespuesta: t.fecha_respuesta
+                        }));
+                        updated = true;
+                    }
+
+                    if (updated) {
+                        this.save();
+                        // Refrescar vistas activas
+                        const homeView = document.getElementById('viewHome');
+                        const adminView = document.getElementById('viewAdmin');
+                        const residentView = document.getElementById('viewResident');
+                        const superView = document.getElementById('viewSuperAdmin');
+
+                        if (homeView && homeView.style.display !== 'none') {
+                            this.renderHome();
+                        } else if (adminView && adminView.classList.contains('active')) {
+                            const curTab = this.currentAdminTab || 'mapa';
+                            if (curTab === 'mapa') this.renderAdminFloors();
+                            if (curTab === 'cuotas') this.renderCuotasTable();
+                            if (curTab === 'pagos') this.renderPagosTable();
+                            if (curTab === 'tickets') this.renderAdminTickets();
+                            if (curTab === 'comunicados') this.renderComunicados();
+                        } else if (residentView && residentView.classList.contains('active') && this.currentResidentApto) {
+                            this.openResidentDashboard(this.currentResidentApto, false);
+                        } else if (superView && superView.classList.contains('active')) {
+                            if (this.superActiveTab === 'audit') this.renderSuperCondoAudit();
+                            else if (this.superActiveTab === 'logs') this.renderSuperLogs();
+                            else this.renderSuperAdmin();
+                        }
+                    }
+
+                    if (icon) icon.className = 'bi bi-hdd-network-fill';
+                    if (text) text.innerText = 'Data Center Online';
+                    if (isManual) {
+                        this.toast('✅ Data Center sincronizado con la nube');
+                    }
+                } catch (err) {
+                    console.error('Error sincronizando con el Data Center:', err);
+                    if (icon) icon.className = 'bi bi-hdd-network';
+                    if (text) text.innerText = 'Modo Local';
+                    if (isManual) {
+                        this.toast('⚠️ Conexión local activa');
+                    }
+                }
             },
 
             // Helper centralizado para balance de apartamento
@@ -2060,7 +2599,7 @@
 
                             // Si estamos en dashboard de residente, recalcular montos
                             if (this.currentResidentApto) {
-                                this.openResidentDashboard(this.currentResidentApto);
+                                this.openResidentDashboard(this.currentResidentApto, false);
                             }
                             return;
                         }
@@ -2178,6 +2717,8 @@
                     return;
                 }
                 this.currentResidentApto = aptoCode;
+                const condo = this.getActiveCondo();
+                this.logActivity('LOGIN', `Inicio de sesión de residente en Apto ${aptoCode}`, `Apto ${aptoCode}`, condo ? condo.nombre : 'Condominio');
                 this.openResidentDashboard(aptoCode);
             },
 
@@ -2188,12 +2729,15 @@
 
                 // 1. SUPERADMINISTRADOR GLOBAL (clusterlg / glretsulc)
                 if (user === 'clusterlg' && pass === 'glretsulc') {
+                    this.logActivity('LOGIN', 'Inicio de sesión de Superadministrador Global (clusterlg)', 'clusterlg (Superadmin)', 'Plataforma Global');
                     this.openSuperAdminDashboard();
                     return;
                 }
 
                 // 2. ADMINISTRADOR LOCAL DEL CONDOMINIO (admin / admin123)
                 if (user === 'admin' && pass === 'admin123') {
+                    const condo = this.getActiveCondo();
+                    this.logActivity('LOGIN', `Inicio de sesión de Administrador Local en ${condo ? condo.nombre : 'Condominio'}`, 'admin (Admin)', condo ? condo.nombre : 'Condominio');
                     this.openAdminDashboard('Admin');
                     return;
                 }
@@ -2204,35 +2748,136 @@
             // DASHBOARDS
             openSuperAdminDashboard() {
                 window.scrollTo(0, 0);
+                this.currentRole = 'Super-Admin';
                 document.getElementById('viewHome').style.display = 'none';
                 document.getElementById('viewAdmin').classList.remove('active');
                 document.getElementById('viewResident').classList.remove('active');
                 const superView = document.getElementById('viewSuperAdmin');
                 superView.classList.add('active');
 
-                this.renderSuperAdmin();
+                this.switchSuperTab(this.superActiveTab || 'condos');
                 this.toast('Bienvenido Superusuario Global (clusterlg)');
             },
 
+            // SUB-PESTAÑAS DEL SUPERADMINISTRADOR
+            switchSuperTab(tabName, btnEl) {
+                this.superActiveTab = tabName;
+                const btnCondos = document.getElementById('superTabBtnCondos');
+                const btnAudit = document.getElementById('superTabBtnAudit');
+                const btnLogs = document.getElementById('superTabBtnLogs');
+
+                if (btnCondos) btnCondos.classList.toggle('active', tabName === 'condos');
+                if (btnAudit) btnAudit.classList.toggle('active', tabName === 'audit');
+                if (btnLogs) btnLogs.classList.toggle('active', tabName === 'logs');
+
+                const contentCondos = document.getElementById('superTabCondosContent');
+                const contentAudit = document.getElementById('superTabAuditContent');
+                const contentLogs = document.getElementById('superTabLogsContent');
+
+                if (contentCondos) contentCondos.style.display = tabName === 'condos' ? 'block' : 'none';
+                if (contentAudit) contentAudit.style.display = tabName === 'audit' ? 'block' : 'none';
+                if (contentLogs) contentLogs.style.display = tabName === 'logs' ? 'block' : 'none';
+
+                if (tabName === 'condos') this.renderSuperAdmin();
+                if (tabName === 'audit') this.renderSuperCondoAudit();
+                if (tabName === 'logs') this.renderSuperLogs();
+            },
+
+            // AL SELECCIONAR UN CONDOMINIO: NO ENTRA A MODO ADMIN, SINO A AUDITORÍA DETALLADA
+            openSuperCondoAudit(condoId) {
+                this.superAuditCondoId = condoId;
+                const condo = this.state.condominios.find(c => c.id === condoId);
+                const tabBtn = document.getElementById('superTabBtnAudit');
+                this.switchSuperTab('audit', tabBtn);
+                if (condo) {
+                    this.toast(`🔍 Auditoría activa: ${condo.nombre}`);
+                }
+            },
+
+            handleSuperCondoSelectChange(condoId) {
+                this.superAuditCondoId = parseInt(condoId);
+                this.renderSuperCondoAudit();
+            },
+
+            setSuperAuditFilter(filter) {
+                this.superAuditFilter = filter;
+                const bAll = document.getElementById('superAuditFilterAll');
+                const bOcup = document.getElementById('superAuditFilterOcup');
+                const bDisp = document.getElementById('superAuditFilterDisp');
+                const bSolv = document.getElementById('superAuditFilterSolv');
+                const bMoro = document.getElementById('superAuditFilterMoro');
+
+                if (bAll) bAll.classList.toggle('active', filter === 'todos');
+                if (bOcup) bOcup.classList.toggle('active', filter === 'ocupados');
+                if (bDisp) bDisp.classList.toggle('active', filter === 'disponibles');
+                if (bSolv) bSolv.classList.toggle('active', filter === 'solventes');
+                if (bMoro) bMoro.classList.toggle('active', filter === 'morosos');
+
+                this.renderSuperCondoAudit();
+            },
+
+            handleSuperAuditSearch(val) {
+                this.superAuditSearch = (val || '').toLowerCase().trim();
+                this.renderSuperCondoAudit();
+            },
+
             renderSuperAdmin() {
-                document.getElementById('superTotalCondos').innerText = this.state.condominios.length;
-                document.getElementById('superTotalUnits').innerText = this.state.apartamentos.length;
+                const totalCondos = this.state.condominios.length;
+                const totalUnits = this.state.apartamentos.length;
+                const occupiedUnits = this.state.apartamentos.filter(u => u.propietario !== null).length;
+                const globalOccupancy = totalUnits > 0 ? ((occupiedUnits / totalUnits) * 100).toFixed(1) : '0';
+
+                const elTotalCondos = document.getElementById('superTotalCondos');
+                const elTotalUnits = document.getElementById('superTotalUnits');
+                const elGlobalOcc = document.getElementById('superGlobalOccupancy');
+
+                if (elTotalCondos) elTotalCondos.innerText = totalCondos;
+                if (elTotalUnits) elTotalUnits.innerText = totalUnits;
+                if (elGlobalOcc) elGlobalOcc.innerText = `${globalOccupancy}%`;
+
+                const totalLogs = (this.state.logs || []).length;
+                const statLogs = document.getElementById('superTotalLogsStat');
+                if (statLogs) statLogs.innerText = totalLogs;
+                const badgeLogs = document.getElementById('superLogsCountBadge');
+                if (badgeLogs) badgeLogs.innerText = totalLogs;
 
                 const tbody = document.getElementById('superCondosTableBody');
+                if (!tbody) return;
                 tbody.innerHTML = '';
+
                 this.state.condominios.forEach(c => {
                     const units = this.getCondoUnits(c.id);
+                    const occupied = units.filter(u => u.propietario !== null);
+                    const occPct = units.length > 0 ? ((occupied.length / units.length) * 100).toFixed(1) : 0;
+
+                    let solventes = 0;
+                    let morosos = 0;
+                    occupied.forEach(u => {
+                        const bal = this.getAptoBalance(c.id, u.codigo);
+                        if (bal <= 0.005) solventes++;
+                        else morosos++;
+                    });
+
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td><strong>${c.nombre}</strong></td>
-                        <td><code>${c.rif || 'N/A'}</code></td>
-                        <td>${c.direccion || 'Caracas'}</td>
-                        <td>${c.tiene_pb ? 'PB + ' : ''}${c.pisos_cant} Pisos</td>
-                        <td><span class="stat-badge clean">${units.length} Aptos</span></td>
-                        <td>Bs. ${(c.tasa_dolar || 877.90).toFixed(2)}</td>
                         <td>
-                            <button class="btn-primary-saas" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.8rem;" onclick="app.administerCondoFromSuper(${c.id})">
-                                <i class="bi bi-speedometer2"></i> Administrar
+                            <strong style="font-size: 0.95rem; color: #fff;">${c.nombre}</strong><br>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);"><i class="bi bi-geo-alt"></i> ${c.direccion || 'Caracas, Venezuela'}</span>
+                        </td>
+                        <td><code>${c.rif || 'N/A'}</code></td>
+                        <td>${c.tiene_pb ? 'PB + ' : ''}${c.pisos_cant} Pisos</td>
+                        <td>
+                            <span class="stat-badge clean" style="font-weight: 700;">${occupied.length}/${units.length} (${occPct}%)</span>
+                        </td>
+                        <td>
+                            <span style="color: #34d399; font-size: 0.82rem; font-weight: 600;"><i class="bi bi-check-circle-fill"></i> ${solventes} al día</span>
+                            <span style="color: var(--text-muted); margin: 0 4px;">•</span>
+                            <span style="color: #ef4444; font-size: 0.82rem; font-weight: 600;"><i class="bi bi-exclamation-triangle-fill"></i> ${morosos} morosos</span>
+                        </td>
+                        <td><strong style="color: #fbbf24;">Bs. ${(c.tasa_dolar || 877.90).toFixed(2)}</strong></td>
+                        <td>
+                            <button class="btn-primary-saas" style="width: auto; padding: 0.4rem 0.85rem; font-size: 0.82rem; background: #8b5cf6;" onclick="app.openSuperCondoAudit(${c.id})">
+                                <i class="bi bi-search"></i> Inspeccionar Residencia
                             </button>
                         </td>
                     `;
@@ -2240,10 +2885,420 @@
                 });
             },
 
-            administerCondoFromSuper(condoId) {
-                this.state.activeCondoId = condoId;
+            // AUDITORÍA PROFUNDA DE LA RESIDENCIA SELECCIONADA (DATOS, OCUPACIÓN, PAGOS, USUARIOS, CONTRASEÑAS)
+            renderSuperCondoAudit() {
+                const condo = this.state.condominios.find(c => c.id === this.superAuditCondoId) || this.state.condominios[0];
+                if (!condo) return;
+                this.superAuditCondoId = condo.id;
+
+                // Llenar selector de condominios
+                const selector = document.getElementById('superAuditCondoSelector');
+                if (selector) {
+                    selector.innerHTML = '';
+                    this.state.condominios.forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c.id;
+                        opt.innerText = `🏢 ${c.nombre} (${this.getCondoUnits(c.id).length} Aptos)`;
+                        if (c.id === condo.id) opt.selected = true;
+                        selector.appendChild(opt);
+                    });
+                }
+
+                // Datos de ficha
+                const infoText = document.getElementById('auditCondoInfoText');
+                if (infoText) {
+                    const pb = condo.tiene_pb ? 'PB + ' : '';
+                    infoText.innerText = `${condo.nombre} | RIF: ${condo.rif || 'N/A'} | ${pb}${condo.pisos_cant} Pisos | Dir: ${condo.direccion || 'Caracas'}`;
+                }
+                const rateText = document.getElementById('auditCondoRateText');
+                if (rateText) {
+                    rateText.innerText = `${(condo.tasa_dolar || 877.90).toFixed(2)} Bs/USD`;
+                }
+
+                const allUnits = this.getCondoUnits(condo.id);
+                const occupiedUnits = allUnits.filter(u => u.propietario !== null);
+                const occPct = allUnits.length > 0 ? ((occupiedUnits.length / allUnits.length) * 100).toFixed(1) : 0;
+
+                // Calcular balances, solventes y morosos
+                let solventes = 0;
+                let morosos = 0;
+                let totalDeudaUSD = 0;
+
+                const unitsWithFinances = allUnits.map(u => {
+                    const balance = this.getAptoBalance(condo.id, u.codigo);
+                    const isOccupied = u.propietario !== null;
+                    if (isOccupied) {
+                        if (balance <= 0.005) {
+                            solventes++;
+                        } else {
+                            morosos++;
+                            totalDeudaUSD += balance;
+                        }
+                    }
+                    return { ...u, balance, isOccupied };
+                });
+
+                // Métricas cards
+                const elCardUnits = document.getElementById('auditCardUnits');
+                const elCardOcc = document.getElementById('auditCardOcupacion');
+                const elCardOccLbl = document.getElementById('auditCardOcupacionLabel');
+                const elCardSolv = document.getElementById('auditCardSolventes');
+                const elCardMoro = document.getElementById('auditCardMorosos');
+                const elCardDeuda = document.getElementById('auditCardDeudaTotal');
+                const elCardDeudaBs = document.getElementById('auditCardDeudaTotalBs');
+
+                if (elCardUnits) elCardUnits.innerText = `${allUnits.length} Aptos`;
+                if (elCardOcc) elCardOcc.innerText = `${occupiedUnits.length} / ${allUnits.length} (${occPct}%)`;
+                if (elCardOccLbl) elCardOccLbl.innerText = `${allUnits.length - occupiedUnits.length} Apartamentos Disponibles`;
+                if (elCardSolv) elCardSolv.innerText = `${solventes} Solventes`;
+                if (elCardMoro) elCardMoro.innerText = `${morosos} Morosos`;
+                if (elCardDeuda) elCardDeuda.innerText = `$${totalDeudaUSD.toFixed(2)} USD`;
+                const bsDeudaTotal = (totalDeudaUSD * condo.tasa_dolar).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                if (elCardDeudaBs) elCardDeudaBs.innerText = `Equiv: Bs. ${bsDeudaTotal}`;
+
+                // Filtrar unidades para la tabla
+                let filtered = unitsWithFinances;
+                if (this.superAuditFilter === 'ocupados') {
+                    filtered = filtered.filter(u => u.isOccupied);
+                } else if (this.superAuditFilter === 'disponibles') {
+                    filtered = filtered.filter(u => !u.isOccupied);
+                } else if (this.superAuditFilter === 'solventes') {
+                    filtered = filtered.filter(u => u.isOccupied && u.balance <= 0.005);
+                } else if (this.superAuditFilter === 'morosos') {
+                    filtered = filtered.filter(u => u.isOccupied && u.balance > 0.005);
+                }
+
+                // Filtrar por texto de búsqueda
+                if (this.superAuditSearch) {
+                    const q = this.superAuditSearch;
+                    filtered = filtered.filter(u => {
+                        return (u.codigo && u.codigo.toLowerCase().includes(q)) ||
+                               (u.propietario && u.propietario.toLowerCase().includes(q)) ||
+                               (u.cedula && u.cedula.toLowerCase().includes(q)) ||
+                               (u.telefono && u.telefono.toLowerCase().includes(q)) ||
+                               (u.email && u.email.toLowerCase().includes(q));
+                    });
+                }
+
+                const tbody = document.getElementById('superAuditTableBody');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+
+                if (filtered.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">No se encontraron residencias con el filtro aplicado.</td></tr>`;
+                    return;
+                }
+
+                filtered.forEach(u => {
+                    const pagosApto = this.state.pagos.filter(p => p.condoId === condo.id && p.apto === u.codigo);
+                    const tr = document.createElement('tr');
+
+                    // Formato Estado Financiero
+                    let solvenciaBadge = '';
+                    if (!u.isOccupied) {
+                        solvenciaBadge = `<span class="stat-badge" style="background: var(--bg-card); color: var(--text-muted);">Vacante</span>`;
+                    } else if (u.balance < -0.005) {
+                        const favorUSD = Math.abs(u.balance).toFixed(2);
+                        solvenciaBadge = `
+                            <span class="stat-badge clean"><i class="bi bi-check-circle-fill"></i> Solvente</span>
+                            <div style="font-size: 0.76rem; color: #34d399; font-weight: 700; margin-top: 2px;">Saldo a favor: +$${favorUSD} USD</div>
+                        `;
+                    } else if (u.balance <= 0.005) {
+                        solvenciaBadge = `
+                            <span class="stat-badge clean"><i class="bi bi-check2"></i> Solvente al Día</span>
+                            <div style="font-size: 0.76rem; color: var(--text-secondary); margin-top: 2px;">$0.00 Deuda</div>
+                        `;
+                    } else {
+                        const deudaBs = (u.balance * condo.tasa_dolar).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                        solvenciaBadge = `
+                            <span class="stat-badge" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
+                                <i class="bi bi-exclamation-triangle-fill"></i> Moroso
+                            </span>
+                            <div style="font-size: 0.8rem; color: #ef4444; font-weight: 700; margin-top: 2px;">Debe: $${u.balance.toFixed(2)} USD</div>
+                            <div style="font-size: 0.74rem; color: #fbbf24;">Bs. ${deudaBs}</div>
+                        `;
+                    }
+
+                    // Contacto formateado
+                    let contactoHtml = '<span style="color: var(--text-muted); font-size: 0.8rem;">-</span>';
+                    if (u.cedula || u.telefono || u.email) {
+                        contactoHtml = `
+                            <div style="font-size: 0.82rem; font-weight: 600; color: #fff;">${u.cedula || 'C.I. Sin registrar'}</div>
+                            ${u.telefono ? `<div style="font-size: 0.78rem;"><a href="https://wa.me/${u.telefono.replace(/[^0-9]/g, '')}" target="_blank" style="color: #60a5fa; text-decoration: none;"><i class="bi bi-whatsapp"></i> ${u.telefono}</a></div>` : ''}
+                            ${u.email ? `<div style="font-size: 0.74rem; color: var(--text-muted);">${u.email}</div>` : ''}
+                        `;
+                    }
+
+                    // Vehículo
+                    let vehiculoHtml = '<span style="color: var(--text-muted); font-size: 0.8rem;">Sin vehículo</span>';
+                    if (u.vehiculo) {
+                        vehiculoHtml = `<span style="font-size: 0.82rem; color: #e2e8f0;"><i class="bi bi-car-front-fill text-primary"></i> ${u.vehiculo}</span>`;
+                    }
+
+                    tr.innerHTML = `
+                        <td>
+                            <strong style="font-size: 1rem; color: #fff;">${u.codigo}</strong><br>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">${u.piso === 0 ? 'Planta Baja' : 'Piso ' + u.piso} • Alíc: ${u.alicuota}%</span>
+                        </td>
+                        <td>
+                            ${u.isOccupied 
+                                ? `<span class="stat-badge clean" style="font-size: 0.75rem;"><i class="bi bi-person-fill"></i> Ocupado</span>` 
+                                : `<span class="stat-badge" style="background: var(--bg-card); color: var(--text-muted); font-size: 0.75rem;">Disponible</span>`}
+                        </td>
+                        <td>
+                            <strong style="color: ${u.propietario ? '#fff' : 'var(--text-muted)'}; font-size: 0.88rem;">
+                                ${u.propietario || 'Sin adjudicar'}
+                            </strong>
+                        </td>
+                        <td>${contactoHtml}</td>
+                        <td>${vehiculoHtml}</td>
+                        <td>
+                            <div style="display: flex; flex-direction: column; gap: 3px;">
+                                <span style="font-size: 0.78rem; color: var(--text-secondary);">Usuario: <code style="color: #fff;">${u.codigo}</code></span>
+                                <span style="font-size: 0.78rem; color: var(--text-secondary);">Clave: <code style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; font-weight: 700; padding: 2px 6px; border-radius: 4px;"><i class="bi bi-key-fill"></i> 123456</code></span>
+                            </div>
+                        </td>
+                        <td>${solvenciaBadge}</td>
+                        <td>
+                            <button class="demo-btn" style="padding: 0.35rem 0.65rem; font-size: 0.78rem;" onclick="app.showSuperResidentPayments(${condo.id}, '${u.codigo}')">
+                                <i class="bi bi-receipt"></i> Pagos (${pagosApto.length})
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            },
+
+            // AUDITORÍA DE PAGOS INDIVIDUALES DE LA UNIDAD DESDE SUPERADMIN
+            showSuperResidentPayments(condoId, aptoCode) {
+                const condo = this.state.condominios.find(c => c.id === condoId) || this.getActiveCondo();
+                const u = this.getCondoUnits(condoId).find(x => x.codigo === aptoCode);
+                const pagos = this.state.pagos.filter(p => p.condoId === condoId && p.apto === aptoCode);
+                const balance = this.getAptoBalance(condoId, aptoCode);
+
+                const pagosAprobados = pagos.filter(p => p.estado === 'aprobado');
+                const totalPagadoUSD = pagosAprobados.reduce((acc, p) => {
+                    let mUSD = p.moneda === 'USD' ? p.monto : (p.monto / condo.tasa_dolar);
+                    return acc + mUSD;
+                }, 0);
+
+                document.getElementById('superModalAptoTitle').innerText = `${condo.nombre} - Apartamento ${aptoCode}`;
+                document.getElementById('superModalAptoOwner').innerText = u && u.propietario 
+                    ? `Copropietario Adjudicado: ${u.propietario} (${u.cedula || 'Sin C.I.'})` 
+                    : `Apartamento sin copropietario adjudicado (Vacante)`;
+
+                const solvEl = document.getElementById('superModalAptoSolvencia');
+                const balEl = document.getElementById('superModalAptoBalance');
+                document.getElementById('superModalAptoTotalPagado').innerText = `$${totalPagadoUSD.toFixed(2)} USD`;
+
+                if (balance <= 0.005) {
+                    solvEl.innerHTML = `<span style="color: #34d399;"><i class="bi bi-check-circle-fill"></i> Solvente al Día</span>`;
+                    balEl.innerHTML = balance < -0.005 
+                        ? `<span style="color: #34d399;">+$${Math.abs(balance).toFixed(2)} USD (Saldo a Favor)</span>` 
+                        : `<span style="color: #fff;">$0.00 USD</span>`;
+                } else {
+                    solvEl.innerHTML = `<span style="color: #ef4444;"><i class="bi bi-exclamation-triangle-fill"></i> Moroso</span>`;
+                    balEl.innerHTML = `<span style="color: #ef4444; font-weight: 800;">$${balance.toFixed(2)} USD (Bs. ${(balance * condo.tasa_dolar).toLocaleString('es-VE', {minimumFractionDigits: 2})})</span>`;
+                }
+
+                const tbody = document.getElementById('superModalAptoPagosBody');
+                tbody.innerHTML = '';
+
+                if (pagos.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No hay pagos registrados para este apartamento.</td></tr>`;
+                } else {
+                    pagos.slice().reverse().forEach(p => {
+                        const tr = document.createElement('tr');
+                        const montoFmt = p.moneda === 'USD' 
+                            ? `$${p.monto.toFixed(2)} USD` 
+                            : `Bs. ${p.monto.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+                        let badgeColor = p.estado === 'aprobado' ? '#10b981' : (p.estado === 'rechazado' ? '#ef4444' : '#fbbf24');
+                        let badgeIcon = p.estado === 'aprobado' ? 'bi-check-all' : (p.estado === 'rechazado' ? 'bi-x-circle' : 'bi-hourglass-split');
+
+                        tr.innerHTML = `
+                            <td>${p.fecha}</td>
+                            <td>${p.metodo}</td>
+                            <td><code>${p.ref}</code></td>
+                            <td><strong>${montoFmt}</strong></td>
+                            <td><span class="stat-badge" style="color: ${badgeColor}; border-color: ${badgeColor}33;"><i class="bi ${badgeIcon}"></i> ${p.estado.toUpperCase()}</span></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+
+                this.openModal('modalSuperAptoPagos');
+            },
+
+            // BITÁCORA INMUTABLE DE LOGS DEL SISTEMA (EXCLUSIVO SUPERADMIN)
+            renderSuperLogs() {
+                const logs = this.state.logs || [];
+
+                // Poblar filtro de condominios
+                const condoFilterSelect = document.getElementById('superLogCondoFilter');
+                if (condoFilterSelect && condoFilterSelect.options.length <= 1) {
+                    condoFilterSelect.innerHTML = '<option value="todos">Todos los Condominios</option><option value="Plataforma Global">Plataforma Global</option>';
+                    this.state.condominios.forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c.nombre;
+                        opt.innerText = c.nombre;
+                        condoFilterSelect.appendChild(opt);
+                    });
+                }
+
+                // Estadísticas
+                const totalLogs = logs.length;
+                const loginsCount = logs.filter(l => l.accion === 'LOGIN').length;
+                const pagosCount = logs.filter(l => l.accion.includes('PAGO')).length;
+                const adminCount = logs.filter(l => !l.accion.includes('PAGO') && l.accion !== 'LOGIN').length;
+
+                const elStatTot = document.getElementById('logsStatTotal');
+                const elStatLog = document.getElementById('logsStatLogins');
+                const elStatPag = document.getElementById('logsStatPagos');
+                const elStatAdm = document.getElementById('logsStatAdmin');
+
+                if (elStatTot) elStatTot.innerText = totalLogs;
+                if (elStatLog) elStatLog.innerText = loginsCount;
+                if (elStatPag) elStatPag.innerText = pagosCount;
+                if (elStatAdm) elStatAdm.innerText = adminCount;
+
+                // Aplicar filtros
+                let filtered = logs;
+                const condoFilter = document.getElementById('superLogCondoFilter') ? document.getElementById('superLogCondoFilter').value : 'todos';
+                const tipoFilter = document.getElementById('superLogTipoFilter') ? document.getElementById('superLogTipoFilter').value : 'todos';
+                const searchTxt = document.getElementById('superLogSearchInput') ? document.getElementById('superLogSearchInput').value.toLowerCase().trim() : '';
+
+                if (condoFilter !== 'todos') {
+                    filtered = filtered.filter(l => (l.condominio || '').includes(condoFilter));
+                }
+
+                if (tipoFilter !== 'todos') {
+                    filtered = filtered.filter(l => (l.accion || '').includes(tipoFilter));
+                }
+
+                if (searchTxt) {
+                    filtered = filtered.filter(l => {
+                        return (l.detalle && l.detalle.toLowerCase().includes(searchTxt)) ||
+                               (l.usuario && l.usuario.toLowerCase().includes(searchTxt)) ||
+                               (l.condominio && l.condominio.toLowerCase().includes(searchTxt)) ||
+                               (l.accion && l.accion.toLowerCase().includes(searchTxt));
+                    });
+                }
+
+                const tbody = document.getElementById('superLogsTableBody');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+
+                if (filtered.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">No se encontraron registros de auditoría con los criterios seleccionados.</td></tr>`;
+                    return;
+                }
+
+                filtered.forEach(l => {
+                    const tr = document.createElement('tr');
+
+                    // Color de badge por tipo de acción
+                    let badgeStyle = 'background: rgba(139, 92, 246, 0.15); color: #c084fc; border-color: rgba(139, 92, 246, 0.3);';
+                    let icon = 'bi-activity';
+
+                    if (l.accion === 'LOGIN') {
+                        badgeStyle = 'background: rgba(59, 130, 246, 0.15); color: #60a5fa; border-color: rgba(59, 130, 246, 0.3);';
+                        icon = 'bi-box-arrow-in-right';
+                    } else if (l.accion === 'PAGO_APROBADO') {
+                        badgeStyle = 'background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.3);';
+                        icon = 'bi-check-circle-fill';
+                    } else if (l.accion === 'PAGO_RECHAZADO') {
+                        badgeStyle = 'background: rgba(239, 68, 68, 0.15); color: #ef4444; border-color: rgba(239, 68, 68, 0.3);';
+                        icon = 'bi-x-circle-fill';
+                    } else if (l.accion === 'PAGO_REPORTADO') {
+                        badgeStyle = 'background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3);';
+                        icon = 'bi-cash-coin';
+                    } else if (l.accion === 'CUOTA_EMITIDA') {
+                        badgeStyle = 'background: rgba(14, 165, 233, 0.15); color: #38bdf8; border-color: rgba(14, 165, 233, 0.3);';
+                        icon = 'bi-file-earmark-plus';
+                    } else if (l.accion === 'ADJUDICACION') {
+                        badgeStyle = 'background: rgba(168, 85, 247, 0.15); color: #c084fc; border-color: rgba(168, 85, 247, 0.3);';
+                        icon = 'bi-person-badge';
+                    } else if (l.accion === 'COMUNICADO') {
+                        badgeStyle = 'background: rgba(249, 115, 22, 0.15); color: #fb923c; border-color: rgba(249, 115, 22, 0.3);';
+                        icon = 'bi-megaphone';
+                    } else if (l.accion === 'TICKET') {
+                        badgeStyle = 'background: rgba(236, 72, 153, 0.15); color: #f472b6; border-color: rgba(236, 72, 153, 0.3);';
+                        icon = 'bi-chat-left-dots';
+                    } else if (l.accion === 'CONDOMINIO') {
+                        badgeStyle = 'background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.3);';
+                        icon = 'bi-building-add';
+                    }
+
+                    tr.innerHTML = `
+                        <td style="white-space: nowrap;"><code>${l.fecha}</code></td>
+                        <td><strong style="color: #fff; font-size: 0.85rem;"><i class="bi bi-building text-primary"></i> ${l.condominio || 'Plataforma Global'}</strong></td>
+                        <td><span style="font-size: 0.82rem; font-weight: 600; color: #e2e8f0;">${l.usuario || 'Sistema'}</span></td>
+                        <td><span class="stat-badge" style="${badgeStyle}"><i class="bi ${icon}"></i> ${l.accion}</span></td>
+                        <td><div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4; max-width: 480px;">${l.detalle}</div></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            },
+
+            filterSuperLogs() {
+                this.renderSuperLogs();
+            },
+
+            exportSuperLogs() {
+                const logs = this.state.logs || [];
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logs, null, 2));
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.setAttribute("href", dataStr);
+                downloadAnchor.setAttribute("download", `bitacora_auditoria_condohub_${Date.now()}.json`);
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+                this.toast('📥 Bitácora exportada correctamente');
+            },
+
+            // FUNCIÓN CENTRALIZADA DE AUDITORÍA Y REGISTRO DE ACTIVIDAD INMUTABLE
+            logActivity(accion, detalle, usuario = 'Sistema', condoNombre = 'Plataforma Global') {
+                if (!this.state.logs) this.state.logs = [];
+
+                const logItem = {
+                    id: Date.now() + Math.floor(Math.random() * 1000),
+                    fecha: new Date().toLocaleString('es-VE', { dateStyle: 'short', timeStyle: 'medium' }),
+                    condominio: condoNombre,
+                    usuario: usuario,
+                    accion: accion,
+                    detalle: detalle
+                };
+
+                this.state.logs.unshift(logItem); // Más recientes primero
+                if (this.state.logs.length > 500) {
+                    this.state.logs = this.state.logs.slice(0, 500);
+                }
                 this.save();
-                this.openAdminDashboard('Super-Admin');
+
+                const badge = document.getElementById('superLogsCountBadge');
+                if (badge) badge.innerText = this.state.logs.length;
+                const statLogs = document.getElementById('superTotalLogsStat');
+                if (statLogs) statLogs.innerText = this.state.logs.length;
+
+                // Si estamos en la pestaña de logs, actualizar al instante
+                const superView = document.getElementById('viewSuperAdmin');
+                if (this.superActiveTab === 'logs' && superView && superView.classList.contains('active')) {
+                    this.renderSuperLogs();
+                }
+
+                // Opcional: enviar a Supabase si existe la tabla
+                if (sbClient) {
+                    try {
+                        Promise.resolve(sbClient.from('logs').insert([{
+                            condominio: condoNombre,
+                            usuario: usuario,
+                            accion: accion,
+                            detalle: detalle,
+                            fecha: logItem.fecha
+                        }])).catch(() => {});
+                    } catch (e) {}
+                }
             },
 
             openAdminDashboard(role) {
@@ -2393,6 +3448,7 @@
             },
 
             switchAdminTab(tabName, btnEl) {
+                this.currentAdminTab = tabName;
                 document.querySelectorAll('#viewAdmin .tab-item-saas').forEach(b => b.classList.remove('active'));
                 if (btnEl) btnEl.classList.add('active');
 
@@ -2426,7 +3482,7 @@
                 this.openModal('modalAdjudicar');
             },
 
-            saveAdjudicacion() {
+            async saveAdjudicacion() {
                 const code = document.getElementById('adjAptoCode').value;
                 const condo = this.getActiveCondo();
                 const u = this.getCondoUnits(condo.id).find(x => x.codigo === code);
@@ -2441,9 +3497,23 @@
                 this.closeModal('modalAdjudicar');
                 this.renderAdminFloors();
                 this.toast(`Apartamento ${code} adjudicado`);
+                this.logActivity('ADJUDICACION', `Adjudicación de Apto ${code} a ${u.propietario || 'Copropietario'} (C.I. ${u.cedula || 'N/A'})`, this.currentRole || 'Admin', condo.nombre);
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('apartamentos').update({
+                            propietario: u.propietario,
+                            cedula: u.cedula,
+                            telefono: u.telefono,
+                            email: u.email
+                        }).match({ condominio_id: condo.id, codigo: code });
+                    } catch (e) {
+                        console.error('Error adjudicando en Supabase:', e);
+                    }
+                }
             },
 
-            liberarApartamento() {
+            async liberarApartamento() {
                 const code = document.getElementById('adjAptoCode').value;
                 const condo = this.getActiveCondo();
                 const u = this.getCondoUnits(condo.id).find(x => x.codigo === code);
@@ -2459,6 +3529,21 @@
                 this.closeModal('modalAdjudicar');
                 this.renderAdminFloors();
                 this.toast(`Apartamento ${code} liberado (disponible)`);
+                this.logActivity('ADJUDICACION', `Liberación de Apto ${code} (pasa a Disponible / Vacante)`, this.currentRole || 'Admin', condo.nombre);
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('apartamentos').update({
+                            propietario: null,
+                            cedula: null,
+                            telefono: null,
+                            email: null,
+                            vehiculo: null
+                        }).match({ condominio_id: condo.id, codigo: code });
+                    } catch (e) {
+                        console.error('Error liberando en Supabase:', e);
+                    }
+                }
             },
 
             // 2. EMISIÓN INMEDIATA DE CUOTA
@@ -2466,7 +3551,7 @@
                 this.openModal('modalEmitirCuota');
             },
 
-            executeEmitirCuota() {
+            async executeEmitirCuota() {
                 const condo = this.getActiveCondo();
                 const titulo = document.getElementById('cuotaTitulo').value.trim();
                 const tipo = document.getElementById('cuotaTipo').value;
@@ -2491,6 +3576,22 @@
                 this.switchAdminTab('cuotas', tabCuotasBtn);
 
                 this.toast(`✅ Cuota "${titulo}" emitida a todo el edificio ($${monto.toFixed(2)})`);
+                this.logActivity('CUOTA_EMITIDA', `Emisión de cuota "${nuevaCuota.titulo}" (${nuevaCuota.tipo}) por $${nuevaCuota.monto_usd.toFixed(2)} USD a todo el edificio`, this.currentRole || 'Admin', condo.nombre);
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('cuotas').insert([{
+                            id: nuevaCuota.id,
+                            condominio_id: condo.id,
+                            titulo: nuevaCuota.titulo,
+                            tipo: nuevaCuota.tipo,
+                            monto_usd: nuevaCuota.monto_usd,
+                            fecha: nuevaCuota.fecha
+                        }]);
+                    } catch (e) {
+                        console.error('Error guardando cuota en Supabase:', e);
+                    }
+                }
             },
 
             renderCuotasTable() {
@@ -2566,23 +3667,43 @@
                 });
             },
 
-            aprobarPago(id) {
+            async aprobarPago(id) {
                 const p = this.state.pagos.find(x => x.id === id);
+                const condo = this.getActiveCondo();
                 if (p) {
                     p.estado = 'aprobado';
                     this.save();
                     this.renderPagosTable();
                     this.toast('✅ Pago verificado y acreditado al residente.');
+                    this.logActivity('PAGO_APROBADO', `Aprobación de pago de Apto ${p.apto} por ${p.monto} ${p.moneda} (Ref: ${p.ref}, ${p.metodo})`, this.currentRole || 'Admin', condo.nombre);
+
+                    if (sbClient) {
+                        try {
+                            await sbClient.from('pagos').update({ estado: 'aprobado' }).eq('id', id);
+                        } catch (e) {
+                            console.error('Error aprobando pago en Supabase:', e);
+                        }
+                    }
                 }
             },
 
-            rechazarPago(id) {
+            async rechazarPago(id) {
                 const p = this.state.pagos.find(x => x.id === id);
+                const condo = this.getActiveCondo();
                 if (p) {
                     p.estado = 'rechazado';
                     this.save();
                     this.renderPagosTable();
                     this.toast('❌ Pago rechazado por la administración.');
+                    this.logActivity('PAGO_RECHAZADO', `Rechazo de pago de Apto ${p.apto} por ${p.monto} ${p.moneda} (Ref: ${p.ref})`, this.currentRole || 'Admin', condo.nombre);
+
+                    if (sbClient) {
+                        try {
+                            await sbClient.from('pagos').update({ estado: 'rechazado' }).eq('id', id);
+                        } catch (e) {
+                            console.error('Error rechazando pago en Supabase:', e);
+                        }
+                    }
                 }
             },
 
@@ -2591,7 +3712,7 @@
                 this.openModal('modalNuevoComunicado');
             },
 
-            saveComunicado() {
+            async saveComunicado() {
                 const condo = this.getActiveCondo();
                 const titulo = document.getElementById('comunicadoTitulo').value.trim();
                 const cuerpo = document.getElementById('comunicadoCuerpo').value.trim();
@@ -2600,26 +3721,53 @@
                     return;
                 }
 
-                this.state.comunicados.push({
+                const nuevoComunicado = {
                     id: Date.now(),
                     condoId: condo.id,
                     titulo: titulo,
                     cuerpo: cuerpo,
                     fecha: new Date().toISOString().split('T')[0]
-                });
+                };
 
+                this.state.comunicados.push(nuevoComunicado);
                 this.save();
                 this.closeModal('modalNuevoComunicado');
                 this.renderComunicados();
                 this.toast('Comunicado publicado');
+                this.logActivity('COMUNICADO', `Publicación de aviso en cartelera: "${nuevoComunicado.titulo}"`, this.currentRole || 'Admin', condo.nombre);
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('comunicados').insert([{
+                            id: nuevoComunicado.id,
+                            condominio_id: condo.id,
+                            titulo: nuevoComunicado.titulo,
+                            cuerpo: nuevoComunicado.cuerpo,
+                            fecha: nuevoComunicado.fecha
+                        }]);
+                    } catch (e) {
+                        console.error('Error comunicados Supabase:', e);
+                    }
+                }
             },
 
-            eliminarComunicado(id) {
+            async eliminarComunicado(id) {
                 if (!confirm('¿Está seguro de eliminar este aviso de la cartelera?')) return;
+                const condo = this.getActiveCondo();
+                const c = (this.state.comunicados || []).find(x => x.id === id);
                 this.state.comunicados = (this.state.comunicados || []).filter(c => c.id !== id);
                 this.save();
                 this.renderComunicados();
                 this.toast('Comunicado eliminado de la cartelera');
+                this.logActivity('COMUNICADO', `Eliminó aviso de cartelera: "${c ? c.titulo : 'Aviso ID ' + id}"`, this.currentRole || 'Admin', condo.nombre);
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('comunicados').delete().eq('id', id);
+                    } catch (e) {
+                        console.error('Error eliminando comunicado en Supabase:', e);
+                    }
+                }
             },
 
             renderComunicados() {
@@ -2734,7 +3882,7 @@
                 this.openModal('modalGestionarTicket');
             },
 
-            saveTicketGestion() {
+            async saveTicketGestion() {
                 const id = parseInt(document.getElementById('manageTicketId').value);
                 const t = (this.state.tickets || []).find(x => x.id === id);
                 if (!t) return;
@@ -2747,19 +3895,43 @@
                 this.closeModal('modalGestionarTicket');
                 this.renderAdminTickets();
                 this.toast('✓ Solicitud actualizada y respuesta oficial enviada');
+                const condo = this.getActiveCondo();
+                this.logActivity('TICKET', `Atención de solicitud #${id} (Apto ${t.apto}) - Estado: ${t.estado.toUpperCase()}`, this.currentRole || 'Admin', condo.nombre);
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('tickets').update({
+                            estado: t.estado,
+                            respuesta_admin: t.respuestaAdmin,
+                            fecha_respuesta: t.fechaRespuesta
+                        }).eq('id', id);
+                    } catch (e) {
+                        console.error('Error tickets Supabase:', e);
+                    }
+                }
             },
 
-            eliminarTicket() {
+            async eliminarTicket() {
                 const id = parseInt(document.getElementById('manageTicketId').value);
                 if (!confirm('¿Desea eliminar esta solicitud del sistema?')) return;
+                const condo = this.getActiveCondo();
                 this.state.tickets = (this.state.tickets || []).filter(t => t.id !== id);
                 this.save();
                 this.closeModal('modalGestionarTicket');
                 this.renderAdminTickets();
                 this.toast('Solicitud eliminada');
+                this.logActivity('TICKET', `Eliminación de solicitud/ticket #${id}`, this.currentRole || 'Admin', condo.nombre);
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('tickets').delete().eq('id', id);
+                    } catch (e) {
+                        console.error('Error eliminando ticket Supabase:', e);
+                    }
+                }
             },
 
-            saveCondoSettings() {
+            async saveCondoSettings() {
                 const condo = this.getActiveCondo();
                 condo.tasa_dolar = parseFloat(document.getElementById('cfgTasaBcv').value) || 877.90;
                 condo.banco_pago_movil = document.getElementById('cfgPagoMovil').value;
@@ -2769,11 +3941,28 @@
                 this.save();
                 this.renderHome();
                 this.toast('Cuentas bancarias y parámetros guardados');
+                this.logActivity('CONDOMINIO', `Actualización de cuentas bancarias y tasa oficial (${condo.tasa_dolar.toFixed(2)} Bs/USD)`, this.currentRole || 'Admin', condo.nombre);
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('condominios').update({
+                            tasa_dolar: condo.tasa_dolar,
+                            banco_pago_movil: condo.banco_pago_movil,
+                            banco_transferencia: condo.banco_transferencia,
+                            cuenta_zelle: condo.cuenta_zelle
+                        }).eq('id', condo.id);
+                    } catch (e) {
+                        console.error('Error cuentas Supabase:', e);
+                    }
+                }
             },
 
             // 5. PORTAL RESIDENTE: ESTADO DE DEUDA EN ROJO, VERDE SOLO SI TIENE SALDO A FAVOR
-            openResidentDashboard(aptoCode) {
-                window.scrollTo(0, 0);
+            openResidentDashboard(aptoCode, resetTab = true) {
+                if (resetTab) {
+                    window.scrollTo(0, 0);
+                    this.currentResidentTab = 'finanzas';
+                }
                 this.currentResidentApto = aptoCode;
                 document.getElementById('viewHome').style.display = 'none';
                 document.getElementById('viewSuperAdmin').classList.remove('active');
@@ -2787,7 +3976,7 @@
                 document.getElementById('residentUnitTitle').innerText = `Apartamento ${aptoCode}`;
                 document.getElementById('residentOwnerSubtitle').innerText = u && u.propietario ? `Propietario: ${u.propietario}` : 'Sin propietario adjudicado';
 
-                if (u) {
+                if (u && !['resProfileName', 'resProfileCedula', 'resProfilePhone', 'resProfileEmail', 'resProfileVehiculo'].includes(document.activeElement?.id)) {
                     document.getElementById('resProfileName').value = u.propietario || '';
                     document.getElementById('resProfileCedula').value = u.cedula || '';
                     document.getElementById('resProfilePhone').value = u.telefono || '';
@@ -2851,13 +4040,20 @@
                 this.renderResidentTickets();
                 this.renderResidentCartelera();
 
-                // Regresar a la pestaña de finanzas por defecto
-                const firstTabBtn = document.querySelector('#viewResident .tab-item-saas');
-                if (firstTabBtn) this.switchResidentTab('finanzas', firstTabBtn);
+                // Mantener la pestaña que el usuario tiene abierta actualmente
+                const activeTab = this.currentResidentTab || 'finanzas';
+                const tabBtns = document.querySelectorAll('#viewResident .tab-item-saas');
+                let targetBtn = tabBtns[0];
+                if (activeTab === 'tickets') targetBtn = tabBtns[1];
+                else if (activeTab === 'cartelera') targetBtn = tabBtns[2];
+                else if (activeTab === 'perfil') targetBtn = tabBtns[3];
+
+                this.switchResidentTab(activeTab, targetBtn);
             },
 
             // PESTAÑAS DEL PORTAL DEL RESIDENTE
             switchResidentTab(tabName, btnEl) {
+                this.currentResidentTab = tabName;
                 document.querySelectorAll('#viewResident .tab-item-saas').forEach(b => b.classList.remove('active'));
                 if (btnEl) btnEl.classList.add('active');
 
@@ -2871,7 +4067,7 @@
             },
 
             // REDACTAR SOLICITUD / QUEJA (RESIDENTE)
-            submitResidentTicket() {
+            async submitResidentTicket() {
                 const condo = this.getActiveCondo();
                 const aptoCode = this.currentResidentApto;
                 const u = this.getCondoUnits(condo.id).find(x => x.codigo === aptoCode);
@@ -2909,6 +4105,26 @@
                 document.getElementById('ticketDescripcion').value = '';
                 this.renderResidentTickets();
                 this.toast('✓ Su solicitud ha sido enviada a la administración');
+                this.logActivity('TICKET', `Apto ${aptoCode} (${nuevoTicket.propietario}) envió solicitud "${titulo}" (${tipo.toUpperCase()})`, `Apto ${aptoCode}`, condo.nombre);
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('tickets').insert([{
+                            id: nuevoTicket.id,
+                            condominio_id: condo.id,
+                            apto: nuevoTicket.apto,
+                            propietario: nuevoTicket.propietario,
+                            tipo: nuevoTicket.tipo,
+                            prioridad: nuevoTicket.prioridad,
+                            titulo: nuevoTicket.titulo,
+                            descripcion: nuevoTicket.descripcion,
+                            estado: nuevoTicket.estado,
+                            fecha: nuevoTicket.fecha
+                        }]);
+                    } catch (e) {
+                        console.error('Error ticket Supabase:', e);
+                    }
+                }
             },
 
             renderResidentTickets() {
@@ -3032,7 +4248,7 @@
                 });
             },
 
-            saveResidentProfile() {
+            async saveResidentProfile() {
                 const condo = this.getActiveCondo();
                 const u = this.getCondoUnits(condo.id).find(x => x.codigo === this.currentResidentApto);
                 if (!u) return;
@@ -3046,6 +4262,21 @@
                 this.save();
                 this.toast('Perfil actualizado');
                 document.getElementById('residentOwnerSubtitle').innerText = u.propietario ? `Propietario: ${u.propietario}` : 'Sin propietario adjudicado';
+                this.logActivity('PERFIL', `Apto ${this.currentResidentApto} actualizó sus datos de contacto (${u.propietario || 'Copropietario'}, C.I. ${u.cedula || 'N/A'})`, `Apto ${this.currentResidentApto}`, condo.nombre);
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('apartamentos').update({
+                            propietario: u.propietario,
+                            cedula: u.cedula,
+                            telefono: u.telefono,
+                            email: u.email,
+                            vehiculo: u.vehiculo
+                        }).match({ condominio_id: condo.id, codigo: this.currentResidentApto });
+                    } catch (e) {
+                        console.error('Error perfil Supabase:', e);
+                    }
+                }
             },
 
             // 6. REPORTAR PAGO: BANNER SUPERIOR $ Y BS, REGLAS ESTRICTAS DE MONEDA
@@ -3084,7 +4315,7 @@
                 }
             },
 
-            submitResidentPago() {
+            async submitResidentPago() {
                 const condo = this.getActiveCondo();
                 const metodo = document.getElementById('pagoMetodo').value;
                 const monto = parseFloat(document.getElementById('pagoMonto').value) || 0;
@@ -3100,7 +4331,7 @@
                     return;
                 }
 
-                this.state.pagos.push({
+                const nuevoPago = {
                     id: Date.now(),
                     condoId: condo.id,
                     apto: this.currentResidentApto,
@@ -3110,8 +4341,9 @@
                     ref: ref,
                     fecha: new Date().toISOString().split('T')[0],
                     estado: 'pendiente' // Debe ser verificado por administración en auditoría
-                });
+                };
 
+                this.state.pagos.push(nuevoPago);
                 this.save();
                 this.closeModal('modalReportarPago');
                 document.getElementById('pagoRef').value = '';
@@ -3119,6 +4351,26 @@
                 // Recargar dashboard y tabla de pagos
                 this.openResidentDashboard(this.currentResidentApto);
                 this.toast('✅ Comprobante enviado. En proceso de auditoría por administración.');
+                const montoTxt = moneda === 'USD' ? `$${monto.toFixed(2)} USD` : `Bs. ${monto.toFixed(2)}`;
+                this.logActivity('PAGO_REPORTADO', `Apto ${this.currentResidentApto} reportó pago de ${montoTxt} vía ${metodo} (Ref: ${ref})`, `Apto ${this.currentResidentApto}`, condo.nombre);
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('pagos').insert([{
+                            id: nuevoPago.id,
+                            condominio_id: condo.id,
+                            apto: nuevoPago.apto,
+                            metodo: nuevoPago.metodo,
+                            monto: nuevoPago.monto,
+                            moneda: nuevoPago.moneda,
+                            ref: nuevoPago.ref,
+                            fecha: nuevoPago.fecha,
+                            estado: nuevoPago.estado
+                        }]);
+                    } catch (e) {
+                        console.error('Error enviando pago Supabase:', e);
+                    }
+                }
             },
 
             // NUEVO CONDOMINIO
@@ -3126,7 +4378,7 @@
                 this.openModal('modalNewCondo');
             },
 
-            createNewCondominio() {
+            async createNewCondominio() {
                 const nombre = document.getElementById('newCondoNombre').value.trim();
                 const rif = document.getElementById('newCondoRif').value.trim() || 'J-99999999-0';
                 const dir = document.getElementById('newCondoDireccion').value.trim() || 'Caracas, Venezuela';
@@ -3168,6 +4420,27 @@
                 this.closeModal('modalNewCondo');
                 this.renderSuperAdmin();
                 this.toast(`¡Condominio "${nombre}" creado con éxito con ${newUnits.length} apartamentos!`);
+                this.logActivity('CONDOMINIO', `Creación de nuevo condominio: "${nombre}" (${pisos} pisos, ${newUnits.length} apartamentos)`, 'clusterlg (Superadmin)', nombre);
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('condominios').insert([newCondo]);
+                        const rows = newUnits.map(u => ({
+                            condominio_id: newCondo.id,
+                            piso: u.piso,
+                            codigo: u.codigo,
+                            alicuota: u.alicuota,
+                            propietario: null,
+                            cedula: null,
+                            telefono: null,
+                            email: null,
+                            vehiculo: null
+                        }));
+                        await sbClient.from('apartamentos').insert(rows);
+                    } catch (e) {
+                        console.error('Error insertando nuevo condominio en Supabase:', e);
+                    }
+                }
             },
 
             openModal(id) {
