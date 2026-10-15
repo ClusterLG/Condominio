@@ -24,6 +24,9 @@ CREATE POLICY "Public full access" ON tickets FOR ALL TO public USING (true) WIT
 ALTER TABLE cuentas_bancarias ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Public full access" ON cuentas_bancarias;
 CREATE POLICY "Public full access" ON cuentas_bancarias FOR ALL TO public USING (true) WITH CHECK (true);
+ALTER TABLE usuarios ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public full access" ON usuarios;
+CREATE POLICY "Public full access" ON usuarios FOR ALL TO public USING (true) WITH CHECK (true);
 
 GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;
@@ -101,4 +104,30 @@ VALUES
 ('acc_chichi_pm', 2, 'pago_movil', '0105', 'Banco Mercantil', NULL, NULL, '0414', '9988776', 'J', '4658975-1', 'Condominio Chichi Suggar', NULL, 'Pago móvil verificado automáticamente', true),
 ('acc_chichi_tr', 2, 'transferencia', '0105', 'Banco Mercantil', 'Cuenta Corriente', '01051234567890123456', NULL, NULL, 'J', '4658975-1', 'Condominio Chichi Suggar', NULL, 'Cuenta corriente jurídica Mercantil', true),
 ('acc_chichi_zl', 2, 'zelle', 'ZELLE', 'Zelle (EE.UU. USD)', NULL, NULL, NULL, NULL, NULL, NULL, 'Condominio Chichi Suggar', 'chichi.suggar.condo@gmail.com', 'Colocar número de apartamento en el memo de Zelle', true);
+
+-- USUARIOS INICIALES (ADMINISTRATIVOS Y RESIDENTES)
+DELETE FROM public.usuarios WHERE username IN ('clusterlg', 'admin', 'admin_chichi');
+INSERT INTO public.usuarios (condominio_id, username, email, password, nombre_completo, cedula, telefono, rol, apto_codigo, activo)
+VALUES
+(NULL, 'clusterlg', 'lams210488@gmail.com', 'glretsulc', 'Superadministrador Global ClusterLG', 'V-00.000.000', '0414-1234567', 'superadmin', NULL, true),
+(1, 'admin', 'admin.samanes@gmail.com', 'admin123', 'Administrador Residencias Los Samanes', 'J-12345678-0', '0414-1234567', 'admin', NULL, true),
+(2, 'admin_chichi', 'chichi.suggar.condo@gmail.com', 'admin123', 'Administrador Residencia Chichi Suggar', 'J-4658975-1', '0414-9988776', 'admin', NULL, true);
+
+-- ALTA AUTOMÁTICA DE RESIDENTES COMO USUARIOS DESDE apartamentos
+INSERT INTO public.usuarios (condominio_id, username, email, password, nombre_completo, cedula, telefono, rol, apto_codigo, activo)
+SELECT 
+    a.condominio_id,
+    LOWER(REPLACE(CONCAT('c', a.condominio_id, '_', a.codigo), '-', '')) AS username,
+    COALESCE(a.email, CONCAT('apto.', LOWER(REPLACE(a.codigo, '-', '')), '@condominio.local')),
+    '123456' AS password,
+    COALESCE(a.propietario, CONCAT('Residente Apto ', a.codigo)),
+    a.cedula,
+    a.telefono,
+    'residente' AS rol,
+    a.codigo AS apto_codigo,
+    true AS activo
+FROM public.apartamentos a
+WHERE a.propietario IS NOT NULL
+ON CONFLICT (username) DO NOTHING;
+
 

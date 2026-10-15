@@ -8,6 +8,7 @@ DROP TABLE IF EXISTS comunicados CASCADE;
 DROP TABLE IF EXISTS pagos CASCADE;
 DROP TABLE IF EXISTS cuotas CASCADE;
 DROP TABLE IF EXISTS cuentas_bancarias CASCADE;
+DROP TABLE IF EXISTS usuarios CASCADE;
 DROP TABLE IF EXISTS apartamentos CASCADE;
 DROP TABLE IF EXISTS condominios CASCADE;
 
@@ -115,6 +116,23 @@ CREATE TABLE cuentas_bancarias (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- 8. TABLA: usuarios (GESTIÓN DE ACCESOS, ROLES Y CREDENCIALES)
+CREATE TABLE usuarios (
+    id BIGSERIAL PRIMARY KEY,
+    condominio_id BIGINT REFERENCES condominios(id) ON DELETE CASCADE,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    email VARCHAR(150),
+    password VARCHAR(255) NOT NULL DEFAULT '123456',
+    nombre_completo VARCHAR(150),
+    cedula VARCHAR(50),
+    telefono VARCHAR(50),
+    rol VARCHAR(50) NOT NULL DEFAULT 'residente',
+    apto_codigo VARCHAR(20),
+    activo BOOLEAN DEFAULT true,
+    ultimo_acceso TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- DESACTIVAR RLS TEMPORALMENTE PARA ACCESO PÚBLICO ANÓNIMO DIRECTO (SIN COMPLICACIONES)
 ALTER TABLE condominios DISABLE ROW LEVEL SECURITY;
 ALTER TABLE apartamentos DISABLE ROW LEVEL SECURITY;
@@ -123,6 +141,7 @@ ALTER TABLE pagos DISABLE ROW LEVEL SECURITY;
 ALTER TABLE comunicados DISABLE ROW LEVEL SECURITY;
 ALTER TABLE tickets DISABLE ROW LEVEL SECURITY;
 ALTER TABLE cuentas_bancarias DISABLE ROW LEVEL SECURITY;
+ALTER TABLE usuarios DISABLE ROW LEVEL SECURITY;
 
 -- DATOS INICIALES: RESIDENCIAS LOS SAMANES
 INSERT INTO condominios (id, slug, nombre, rif, direccion, pisos_cant, tiene_pb, aptos_pb_cant, aptos_por_piso, tasa_dolar, banco_pago_movil, banco_transferencia, cuenta_zelle)

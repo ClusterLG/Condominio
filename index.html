@@ -3107,14 +3107,15 @@
                 }
 
                 try {
-                    const [resCondos, resAptos, resCuotas, resPagos, resComunicados, resTickets, resCuentas] = await Promise.all([
+                    const [resCondos, resAptos, resCuotas, resPagos, resComunicados, resTickets, resCuentas, resUsuarios] = await Promise.all([
                         sbClient.from('condominios').select('*').order('id'),
                         sbClient.from('apartamentos').select('*').order('id'),
                         sbClient.from('cuotas').select('*').order('id'),
                         sbClient.from('pagos').select('*').order('id'),
                         sbClient.from('comunicados').select('*').order('id'),
                         sbClient.from('tickets').select('*').order('id'),
-                        sbClient.from('cuentas_bancarias').select('*').order('created_at')
+                        sbClient.from('cuentas_bancarias').select('*').order('created_at'),
+                        sbClient.from('usuarios').select('*').order('id')
                     ]);
 
                     let updated = false;
@@ -3252,6 +3253,22 @@
                             fecha: t.fecha,
                             fechaRespuesta: t.fecha_respuesta
                         }));
+                        updated = true;
+                    }
+
+                    if (resUsuarios && resUsuarios.data && resUsuarios.data.length > 0) {
+                        this.state.usuarios = resUsuarios.data;
+                        this.state.usuarios.forEach(u => {
+                            if (u.condominio_id && u.apto_codigo && u.password) {
+                                const unit = (this.state.apartamentos || []).find(a => 
+                                    String(a.condoId) === String(u.condominio_id) && 
+                                    this.normCode(a.codigo) === this.normCode(u.apto_codigo)
+                                );
+                                if (unit) {
+                                    unit.password = u.password;
+                                }
+                            }
+                        });
                         updated = true;
                     }
 
@@ -3625,6 +3642,28 @@
                 e.preventDefault();
                 const user = document.getElementById('admin-user').value.trim();
                 const pass = document.getElementById('admin-pass').value.trim();
+
+                // 0. VALIDACIÓN DINÁMICA CON TABLA USUARIOS EN SUPABASE
+                if (this.state.usuarios && this.state.usuarios.length > 0) {
+                    const userFound = this.state.usuarios.find(u => 
+                        u.username && u.username.toLowerCase() === user.toLowerCase() && 
+                        u.password === pass && 
+                        u.activo !== false
+                    );
+                    if (userFound) {
+                        if (userFound.rol === 'superadmin') {
+                            this.logActivity('LOGIN', `Inicio de sesión de Superadministrador (${userFound.username})`, `${userFound.username} (Superadmin)`, 'Plataforma Global');
+                            this.openSuperAdminDashboard();
+                            return;
+                        } else if (userFound.rol === 'admin' || userFound.rol === 'junta') {
+                            if (userFound.condominio_id) this.switchCondominio(userFound.condominio_id);
+                            const condo = this.getActiveCondo();
+                            this.logActivity('LOGIN', `Inicio de sesión de Administrador (${userFound.username}) en ${condo ? condo.nombre : 'Condominio'}`, `${userFound.username} (${userFound.rol})`, condo ? condo.nombre : 'Condominio');
+                            this.openAdminDashboard(userFound.rol === 'junta' ? 'Junta de Condominio' : 'Admin');
+                            return;
+                        }
+                    }
+                }
 
                 // 1. SUPERADMINISTRADOR GLOBAL (clusterlg / glretsulc)
                 if (user === 'clusterlg' && pass === 'glretsulc') {
@@ -6151,8 +6190,13 @@
                         await sbClient.from('apartamentos').update({
                             password: newPass
                         }).match({ condominio_id: condo.id, codigo: this.currentResidentApto });
+                    } catch (e) {}
+                    try {
+                        await sbClient.from('usuarios').update({
+                            password: newPass
+                        }).match({ condominio_id: condo.id, apto_codigo: this.currentResidentApto });
                     } catch (e) {
-                        console.error('Error guardando contraseña en Supabase:', e);
+                        console.warn('Error guardando contraseña en usuarios Supabase:', e);
                     }
                 }
             },
