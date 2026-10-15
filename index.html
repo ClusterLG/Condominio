@@ -614,7 +614,7 @@
             <form id="form-login-resident" onsubmit="app.handleResidentSubmit(event)">
                 <div class="form-group">
                     <label class="form-label"><i class="bi bi-house"></i> Apartamento Residencial:</label>
-                    <select id="res-codigo" class="form-control" required>
+                    <select id="res-codigo" class="form-control" required onchange="app.selectedResidentApto = this.value">
                         <!-- Apartamentos llenados dinámicamente -->
                     </select>
                 </div>
@@ -2346,6 +2346,7 @@
             state: null,
             currentRole: null,
             currentResidentApto: null,
+            selectedResidentApto: '',
             currentResidentTab: 'finanzas',
             currentAdminTab: 'mapa',
             floorFilter: 'todos',
@@ -2391,13 +2392,13 @@
 
                 this.renderHome();
 
-                // 1. Sincronización inmediata con Supabase en la nube
+                // 1. Sincronización inmediata con Supabase en la nube (silenciosa en segundo plano)
                 this.syncFromSupabase(false);
 
-                // 2. Polling periódico de sincronización automática cada 8 segundos (sincroniza automáticamente entre dispositivos)
+                // 2. Polling periódico silencioso en segundo plano cada 60 segundos (no reinicia la pantalla)
                 setInterval(() => {
                     this.syncFromSupabase(false);
-                }, 8000);
+                }, 60000);
 
                 // 3. Resincronizar cuando el usuario regrese o cambie a esta pestaña
                 window.addEventListener('focus', () => {
@@ -2413,8 +2414,10 @@
 
                 const icon = document.getElementById('cloudStatusIcon');
                 const text = document.getElementById('cloudStatusText');
-                if (icon) icon.className = 'bi bi-arrow-repeat spin';
-                if (text) text.innerText = 'Sincronizando...';
+                if (isManual) {
+                    if (icon) icon.className = 'bi bi-arrow-repeat spin';
+                    if (text) text.innerText = 'Sincronizando...';
+                }
 
                 try {
                     const [resCondos, resAptos, resCuotas, resPagos, resComunicados, resTickets] = await Promise.all([
@@ -2507,27 +2510,27 @@
 
                     if (updated) {
                         this.save();
-                        // Refrescar vistas activas
-                        const homeView = document.getElementById('viewHome');
-                        const adminView = document.getElementById('viewAdmin');
-                        const residentView = document.getElementById('viewResident');
-                        const superView = document.getElementById('viewSuperAdmin');
+                        // La sincronización en segundo plano NUNCA reinicia ni toca la pantalla actual
+                        // Solo si fue solicitada manualmente por el usuario (isManual = true) refresca las vistas de dashboard
+                        if (isManual) {
+                            const adminView = document.getElementById('viewAdmin');
+                            const residentView = document.getElementById('viewResident');
+                            const superView = document.getElementById('viewSuperAdmin');
 
-                        if (homeView && homeView.style.display !== 'none') {
-                            this.renderHome();
-                        } else if (adminView && adminView.classList.contains('active')) {
-                            const curTab = this.currentAdminTab || 'mapa';
-                            if (curTab === 'mapa') this.renderAdminFloors();
-                            if (curTab === 'cuotas') this.renderCuotasTable();
-                            if (curTab === 'pagos') this.renderPagosTable();
-                            if (curTab === 'tickets') this.renderAdminTickets();
-                            if (curTab === 'comunicados') this.renderComunicados();
-                        } else if (residentView && residentView.classList.contains('active') && this.currentResidentApto) {
-                            this.openResidentDashboard(this.currentResidentApto, false);
-                        } else if (superView && superView.classList.contains('active')) {
-                            if (this.superActiveTab === 'audit') this.renderSuperCondoAudit();
-                            else if (this.superActiveTab === 'logs') this.renderSuperLogs();
-                            else this.renderSuperAdmin();
+                            if (adminView && adminView.classList.contains('active')) {
+                                const curTab = this.currentAdminTab || 'mapa';
+                                if (curTab === 'mapa') this.renderAdminFloors();
+                                if (curTab === 'cuotas') this.renderCuotasTable();
+                                if (curTab === 'pagos') this.renderPagosTable();
+                                if (curTab === 'tickets') this.renderAdminTickets();
+                                if (curTab === 'comunicados') this.renderComunicados();
+                            } else if (residentView && residentView.classList.contains('active') && this.currentResidentApto) {
+                                this.openResidentDashboard(this.currentResidentApto, false);
+                            } else if (superView && superView.classList.contains('active')) {
+                                if (this.superActiveTab === 'audit') this.renderSuperCondoAudit();
+                                else if (this.superActiveTab === 'logs') this.renderSuperLogs();
+                                else this.renderSuperAdmin();
+                            }
                         }
                     }
 
@@ -2597,8 +2600,8 @@
                                 this.toast(`✅ Tasa Oficial BCV sincronizada con éxito: ${tasaNum.toFixed(2)} Bs/USD`);
                             }
 
-                            // Si estamos en dashboard de residente, recalcular montos
-                            if (this.currentResidentApto) {
+                            // Si estamos en dashboard de residente y el usuario lo solicitó manualmente, recalcular montos
+                            if (this.currentResidentApto && userTriggered) {
                                 this.openResidentDashboard(this.currentResidentApto, false);
                             }
                             return;
@@ -2631,51 +2634,93 @@
 
             renderHome() {
                 const condo = this.getActiveCondo();
+                if (!condo) return;
                 const units = this.getCondoUnits(condo.id);
 
                 // Selector de condominios
                 const selectEl = document.getElementById('select-condominio');
-                selectEl.innerHTML = '';
-                this.state.condominios.forEach(c => {
-                    const count = this.getCondoUnits(c.id).length;
-                    const opt = document.createElement('option');
-                    opt.value = c.id;
-                    opt.innerText = `🏢 ${c.nombre} (${count} Aptos)`;
-                    if (c.id === condo.id) opt.selected = true;
-                    selectEl.appendChild(opt);
-                });
+                if (selectEl) {
+                    const currentCondoId = condo.id;
+                    const condosSignature = this.state.condominios.map(c => `${c.id}:${c.nombre}:${this.getCondoUnits(c.id).length}`).join('|');
+                    if (selectEl.dataset.condosSignature !== condosSignature || selectEl.options.length === 0) {
+                        selectEl.innerHTML = '';
+                        this.state.condominios.forEach(c => {
+                            const count = this.getCondoUnits(c.id).length;
+                            const opt = document.createElement('option');
+                            opt.value = c.id;
+                            opt.innerText = `🏢 ${c.nombre} (${count} Aptos)`;
+                            if (c.id === currentCondoId) opt.selected = true;
+                            selectEl.appendChild(opt);
+                        });
+                        selectEl.dataset.condosSignature = condosSignature;
+                    }
+                    if (selectEl.value != currentCondoId) {
+                        selectEl.value = currentCondoId;
+                    }
+                }
 
                 // Títulos e información
-                document.getElementById('condo-display-name').innerText = condo.nombre;
+                const condoNameEl = document.getElementById('condo-display-name');
+                if (condoNameEl) condoNameEl.innerText = condo.nombre;
                 const pbText = condo.tiene_pb ? 'PB + ' : '';
-                document.getElementById('condo-display-specs').innerText = `${pbText}${condo.pisos_cant} Pisos (${units.length} Apartamentos Residenciales)`;
-                document.getElementById('topBcvRate').innerText = (condo.tasa_dolar || 877.90).toFixed(2);
+                const condoSpecsEl = document.getElementById('condo-display-specs');
+                if (condoSpecsEl) condoSpecsEl.innerText = `${pbText}${condo.pisos_cant} Pisos (${units.length} Apartamentos Residenciales)`;
+                const bcvRateEl = document.getElementById('topBcvRate');
+                if (bcvRateEl) bcvRateEl.innerText = (condo.tasa_dolar || 877.90).toFixed(2);
 
                 // Llenar selector de apartamentos agrupados por piso
                 const resSelect = document.getElementById('res-codigo');
-                resSelect.innerHTML = '<option value="">-- Seleccione su apartamento --</option>';
+                if (resSelect) {
+                    // Mantener el apartamento actualmente seleccionado por el usuario
+                    const currentSelected = resSelect.value || this.selectedResidentApto || '';
+                    if (currentSelected) {
+                        this.selectedResidentApto = currentSelected;
+                    }
 
-                // Agrupar por piso
-                const floors = {};
-                units.forEach(u => {
-                    if (!floors[u.piso]) floors[u.piso] = [];
-                    floors[u.piso].push(u);
-                });
+                    // Firma para saber si cambiaron las unidades y evitar reconstruir innecesariamente
+                    const unitsSignature = `${condo.id}_` + units.map(u => `${u.id}:${u.codigo}:${u.propietario || ''}`).join('|');
 
-                Object.keys(floors).map(Number).sort((a,b) => a - b).forEach(pNum => {
-                    const group = document.createElement('optgroup');
-                    group.label = pNum === 0 ? 'Planta Baja (PB)' : `Piso ${pNum}`;
-                    floors[pNum].forEach(u => {
-                        const opt = document.createElement('option');
-                        opt.value = u.codigo;
-                        opt.innerText = `Apto ${u.codigo} ${u.propietario ? '(' + u.propietario + ')' : '(Disponible)'}`;
-                        group.appendChild(opt);
-                    });
-                    resSelect.appendChild(group);
-                });
+                    if (resSelect.dataset.unitsSignature !== unitsSignature || resSelect.options.length <= 1) {
+                        resSelect.innerHTML = '<option value="">-- Seleccione su apartamento --</option>';
+
+                        // Agrupar por piso
+                        const floors = {};
+                        units.forEach(u => {
+                            if (!floors[u.piso]) floors[u.piso] = [];
+                            floors[u.piso].push(u);
+                        });
+
+                        Object.keys(floors).map(Number).sort((a,b) => a - b).forEach(pNum => {
+                            const group = document.createElement('optgroup');
+                            group.label = pNum === 0 ? 'Planta Baja (PB)' : `Piso ${pNum}`;
+                            floors[pNum].forEach(u => {
+                                const opt = document.createElement('option');
+                                opt.value = u.codigo;
+                                opt.innerText = `Apto ${u.codigo} ${u.propietario ? '(' + u.propietario + ')' : '(Disponible)'}`;
+                                if (currentSelected && u.codigo === currentSelected) {
+                                    opt.selected = true;
+                                }
+                                group.appendChild(opt);
+                            });
+                            resSelect.appendChild(group);
+                        });
+                        resSelect.dataset.unitsSignature = unitsSignature;
+                    }
+
+                    // Asegurar que la selección previa se conserve intacta
+                    if (currentSelected && resSelect.value !== currentSelected) {
+                        resSelect.value = currentSelected;
+                    }
+                }
             },
 
             switchCondominio(condoId) {
+                this.selectedResidentApto = '';
+                const resSelect = document.getElementById('res-codigo');
+                if (resSelect) {
+                    resSelect.value = '';
+                    delete resSelect.dataset.unitsSignature;
+                }
                 this.state.activeCondoId = parseInt(condoId);
                 this.save();
                 this.renderHome();
