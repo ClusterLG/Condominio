@@ -102,6 +102,7 @@
         .login-wrapper {
             min-height: calc(100vh - 65px);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 1.5rem 1rem;
@@ -246,6 +247,39 @@
         }
         .dashboard-view.active {
             display: block;
+        }
+
+        /* PIE DE PÁGINA GLOBAL DE LA PLATAFORMA (CLUSTER LG) */
+        .app-global-footer {
+            background: rgba(17, 24, 39, 0.95);
+            border-top: 1px solid var(--border-color);
+            padding: 1.25rem 1.5rem;
+            text-align: center;
+            font-size: 0.84rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-top: auto;
+        }
+        .app-global-footer a {
+            color: #60a5fa;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        .app-global-footer a:hover {
+            color: #93c5fd;
+            text-decoration: underline;
+        }
+        .app-global-footer .whatsapp-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: rgba(37, 211, 102, 0.12);
+            color: #34d399;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            border: 1px solid rgba(37, 211, 102, 0.3);
+            font-weight: 700;
         }
 
         .dashboard-header {
@@ -830,6 +864,21 @@
                 <button type="button" onclick="app.showResetPasswordModal()" style="background: none; border: none; color: #60a5fa; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.65rem; border-radius: 6px; transition: var(--transition);">
                     <i class="bi bi-key-fill text-warning"></i> ¿Olvidó su contraseña? Solicitar restablecimiento
                 </button>
+            </div>
+        </div>
+
+        <!-- PIE DE PÁGINA EN PANTALLA PRINCIPAL -->
+        <div style="margin-top: 2rem; text-align: center; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6; max-width: 580px;">
+            <div>
+                <strong>CondoHub SaaS</strong> es un proyecto llevado a cabo por <strong>Leonardo Morales</strong> a través del emprendimiento tecnológico <strong>Cluster LG</strong>.
+            </div>
+            <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 0.35rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
+                <span style="color: #38bdf8; font-weight: 700;"><i class="bi bi-geo-alt-fill"></i> Material 100% hecho en La Guaira</span>
+                <span>•</span>
+                <span>Soporte WhatsApp:</span>
+                <a href="https://wa.me/584129031966" target="_blank" class="whatsapp-link" style="color: #34d399; text-decoration: none; font-weight: 700; background: rgba(37, 211, 102, 0.12); padding: 2px 7px; border-radius: 6px; border: 1px solid rgba(37, 211, 102, 0.3);">
+                    <i class="bi bi-whatsapp"></i> 0412-9031966
+                </a>
             </div>
         </div>
     </main>
@@ -1575,6 +1624,23 @@
         </div>
     </section>
 
+    <!-- PIE DE PÁGINA GLOBAL DE LA PLATAFORMA CONDOHUB -->
+    <footer class="app-global-footer">
+        <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 0.45rem;">
+            <div>
+                <strong>CondoHub SaaS</strong> es un proyecto llevado a cabo por <strong>Leonardo Morales</strong> a través del emprendimiento tecnológico <strong>Cluster LG</strong>.
+            </div>
+            <div style="font-size: 0.8rem; color: #94a3b8; display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; justify-content: center;">
+                <span style="color: #38bdf8; font-weight: 700;"><i class="bi bi-geo-alt-fill"></i> Material 100% hecho en La Guaira</span>
+                <span>•</span>
+                <span>Cualquier soporte requerido escribir al WhatsApp:</span>
+                <a href="https://wa.me/584129031966" target="_blank" class="whatsapp-link">
+                    <i class="bi bi-whatsapp"></i> 0412-9031966
+                </a>
+            </div>
+        </div>
+    </footer>
+
     <!-- MODAL: REGISTRAR NUEVO CONDOMINIO (ACCESIBLE EXCLUSIVAMENTE POR EL SUPERADMINISTRADOR) -->
     <div id="modalNewCondo" class="modal-backdrop-saas">
         <div class="modal-box-saas">
@@ -1732,7 +1798,7 @@
                 <button class="close-btn" onclick="app.closeModal('modalResetPassword')">&times;</button>
             </div>
             <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.25rem; line-height: 1.5;">
-                Seleccione su apartamento o usuario. Se generará una solicitud formal dirigida al Superadministrador con los datos del condominio para que le proporcione su clave de acceso vía WhatsApp.
+                Seleccione su apartamento o usuario. Se generará una solicitud formal dirigida a Soporte Técnico Cluster LG con los datos del condominio para que le proporcione su clave de acceso vía WhatsApp.
             </p>
             <div>
                 <div class="form-group">
@@ -1749,13 +1815,13 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label"><i class="bi bi-whatsapp text-success"></i> Su Número de WhatsApp de Contacto:</label>
-                    <input type="text" id="resetContactPhone" class="form-control" placeholder="Ej: 0414-1234567 o +584141234567">
+                    <input type="text" id="resetContactPhone" class="form-control" placeholder="Ej: 0412-9031966 o +584129031966">
                     <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.25rem; display: block;">
-                        Por este número el Superadministrador le responderá y le suministrará su clave de acceso.
+                        Por este número el equipo de soporte le responderá y le suministrará su clave de acceso (Soporte WhatsApp: 0412-9031966).
                     </small>
                 </div>
                 <button class="btn-primary-saas" style="background: #25D366; color: #fff; font-weight: 700; margin-top: 0.5rem;" onclick="app.sendResetPasswordRequest()">
-                    <i class="bi bi-whatsapp"></i> Solicitar al Superadministrador vía WhatsApp
+                    <i class="bi bi-whatsapp"></i> Solicitar Soporte vía WhatsApp (0412-9031966)
                 </button>
             </div>
         </div>
@@ -3642,8 +3708,8 @@
                     return;
                 }
 
-                // WhatsApp de contacto del Superadministrador (ClusterLG / Soporte Global)
-                const superadminPhone = '584141234567';
+                // WhatsApp de contacto de Soporte Técnico (Leonardo Morales / Cluster LG)
+                const superadminPhone = '584129031966';
 
                 const mensaje = `🔒 *SOLICITUD DE RESTABLECIMIENTO DE CONTRASEÑA*\n\n` +
                     `🏢 *Condominio:* ${condoNombre}\n` +
@@ -3668,10 +3734,10 @@
                 if (!this.state.tickets) this.state.tickets = [];
                 this.state.tickets.push(nuevoTicket);
                 this.save();
-                this.logActivity('RESTABLECER_PASS', `Solicitud de restablecimiento de clave enviada al Superadministrador para ${usuarioTexto}`, usuario, condoNombre);
+                this.logActivity('RESTABLECER_PASS', `Solicitud de restablecimiento de clave enviada a Soporte Cluster LG para ${usuarioTexto}`, usuario, condoNombre);
 
                 this.closeModal('modalResetPassword');
-                this.toast('✅ Solicitud registrada. Abriendo WhatsApp del Superadministrador...');
+                this.toast('✅ Solicitud registrada. Abriendo WhatsApp de Soporte (0412-9031966)...');
 
                 const url = `https://wa.me/${superadminPhone}?text=${encodeURIComponent(mensaje)}`;
                 window.open(url, '_blank');

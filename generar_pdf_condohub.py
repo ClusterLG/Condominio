@@ -28,25 +28,25 @@ class NumberedCanvas(canvas.Canvas):
 
     def draw_page_decorations(self, page_count):
         self.saveState()
-        self.setFont("Helvetica", 8)
+        self.setFont("Helvetica", 7.5)
         self.setFillColor(colors.HexColor("#64748b"))
 
         # Header (pages > 1)
         if self._pageNumber > 1:
-            self.drawString(36, 758, "CondoHub SaaS - Plataforma Integral de Gestion de Condominios")
-            self.drawRightString(576, 758, "Credenciales Piloto: Residencias Los Samanes")
+            self.drawString(36, 762, "CondoHub SaaS • Sistema de Gestion de Condominios • Cluster LG")
+            self.drawRightString(576, 762, "Directorio Piloto: Residencias Los Samanes")
             self.setStrokeColor(colors.HexColor("#e2e8f0"))
             self.setLineWidth(0.5)
-            self.line(36, 752, 576, 752)
+            self.line(36, 756, 576, 756)
 
         # Footer (all pages)
         self.setStrokeColor(colors.HexColor("#e2e8f0"))
         self.setLineWidth(0.5)
-        self.line(36, 42, 576, 42)
+        self.line(36, 44, 576, 44)
 
-        self.drawString(36, 30, "Documento Confidencial - Guia de Acceso para Pruebas de Cliente - CondoHub SaaS")
+        self.drawString(36, 32, "CondoHub es un proyecto de Leonardo Morales • Cluster LG • 100% hecho en La Guaira • Soporte WhatsApp: 0412-9031966")
         page_text = f"Pagina {self._pageNumber} de {page_count}"
-        self.drawRightString(576, 30, page_text)
+        self.drawRightString(576, 32, page_text)
         self.restoreState()
 
 
@@ -57,8 +57,8 @@ def build_pdf():
         pagesize=letter,
         leftMargin=36,
         rightMargin=36,
-        topMargin=44,
-        bottomMargin=50
+        topMargin=40,
+        bottomMargin=52
     )
 
     styles = getSampleStyleSheet()
@@ -68,8 +68,8 @@ def build_pdf():
         'DocTitle',
         parent=styles['Normal'],
         fontName='Helvetica-Bold',
-        fontSize=20,
-        leading=24,
+        fontSize=19,
+        leading=23,
         textColor=colors.HexColor('#0f172a'),
         alignment=0
     )
@@ -78,8 +78,8 @@ def build_pdf():
         'DocTagline',
         parent=styles['Normal'],
         fontName='Helvetica',
-        fontSize=10,
-        leading=14,
+        fontSize=9.5,
+        leading=13,
         textColor=colors.HexColor('#2563eb')
     )
 
@@ -87,18 +87,18 @@ def build_pdf():
         'SectionHeading',
         parent=styles['Normal'],
         fontName='Helvetica-Bold',
-        fontSize=11,
-        leading=15,
+        fontSize=10.5,
+        leading=14,
         textColor=colors.HexColor('#1e293b'),
-        spaceAfter=5
+        spaceAfter=4
     )
 
     body_style = ParagraphStyle(
         'DocBody',
         parent=styles['Normal'],
         fontName='Helvetica',
-        fontSize=8.5,
-        leading=12,
+        fontSize=8.2,
+        leading=11.5,
         textColor=colors.HexColor('#334155')
     )
 
@@ -106,7 +106,7 @@ def build_pdf():
         'TableHeader',
         parent=styles['Normal'],
         fontName='Helvetica-Bold',
-        fontSize=8,
+        fontSize=7.8,
         leading=10,
         textColor=colors.white,
         alignment=1
@@ -116,8 +116,8 @@ def build_pdf():
         'TableCell',
         parent=styles['Normal'],
         fontName='Helvetica',
-        fontSize=7.5,
-        leading=9.5,
+        fontSize=7.3,
+        leading=9.2,
         textColor=colors.HexColor('#1e293b')
     )
 
@@ -125,8 +125,8 @@ def build_pdf():
         'TableCellBold',
         parent=styles['Normal'],
         fontName='Helvetica-Bold',
-        fontSize=7.5,
-        leading=9.5,
+        fontSize=7.3,
+        leading=9.2,
         textColor=colors.HexColor('#0f172a')
     )
 
@@ -134,13 +134,13 @@ def build_pdf():
         'TableCellCode',
         parent=styles['Normal'],
         fontName='Courier-Bold',
-        fontSize=7.2,
-        leading=9,
+        fontSize=7.0,
+        leading=8.8,
         textColor=colors.HexColor('#1d4ed8')
     )
 
-    hright1 = ParagraphStyle('HRight1', parent=styles['Normal'], fontName='Helvetica-Bold', fontSize=8, leading=10, textColor=colors.HexColor('#64748b'), alignment=2)
-    hright2 = ParagraphStyle('HRight2', parent=styles['Normal'], fontName='Helvetica', fontSize=7.5, leading=9.5, textColor=colors.HexColor('#475569'), alignment=2)
+    hright1 = ParagraphStyle('HRight1', parent=styles['Normal'], fontName='Helvetica-Bold', fontSize=7.5, leading=9.5, textColor=colors.HexColor('#475569'), alignment=2)
+    hright2 = ParagraphStyle('HRight2', parent=styles['Normal'], fontName='Helvetica', fontSize=7.2, leading=9, textColor=colors.HexColor('#64748b'), alignment=2)
 
     story = []
 
@@ -148,14 +148,14 @@ def build_pdf():
     header_content = [
         [
             Paragraph("<b>CondoHub</b> <font color='#2563eb'>SaaS</font>", title_style),
-            Paragraph("AMBIENTE PILOTO DE DEMOSTRACION<br/>URL de Acceso: <b>http://localhost/Condominio/</b>", hright1)
+            Paragraph("REPOSITORIO / ACCESO EN LINEA:<br/><b>https://github.com/ClusterLG/Condominio</b>", hright1)
         ],
         [
             Paragraph("<b>Gestion inteligente y transparente de condominios residenciales</b>", tagline_style),
-            Paragraph("Edicion Piloto: Residencias Los Samanes (50 Aptos)", hright2)
+            Paragraph("Edicion Piloto: Residencias Los Samanes • Caracas", hright2)
         ]
     ]
-    t_header = Table(header_content, colWidths=[350, 190])
+    t_header = Table(header_content, colWidths=[330, 210])
     t_header.setStyle(TableStyle([
         ('VALIGN', (0,0), (-1,-1), 'TOP'),
         ('BOTTOMPADDING', (0,0), (-1,-1), 1),
@@ -164,26 +164,26 @@ def build_pdf():
         ('RIGHTPADDING', (0,0), (-1,-1), 0),
     ]))
     story.append(t_header)
-    story.append(Spacer(1, 6))
-    story.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor("#2563eb"), spaceAfter=8))
+    story.append(Spacer(1, 4))
+    story.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor("#2563eb"), spaceAfter=7))
 
     # ---------------- QUE ES CONDOHUB SAAS ----------------
     story.append(Paragraph("1. ¿Que es CondoHub SaaS?", section_heading))
     p_intro = Paragraph(
-        "<b>CondoHub SaaS</b> es una suite tecnologica multi-condominio diseñada para automatizar de punta a punta la administracion financiera, operativa y comunicacional de edificios y conjuntos residenciales. Permite gestionar contabilidad bimoneda (<b>USD y Bolivares con tasa oficial BCV automatizada</b>), emision de cuotas ordinarias y extraordinarias, auditoria de pagos (Pago Movil, Transferencias bancarias y Zelle), gestion de tickets/incidencias y carteleras informativas digitales en tiempo real, con respaldo continuo en la nube (Supabase Cloud).",
+        "<b>CondoHub SaaS</b> es una suite tecnologica multi-condominio diseñada para modernizar y transparentar la administracion financiera, operativa y comunicacional de edificios y conjuntos residenciales. Cuenta con <b>infraestructura de alta disponibilidad en Data Center</b>, garantizando respaldo continuo en todo momento, alta velocidad de consulta y cero perdida de informacion. Opera con contabilidad bimoneda (<b>USD y Bolivares a tasa oficial BCV automatizada</b>), facturacion con alicuotas precisas, conciliacion de multiples cuentas bancarias (0134 Banesco, 0105 Mercantil, Pago Movil y Zelle) y canales digitales de comunicacion para los residentes.",
         body_style
     )
     story.append(p_intro)
-    story.append(Spacer(1, 6))
+    story.append(Spacer(1, 5))
 
     # Features Cards in a 2-Column Table
     features_data = [
         [
             Paragraph("<b>🏢 Para Administradores y Juntas de Condominio:</b><br/>"
-                      "• <b>Mapeo Interactivo de Pisos:</b> Monitoreo visual de cada unidad (Solvente, Moroso, Saldo a Favor).<br/>"
+                      "• <b>Mapeo Interactivo de Pisos:</b> Visualizacion en tiempo real de solvencia, morosidad y saldos a favor.<br/>"
                       "• <b>Facturacion Multi-Moneda:</b> Emision de cuotas con alicuotas automaticas y conversion BCV diaria.<br/>"
-                      "• <b>Auditoria y Conciliacion de Pagos:</b> Aprobacion inmediata con calculo de saldos a favor.<br/>"
-                      "• <b>Multiples Cuentas Bancarias:</b> Registro de cuentas corrientes, Pago Movil (0134 Banesco, 0105 Mercantil) y Zelle.", body_style),
+                      "• <b>Auditoria y Conciliacion de Pagos:</b> Aprobacion de comprobantes y gestion de saldos a favor.<br/>"
+                      "• <b>Multiples Cuentas Bancarias:</b> Registro de cuentas corrientes, Pago Movil y Zelle.", body_style),
             Paragraph("<b>👤 Para Propietarios y Residentes:</b><br/>"
                       "• <b>Portal Personalizado por Apartamento:</b> Consulta de balance exacto en tiempo real ($ USD y Bs).<br/>"
                       "• <b>Reporte de Pagos Intuitivo:</b> Carga de comprobantes por Pago Movil, Transferencia o Zelle.<br/>"
@@ -197,49 +197,43 @@ def build_pdf():
         ('BACKGROUND', (1,0), (1,0), colors.HexColor('#f0fdf4')),
         ('BOX', (0,0), (0,0), 0.8, colors.HexColor('#cbd5e1')),
         ('BOX', (1,0), (1,0), 0.8, colors.HexColor('#86efac')),
-        ('TOPPADDING', (0,0), (-1,-1), 5),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 5),
-        ('LEFTPADDING', (0,0), (-1,-1), 8),
-        ('RIGHTPADDING', (0,0), (-1,-1), 8),
+        ('TOPPADDING', (0,0), (-1,-1), 4),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
+        ('LEFTPADDING', (0,0), (-1,-1), 7),
+        ('RIGHTPADDING', (0,0), (-1,-1), 7),
         ('VALIGN', (0,0), (-1,-1), 'TOP'),
     ]))
     story.append(t_features)
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 7))
 
     # ---------------- GUIA DE ACCESO PARA EL CLIENTE ----------------
-    story.append(Paragraph("2. Instrucciones para Probar el Sistema (Guia del Cliente)", section_heading))
+    story.append(Paragraph("2. Instrucciones para la Prueba del Cliente", section_heading))
     instructions_text = Paragraph(
-        "<b>1. Acceso:</b> Ingrese desde su navegador web a la direccion <b>http://localhost/Condominio/</b> (o el enlace del servidor asignado).<br/>"
-        "<b>2. Usuario:</b> En el campo central <b>'Usuario'</b>, escriba la direccion de correo institucional asignada (ejemplo: <code>admin@resdlossamanes.com</code> para administrar, o <code>aptopba@resdlossamanes.com</code> para ver el portal de un residente).<br/>"
-        "<b>3. Contraseña:</b> Ingrese la clave correspondiente y haga clic en <b>'Ingresar a CondoHub'</b>. El sistema reconocera de forma automatica su rol y abrira el portal correspondiente sin necesidad de seleccionar edificio ni cambiar de pestaña.",
+        "<b>1. Acceso al Sistema:</b> Ingrese a la plataforma desplegada en <b>https://github.com/ClusterLG/Condominio</b> (o en su entorno local <b>http://localhost/Condominio/</b>).<br/>"
+        "<b>2. Usuario:</b> En el campo central <b>'Usuario'</b>, escriba el correo institucional asignado (para administrar use <code>admin@resdlossamanes.com</code>; para ver el portal de un residente use cualquiera de los correos de apartamento listados a continuacion, ej: <code>aptopba@resdlossamanes.com</code>).<br/>"
+        "<b>3. Contraseña:</b> Escriba la clave asignada y pulse <b>'Ingresar a CondoHub'</b>. El sistema detectara el apartamento o condominio correspondiente de forma automatica.",
         body_style
     )
     story.append(instructions_text)
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 7))
 
-    # ---------------- TABLA 1: CUENTAS ADMINISTRATIVAS ----------------
-    story.append(Paragraph("3. Cuentas Administrativas de Demostracion", section_heading))
+    # ---------------- TABLA 1: CUENTA DE ADMINISTRACION ----------------
+    story.append(Paragraph("3. Cuenta de Administracion del Condominio", section_heading))
     admin_table_data = [
         [
-            Paragraph("Rol / Nivel", table_header),
+            Paragraph("Rol de Acceso", table_header),
             Paragraph("Usuario / Correo Institucional", table_header),
             Paragraph("Contraseña", table_header),
-            Paragraph("Alcance / Funcionalidad de Prueba", table_header)
+            Paragraph("Alcance / Funciones Habilitadas para la Prueba", table_header)
         ],
         [
-            Paragraph("<b>Administrador Local</b><br/><font size='6.5' color='#64748b'>Condominio Los Samanes</font>", cell_style),
-            Paragraph("<code>admin@resdlossamanes.com</code><br/><font size='6.5' color='#64748b'>Alias: admin</font>", cell_code),
+            Paragraph("<b>Administrador de Condominio</b><br/><font size='6.5' color='#64748b'>Gestion Residencias Los Samanes</font>", cell_style),
+            Paragraph("<code>admin@resdlossamanes.com</code><br/><font size='6.5' color='#64748b'>Alias directo: admin</font>", cell_code),
             Paragraph("<code>admin123</code>", cell_code),
-            Paragraph("Administracion completa del edificio: mapa de pisos, aprobacion de pagos pendientes, emision de cuotas ordinarias/extraordinarias, comunicados y respuesta a tickets.", cell_style)
-        ],
-        [
-            Paragraph("<b>Superadministrador Global</b><br/><font size='6.5' color='#64748b'>Consola Maestra ClusterLG</font>", cell_style),
-            Paragraph("<code>clusterlg</code><br/><font size='6.5' color='#64748b'>superadmin@condohub.com</font>", cell_code),
-            Paragraph("<code>glretsulc</code>", cell_code),
-            Paragraph("Consola global multi-edificio: alta de nuevos condominios, auditoria profunda de residencias, inspeccion de credenciales y bitacora de auditoria en vivo.", cell_style)
+            Paragraph("Acceso total al panel de administracion: visualizacion del mapa interactivo de 12 pisos + PB, emision de cuotas ordinarias/extraordinarias, auditoria de pagos, gestion de cuentas bancarias, comunicados y respuesta a tickets.", cell_style)
         ]
     ]
-    t_admin = Table(admin_table_data, colWidths=[115, 145, 75, 205])
+    t_admin = Table(admin_table_data, colWidths=[130, 160, 75, 175])
     t_admin.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#0f172a')),
         ('BOX', (0,0), (-1,-1), 1, colors.HexColor('#cbd5e1')),
@@ -250,19 +244,18 @@ def build_pdf():
         ('RIGHTPADDING', (0,0), (-1,-1), 6),
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('BACKGROUND', (0,1), (-1,1), colors.HexColor('#eff6ff')),
-        ('BACKGROUND', (0,2), (-1,2), colors.HexColor('#f8fafc')),
     ]))
     story.append(t_admin)
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 8))
 
     # ---------------- TABLA 2: RESIDENCIAS LOS SAMANES (50 APARTAMENTOS) ----------------
     story.append(Paragraph("4. Directorio de Cuentas Residenciales: Residencias Los Samanes (50 Apartamentos)", section_heading))
     p_sub = Paragraph(
-        "<font size='8' color='#64748b'>Estructura: Planta Baja + 12 Pisos • 50 Unidades Residenciales • Clave inicial por defecto: <b>123456</b></font>",
+        "<font size='7.5' color='#64748b'>Edificio Piloto • Planta Baja + 12 Pisos • 50 Unidades Residenciales • Clave inicial por defecto: <b>123456</b></font>",
         body_style
     )
     story.append(p_sub)
-    story.append(Spacer(1, 5))
+    story.append(Spacer(1, 4))
 
     # Load 50 units from samanes_units.json
     with open('samanes_units.json', 'r', encoding='utf-8') as f:
