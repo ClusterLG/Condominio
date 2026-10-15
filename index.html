@@ -1404,27 +1404,10 @@
                 </div>
             </div>
 
-            <!-- Parámetros Generales: Tasa Oficial BCV -->
-            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; max-width: 580px;">
-                <h4 style="font-size: 1rem; color: #fff; margin: 0 0 0.85rem 0; display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="bi bi-sliders text-warning"></i> Parámetro de Cambio Oficial BCV
-                </h4>
-                <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
-                    <div style="flex: 1; min-width: 180px;">
-                        <label class="form-label" style="font-size: 0.78rem;">Tasa Oficial BCV (Bs/USD):</label>
-                        <input type="number" step="0.01" id="cfgTasaBcv" class="form-control" style="font-weight: 700; color: #34d399;" value="877.90">
-                    </div>
-                    <div style="align-self: flex-end;">
-                        <button type="button" class="btn-primary-saas" style="width: auto; padding: 0.6rem 1rem;" onclick="app.saveCondoSettings()">
-                            <i class="bi bi-save"></i> Guardar Tasa
-                        </button>
-                    </div>
-                </div>
-                <!-- Inputs ocultos de sincronización retrocompatible -->
-                <input type="hidden" id="cfgPagoMovil">
-                <input type="hidden" id="cfgTransferencia">
-                <input type="hidden" id="cfgZelle">
-            </div>
+            <!-- Inputs ocultos de sincronización retrocompatible -->
+            <input type="hidden" id="cfgPagoMovil">
+            <input type="hidden" id="cfgTransferencia">
+            <input type="hidden" id="cfgZelle">
         </div>
     </section>
 
@@ -5537,16 +5520,12 @@
 
             async saveCondoSettings() {
                 const condo = this.getActiveCondo();
-                const bcvInput = document.getElementById('cfgTasaBcv');
-                if (bcvInput) {
-                    condo.tasa_dolar = parseFloat(bcvInput.value) || 877.90;
-                }
                 this.syncLegacyCondoBankStrings(condo);
 
                 this.save();
                 this.renderHome();
-                this.toast('Parámetros y cuentas guardados');
-                this.logActivity('CONDOMINIO', `Actualización de parámetros y tasa oficial (${condo.tasa_dolar.toFixed(2)} Bs/USD)`, this.currentRole || 'Admin', condo.nombre);
+                this.toast('Cuentas bancarias sincronizadas');
+                this.logActivity('CONDOMINIO', `Sincronización de cuentas bancarias`, this.currentRole || 'Admin', condo.nombre);
 
                 if (sbClient) {
                     try {
