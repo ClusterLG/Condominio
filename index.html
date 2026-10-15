@@ -3216,18 +3216,25 @@
                     }
 
                     if (resAptos.data && resAptos.data.length > 0) {
-                        this.state.apartamentos = resAptos.data.map(u => ({
-                            id: u.id,
-                            condoId: u.condominio_id,
-                            piso: u.piso,
-                            codigo: u.codigo,
-                            alicuota: parseFloat(u.alicuota) || 2.0,
-                            propietario: u.propietario,
-                            cedula: u.cedula,
-                            telefono: u.telefono,
-                            email: u.email,
-                            vehiculo: u.vehiculo
-                        }));
+                        this.state.apartamentos = resAptos.data.map(u => {
+                            const prev = (this.state.apartamentos || []).find(a => 
+                                String(a.condoId) === String(u.condominio_id) && 
+                                this.normCode(a.codigo) === this.normCode(u.codigo)
+                            );
+                            return {
+                                id: u.id,
+                                condoId: u.condominio_id,
+                                piso: u.piso,
+                                codigo: u.codigo,
+                                alicuota: parseFloat(u.alicuota) || 2.0,
+                                propietario: u.propietario,
+                                cedula: u.cedula,
+                                telefono: u.telefono,
+                                email: u.email,
+                                vehiculo: u.vehiculo,
+                                password: u.password || (prev ? prev.password : null) || '123456'
+                            };
+                        });
                         updated = true;
                     }
 
@@ -3544,44 +3551,7 @@
                     return;
                 }
 
-                // 2. BUSQUEDA EN TABLA SUPABASE (public.usuarios) SI YA ESTÁ SINCRONIZADA
-                if (this.state.usuarios && this.state.usuarios.length > 0) {
-                    const userFound = this.state.usuarios.find(u => 
-                        (
-                            (u.username && u.username.toLowerCase() === lowerUser) ||
-                            (u.email && u.email.toLowerCase() === lowerUser) ||
-                            (u.apto_codigo && u.apto_codigo.toLowerCase() === lowerUser)
-                        ) &&
-                        u.password === pass &&
-                        u.activo !== false
-                    );
-                    if (userFound) {
-                        if (userFound.rol === 'superadmin') {
-                            this.logActivity('LOGIN', `Inicio de sesión de Superadministrador (${userFound.username})`, `${userFound.username} (Superadmin)`, 'Plataforma Global');
-                            this.openSuperAdminDashboard();
-                            return;
-                        } else if (userFound.rol === 'admin' || userFound.rol === 'junta') {
-                            if (userFound.condominio_id) this.switchCondominio(userFound.condominio_id);
-                            const condo = this.getActiveCondo();
-                            this.logActivity('LOGIN', `Inicio de sesión de Administrador (${userFound.username}) en ${condo ? condo.nombre : 'Condominio'}`, `${userFound.username} (${userFound.rol})`, condo ? condo.nombre : 'Condominio');
-                            this.openAdminDashboard(userFound.rol === 'junta' ? 'Junta de Condominio' : 'Admin');
-                            return;
-                        } else if (userFound.rol === 'residente') {
-                            if (userFound.condominio_id) this.switchCondominio(userFound.condominio_id);
-                            const condo = this.getActiveCondo();
-                            this.currentResidentApto = userFound.apto_codigo;
-                            this.logActivity('LOGIN', `Inicio de sesión de residente en Apto ${userFound.apto_codigo}`, `Apto ${userFound.apto_codigo}`, condo ? condo.nombre : 'Condominio');
-                            this.openResidentDashboard(userFound.apto_codigo);
-                            // Si ingresa con la clave por defecto 123456, sugerir cambiarla
-                            if (pass === '123456') {
-                                setTimeout(() => { this.openModal('modalChangeDefaultPassword'); }, 400);
-                            }
-                            return;
-                        }
-                    }
-                }
-
-                // 3. ADMINS LOCALES POR DOMINIO INSTITUCIONAL O CLAVE LOCAL (admin / admin123)
+                // 2. ADMINS LOCALES POR CORREO INSTITUCIONAL O CLAVE LOCAL (admin / admin123)
                 if (lowerUser === 'admin@resdlossamanes.com' && pass === 'admin123') {
                     this.switchCondominio(1);
                     this.logActivity('LOGIN', 'Inicio de sesión de Administrador (admin@resdlossamanes.com)', 'admin (Admin)', 'Residencias Los Samanes');
@@ -3601,8 +3571,7 @@
                     return;
                 }
 
-                // 4. BÚSQUEDA DE RESIDENTE POR CORREO INSTITUCIONAL O CÓDIGO DIRECTO EN TODOS LOS CONDOMINIOS
-                // Detectar si ingresó formato institucional (ej: aptopba@resdlossamanes.com o apto8a@resdchichisuggar.com)
+                // 3. BÚSQUEDA DE RESIDENTE POR CORREO INSTITUCIONAL O CÓDIGO DIRECTO
                 let matchedCondo = null;
                 let matchedUnit = null;
 
@@ -3634,6 +3603,7 @@
                 }
 
                 if (matchedCondo && matchedUnit) {
+                    // La clave válida proviene de la unidad residencial (actualizada dinámicamente)
                     const validPass = matchedUnit.password || '123456';
                     if (pass !== validPass) {
                         alert(`Contraseña incorrecta para ${matchedUnit.codigo}. Si olvidó su clave, use la opción 'Solicitar restablecimiento'.`);
@@ -3645,12 +3615,48 @@
                     this.openResidentDashboard(matchedUnit.codigo);
 
                     // Si ingresa con la clave por defecto 123456, mostrar mensaje emergente
-                    if (pass === '123456' || validPass === '123456') {
+                    if (pass === '123456') {
                         setTimeout(() => {
                             this.openModal('modalChangeDefaultPassword');
                         }, 400);
                     }
                     return;
+                }
+
+                // 4. BÚSQUEDA EN TABLA SUPABASE (public.usuarios) SI YA ESTÁ SINCRONIZADA
+                if (this.state.usuarios && this.state.usuarios.length > 0) {
+                    const userFound = this.state.usuarios.find(u => 
+                        (
+                            (u.username && u.username.toLowerCase() === lowerUser) ||
+                            (u.email && u.email.toLowerCase() === lowerUser) ||
+                            (u.apto_codigo && u.apto_codigo.toLowerCase() === lowerUser)
+                        ) &&
+                        u.password === pass &&
+                        u.activo !== false
+                    );
+                    if (userFound) {
+                        if (userFound.rol === 'superadmin') {
+                            this.logActivity('LOGIN', `Inicio de sesión de Superadministrador (${userFound.username})`, `${userFound.username} (Superadmin)`, 'Plataforma Global');
+                            this.openSuperAdminDashboard();
+                            return;
+                        } else if (userFound.rol === 'admin' || userFound.rol === 'junta') {
+                            if (userFound.condominio_id) this.switchCondominio(userFound.condominio_id);
+                            const condo = this.getActiveCondo();
+                            this.logActivity('LOGIN', `Inicio de sesión de Administrador (${userFound.username}) en ${condo ? condo.nombre : 'Condominio'}`, `${userFound.username} (${userFound.rol})`, condo ? condo.nombre : 'Condominio');
+                            this.openAdminDashboard(userFound.rol === 'junta' ? 'Junta de Condominio' : 'Admin');
+                            return;
+                        } else if (userFound.rol === 'residente') {
+                            if (userFound.condominio_id) this.switchCondominio(userFound.condominio_id);
+                            const condo = this.getActiveCondo();
+                            this.currentResidentApto = userFound.apto_codigo;
+                            this.logActivity('LOGIN', `Inicio de sesión de residente en Apto ${userFound.apto_codigo}`, `Apto ${userFound.apto_codigo}`, condo ? condo.nombre : 'Condominio');
+                            this.openResidentDashboard(userFound.apto_codigo);
+                            if (pass === '123456') {
+                                setTimeout(() => { this.openModal('modalChangeDefaultPassword'); }, 400);
+                            }
+                            return;
+                        }
+                    }
                 }
 
                 alert('Credenciales incorrectas. Verifique su usuario institucional y contraseña.');
@@ -6232,10 +6238,41 @@
                 }
 
                 const condo = this.getActiveCondo();
-                const u = this.getCondoUnits(condo.id).find(x => x.codigo === this.currentResidentApto);
-                if (!u) return;
+                const u = this.getCondoUnits(condo.id).find(x => this.normCode(x.codigo) === this.normCode(this.currentResidentApto));
+                if (!u) {
+                    alert('No se encontró la unidad residencial activa.');
+                    return;
+                }
 
+                // 1. ACTUALIZAR EN LA UNIDAD RESIDENCIAL EN MEMORIA Y LOCALSTORAGE
                 u.password = newPass;
+
+                // 2. ACTUALIZAR DE INMEDIATO EN LA LISTA LOCAL DE USUARIOS (this.state.usuarios)
+                if (!this.state.usuarios) this.state.usuarios = [];
+                const normApto = this.normCode(this.currentResidentApto);
+                const aptoEmail = this.getAptoEmail(condo, this.currentResidentApto).toLowerCase();
+
+                let userInState = this.state.usuarios.find(user => 
+                    (String(user.condominio_id) === String(condo.id) && this.normCode(user.apto_codigo) === normApto) ||
+                    (user.username && user.username.toLowerCase() === aptoEmail) ||
+                    (user.email && user.email.toLowerCase() === aptoEmail)
+                );
+
+                if (userInState) {
+                    userInState.password = newPass;
+                } else {
+                    // Si no existía en el caché local, registrarlo para login inmediato
+                    this.state.usuarios.push({
+                        condominio_id: condo.id,
+                        username: aptoEmail,
+                        email: aptoEmail,
+                        password: newPass,
+                        rol: 'residente',
+                        apto_codigo: this.currentResidentApto,
+                        activo: true
+                    });
+                }
+
                 this.save();
                 this.toast('✅ Contraseña actualizada exitosamente');
                 this.logActivity('SEGURIDAD', `Apto ${this.currentResidentApto} actualizó su contraseña de acceso personal`, `Apto ${this.currentResidentApto}`, condo.nombre);
@@ -6243,22 +6280,21 @@
                 document.getElementById('resNewPassword').value = '';
                 document.getElementById('resConfirmPassword').value = '';
 
-                // Actualizar campo en formulario de login si estuviera presente
-                const loginPass = document.getElementById('res-password');
-                if (loginPass) loginPass.value = newPass;
-
+                // 3. PERSISTENCIA EN SUPABASE DATA CENTER (TABLAS apartamentos Y usuarios)
                 if (sbClient) {
                     try {
                         await sbClient.from('apartamentos').update({
                             password: newPass
                         }).match({ condominio_id: condo.id, codigo: this.currentResidentApto });
-                    } catch (e) {}
+                    } catch (e) {
+                        console.warn('Nota actualización apartamentos en Supabase:', e);
+                    }
                     try {
                         await sbClient.from('usuarios').update({
                             password: newPass
                         }).match({ condominio_id: condo.id, apto_codigo: this.currentResidentApto });
                     } catch (e) {
-                        console.warn('Error guardando contraseña en usuarios Supabase:', e);
+                        console.warn('Nota actualización usuarios en Supabase:', e);
                     }
                 }
             },
