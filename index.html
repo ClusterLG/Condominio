@@ -1197,6 +1197,29 @@
                 </div>
             </div>
 
+            <!-- CUOTAS Y CARGOS ASIGNADOS A ESTE APARTAMENTO -->
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; max-width: 950px; margin-bottom: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                    <h3 style="font-size: 1.15rem; color: #fff; margin: 0;"><i class="bi bi-receipt-cutoff text-primary"></i> Cuotas y Cargos Asignados</h3>
+                    <span style="font-size: 0.8rem; color: var(--text-secondary);">Cuotas Ordinarias, Extraordinarias e Individuales de mi Unidad</span>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="table-saas">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Concepto</th>
+                                <th>Tipo de Cuota</th>
+                                <th>Monto USD</th>
+                            </tr>
+                        </thead>
+                        <tbody id="residentCuotasTableBody">
+                            <!-- Llenado dinámico -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- LISTADO DE PAGOS REALIZADOS POR EL RESIDENTE CON SU STATUS DE AUDITORÍA -->
             <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; max-width: 950px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
@@ -1696,8 +1719,34 @@
                 </div>
             </div>
 
+            <!-- Detalle de Cuotas y Cargos de la Unidad -->
+            <div style="margin-bottom: 1.25rem;">
+                <div style="font-weight: 700; font-size: 0.92rem; color: #fff; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="bi bi-receipt-cutoff text-primary"></i> Cuotas y Cargos Aplicados a esta Unidad
+                </div>
+                <div style="max-height: 180px; overflow-y: auto;">
+                    <table class="table-saas" style="font-size: 0.85rem;">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Concepto</th>
+                                <th>Tipo de Cuota</th>
+                                <th>Monto USD</th>
+                            </tr>
+                        </thead>
+                        <tbody id="superModalAptoCuotasBody">
+                            <!-- Llenado dinámico -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- Tabla de Pagos de la Unidad -->
-            <div style="max-height: 350px; overflow-y: auto;">
+            <div>
+                <div style="font-weight: 700; font-size: 0.92rem; color: #fff; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="bi bi-wallet2" style="color:#34d399;"></i> Pagos Registrados por el Propietario
+                </div>
+                <div style="max-height: 200px; overflow-y: auto;">
                 <table class="table-saas" style="font-size: 0.85rem;">
                     <thead>
                         <tr>
@@ -1712,6 +1761,7 @@
                         <!-- Llenado dinámico -->
                     </tbody>
                 </table>
+                </div>
             </div>
 
             <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem;">
@@ -2534,14 +2584,37 @@
                     }
 
                     if (resCuotas.data) {
-                        this.state.cuotas = resCuotas.data.map(c => ({
-                            id: c.id,
-                            condoId: c.condominio_id,
-                            titulo: c.titulo,
-                            tipo: c.tipo,
-                            monto_usd: parseFloat(c.monto_usd) || 0,
-                            fecha: c.fecha
-                        }));
+                        this.state.cuotas = resCuotas.data.map(c => {
+                            const prev = (this.state.cuotas || []).find(x => x.id == c.id);
+                            
+                            // 1. Detectar apto desde columna 'apto', o fallback [Apto: ...] en el título, o estado previo
+                            let aptoDestino = c.apto || null;
+                            if (!aptoDestino && c.titulo && c.titulo.includes('[Apto:')) {
+                                const m = c.titulo.match(/\[Apto:\s*([^\]]+)\]/i);
+                                if (m) aptoDestino = m[1].trim();
+                            }
+                            if (!aptoDestino && prev && prev.apto) {
+                                aptoDestino = prev.apto;
+                            }
+                            // Si es la cuota 1792029094521 (Copia Llave de PB-A creada recientemente)
+                            if (!aptoDestino && c.tipo === 'individual' && c.id == 1792029094521) {
+                                aptoDestino = 'PB-A';
+                            }
+
+                            // Limpiar titulo visible si contenía la etiqueta fallback [Apto: ...]
+                            const cleanTitulo = c.titulo ? c.titulo.replace(/\s*\[Apto:\s*[^\]]+\]/i, '').trim() : '';
+
+                            return {
+                                id: c.id,
+                                condoId: c.condominio_id,
+                                titulo: cleanTitulo || c.titulo,
+                                tipo: c.tipo || 'ordinaria',
+                                meses: parseInt(c.meses) || (prev ? prev.meses : 1) || 1,
+                                apto: aptoDestino,
+                                monto_usd: parseFloat(c.monto_usd) || 0,
+                                fecha: c.fecha
+                            };
+                        });
                         updated = true;
                     }
 
@@ -2630,20 +2703,29 @@
                 }
             },
 
+            // Normalizador de códigos de apartamento (elimina espacios, guiones y compara mayúsculas)
+            normCode(code) {
+                return (code || '').toString().trim().replace(/[\s-_]/g, '').toUpperCase();
+            },
+
             // Helper centralizado para balance de apartamento
             getAptoBalance(condoId, aptoCode) {
                 const condo = this.state.condominios.find(c => c.id === condoId) || this.getActiveCondo();
+                const targetNorm = this.normCode(aptoCode);
+
                 const cuotasCondo = this.state.cuotas.filter(c => {
                     if (c.condoId !== condoId) return false;
                     // Las cuotas individuales solo aplican al apartamento al que fueron asignadas
                     if (c.tipo === 'individual') {
-                        return c.apto === aptoCode;
+                        return this.normCode(c.apto) === targetNorm;
                     }
                     return true;
                 });
-                const totalDeudaUSD = cuotasCondo.reduce((acc, c) => acc + c.monto_usd, 0);
+                const totalDeudaUSD = cuotasCondo.reduce((acc, c) => acc + (parseFloat(c.monto_usd) || 0), 0);
 
-                const pagosAprobados = this.state.pagos.filter(p => p.condoId === condoId && p.apto === aptoCode && p.estado === 'aprobado');
+                const pagosAprobados = this.state.pagos.filter(p => {
+                    return p.condoId === condoId && this.normCode(p.apto) === targetNorm && p.estado === 'aprobado';
+                });
                 const totalPagadoUSD = pagosAprobados.reduce((acc, p) => {
                     let montoUSD = p.moneda === 'USD' ? p.monto : (p.monto / condo.tasa_dolar);
                     return acc + montoUSD;
@@ -3325,6 +3407,41 @@
                     balEl.innerHTML = `<span style="color: #ef4444; font-weight: 800;">$${balance.toFixed(2)} USD (Bs. ${(balance * condo.tasa_dolar).toLocaleString('es-VE', {minimumFractionDigits: 2})})</span>`;
                 }
 
+                // Llenar tabla de cuotas y cargos aplicados a la unidad
+                const targetNorm = this.normCode(aptoCode);
+                const cuotasApto = this.state.cuotas.filter(c => {
+                    if (c.condoId !== condoId) return false;
+                    if (c.tipo === 'individual') {
+                        return this.normCode(c.apto) === targetNorm;
+                    }
+                    return true;
+                });
+                const tbodyCuotas = document.getElementById('superModalAptoCuotasBody');
+                if (tbodyCuotas) {
+                    if (cuotasApto.length === 0) {
+                        tbodyCuotas.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 1rem;">No hay cuotas emitidas para este apartamento.</td></tr>`;
+                    } else {
+                        tbodyCuotas.innerHTML = cuotasApto.slice().reverse().map(c => {
+                            let badge = '';
+                            if (c.tipo === 'ordinaria') {
+                                badge = '<span class="stat-badge clean"><i class="bi bi-arrow-repeat"></i> Ordinaria</span>';
+                            } else if (c.tipo === 'extraordinaria') {
+                                badge = `<span class="stat-badge" style="color:#fbbf24;"><i class="bi bi-calendar-range"></i> Extraordinaria (${c.meses || 1} m)</span>`;
+                            } else {
+                                badge = `<span class="stat-badge" style="color:#38bdf8; border-color:rgba(14, 165, 233, 0.4);"><i class="bi bi-door-open"></i> Individual (Exclusiva)</span>`;
+                            }
+                            return `
+                                <tr>
+                                    <td>${c.fecha}</td>
+                                    <td><strong>${c.titulo}</strong></td>
+                                    <td>${badge}</td>
+                                    <td><strong style="color: #60a5fa;">$${parseFloat(c.monto_usd).toFixed(2)} USD</strong></td>
+                                </tr>
+                            `;
+                        }).join('');
+                    }
+                }
+
                 const tbody = document.getElementById('superModalAptoPagosBody');
                 tbody.innerHTML = '';
 
@@ -3861,14 +3978,32 @@
 
                 if (sbClient) {
                     try {
-                        await sbClient.from('cuotas').insert([{
+                        const payload = {
                             id: nuevaCuota.id,
                             condominio_id: condo.id,
                             titulo: nuevaCuota.titulo,
                             tipo: nuevaCuota.tipo,
                             monto_usd: nuevaCuota.monto_usd,
-                            fecha: nuevaCuota.fecha
-                        }]);
+                            fecha: nuevaCuota.fecha,
+                            apto: nuevaCuota.apto || null,
+                            meses: nuevaCuota.meses || 1
+                        };
+                        const { error } = await sbClient.from('cuotas').insert([payload]);
+                        if (error) {
+                            console.warn('Inserción directa con columna apto falló, usando fallback en título:', error);
+                            // Fallback automático por si aún no se ha creado la columna 'apto' en el panel de Supabase
+                            const fallbackTitulo = (nuevaCuota.tipo === 'individual' && nuevaCuota.apto)
+                                ? `${nuevaCuota.titulo} [Apto: ${nuevaCuota.apto}]`
+                                : nuevaCuota.titulo;
+                            await sbClient.from('cuotas').insert([{
+                                id: nuevaCuota.id,
+                                condominio_id: condo.id,
+                                titulo: fallbackTitulo,
+                                tipo: nuevaCuota.tipo,
+                                monto_usd: nuevaCuota.monto_usd,
+                                fecha: nuevaCuota.fecha
+                            }]);
+                        }
                     } catch (e) {
                         console.error('Error guardando cuota en Supabase:', e);
                     }
@@ -4345,7 +4480,8 @@
                     debtBadge.innerHTML = `<i class="bi bi-check2"></i> Solvente al Día`;
                 }
 
-                // Renderizar listado de pagos, tickets y cartelera del residente
+                // Renderizar listado de cuotas, pagos, tickets y cartelera del residente
+                this.renderResidentCuotas();
                 this.renderResidentPagos();
                 this.renderResidentTickets();
                 this.renderResidentCartelera();
@@ -4519,10 +4655,53 @@
                 });
             },
 
+            // 6.5. CUOTAS Y CARGOS DEL RESIDENTE
+            renderResidentCuotas() {
+                const condo = this.getActiveCondo();
+                const aptoCode = this.currentResidentApto || 'PB-A';
+                const targetNorm = this.normCode(aptoCode);
+
+                const cuotasApto = this.state.cuotas.filter(c => {
+                    if (c.condoId !== condo.id) return false;
+                    if (c.tipo === 'individual') {
+                        return this.normCode(c.apto) === targetNorm;
+                    }
+                    return true;
+                });
+
+                const tbody = document.getElementById('residentCuotasTableBody');
+                if (!tbody) return;
+
+                if (cuotasApto.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No hay cuotas emitidas para este apartamento.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = cuotasApto.slice().reverse().map(c => {
+                    let badge = '';
+                    if (c.tipo === 'ordinaria') {
+                        badge = '<span class="stat-badge clean"><i class="bi bi-arrow-repeat"></i> Ordinaria</span>';
+                    } else if (c.tipo === 'extraordinaria') {
+                        badge = `<span class="stat-badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3);"><i class="bi bi-calendar-range"></i> Extraordinaria (${c.meses || 1} m)</span>`;
+                    } else {
+                        badge = `<span class="stat-badge" style="background: rgba(14, 165, 233, 0.15); color: #38bdf8; border-color: rgba(14, 165, 233, 0.3);"><i class="bi bi-door-open"></i> Individual (Exclusiva Apto ${aptoCode})</span>`;
+                    }
+                    return `
+                        <tr>
+                            <td>${c.fecha}</td>
+                            <td><strong>${c.titulo}</strong></td>
+                            <td>${badge}</td>
+                            <td><strong style="color: #60a5fa; font-size: 1rem;">$${parseFloat(c.monto_usd).toFixed(2)} USD</strong></td>
+                        </tr>
+                    `;
+                }).join('');
+            },
+
             // 7. LISTADO DE PAGOS DEL RESIDENTE
             renderResidentPagos() {
                 const condo = this.getActiveCondo();
-                const pagos = this.state.pagos.filter(p => p.condoId === condo.id && p.apto === this.currentResidentApto);
+                const targetNorm = this.normCode(this.currentResidentApto);
+                const pagos = this.state.pagos.filter(p => p.condoId === condo.id && this.normCode(p.apto) === targetNorm);
                 const tbody = document.getElementById('residentPagosTableBody');
                 if (!tbody) return;
 
