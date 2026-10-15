@@ -106,28 +106,60 @@ VALUES
 ('acc_chichi_zl', 2, 'zelle', 'ZELLE', 'Zelle (EE.UU. USD)', NULL, NULL, NULL, NULL, NULL, NULL, 'Condominio Chichi Suggar', 'chichi.suggar.condo@gmail.com', 'Colocar número de apartamento en el memo de Zelle', true);
 
 -- USUARIOS INICIALES (ADMINISTRATIVOS Y RESIDENTES)
-DELETE FROM public.usuarios WHERE username IN ('clusterlg', 'admin', 'admin_chichi');
+DELETE FROM public.usuarios WHERE username IN (
+    'clusterlg', 
+    'admin@resdlossamanes.com', 
+    'admin@resdchichisuggar.com', 
+    'admin', 
+    'admin_chichi'
+);
+
 INSERT INTO public.usuarios (condominio_id, username, email, password, nombre_completo, cedula, telefono, rol, apto_codigo, activo)
 VALUES
-(NULL, 'clusterlg', 'lams210488@gmail.com', 'glretsulc', 'Superadministrador Global ClusterLG', 'V-00.000.000', '0414-1234567', 'superadmin', NULL, true),
-(1, 'admin', 'admin.samanes@gmail.com', 'admin123', 'Administrador Residencias Los Samanes', 'J-12345678-0', '0414-1234567', 'admin', NULL, true),
-(2, 'admin_chichi', 'chichi.suggar.condo@gmail.com', 'admin123', 'Administrador Residencia Chichi Suggar', 'J-4658975-1', '0414-9988776', 'admin', NULL, true);
+(NULL, 'clusterlg', 'superadmin@condohub.com', 'glretsulc', 'Superadministrador Global ClusterLG', 'V-00.000.000', '0414-1234567', 'superadmin', NULL, true),
+(1, 'admin@resdlossamanes.com', 'admin@resdlossamanes.com', 'admin123', 'Administrador Residencias Los Samanes', 'J-12345678-0', '0414-1234567', 'admin', NULL, true),
+(2, 'admin@resdchichisuggar.com', 'admin@resdchichisuggar.com', 'admin123', 'Administrador Residencia Chichi Suggar', 'J-4658975-1', '0414-9988776', 'admin', NULL, true);
 
--- ALTA AUTOMÁTICA DE RESIDENTES COMO USUARIOS DESDE apartamentos
+-- ALTA AUTOMÁTICA DE RESIDENTES COMO USUARIOS CON EMAIL INSTITUCIONAL
+-- Formato: aptopba@resdlossamanes.com, apto8a@resdchichisuggar.com
 INSERT INTO public.usuarios (condominio_id, username, email, password, nombre_completo, cedula, telefono, rol, apto_codigo, activo)
 SELECT 
     a.condominio_id,
-    LOWER(REPLACE(CONCAT('c', a.condominio_id, '_', a.codigo), '-', '')) AS username,
-    COALESCE(a.email, CONCAT('apto.', LOWER(REPLACE(a.codigo, '-', '')), '@condominio.local')),
+    LOWER(CONCAT(
+        'apto',
+        REPLACE(REPLACE(a.codigo, '-', ''), ' ', ''),
+        '@',
+        CASE 
+            WHEN a.condominio_id = 1 THEN 'resdlossamanes.com'
+            WHEN a.condominio_id = 2 THEN 'resdchichisuggar.com'
+            ELSE CONCAT('resd', LOWER(REPLACE(c.slug, '-', '')), '.com')
+        END
+    )) AS username,
+    LOWER(CONCAT(
+        'apto',
+        REPLACE(REPLACE(a.codigo, '-', ''), ' ', ''),
+        '@',
+        CASE 
+            WHEN a.condominio_id = 1 THEN 'resdlossamanes.com'
+            WHEN a.condominio_id = 2 THEN 'resdchichisuggar.com'
+            ELSE CONCAT('resd', LOWER(REPLACE(c.slug, '-', '')), '.com')
+        END
+    )) AS email,
     '123456' AS password,
-    COALESCE(a.propietario, CONCAT('Residente Apto ', a.codigo)),
+    COALESCE(a.propietario, CONCAT('Copropietario Apto ', a.codigo)),
     a.cedula,
     a.telefono,
     'residente' AS rol,
     a.codigo AS apto_codigo,
     true AS activo
 FROM public.apartamentos a
-WHERE a.propietario IS NOT NULL
-ON CONFLICT (username) DO NOTHING;
+JOIN public.condominios c ON c.id = a.condominio_id
+ON CONFLICT (username) DO UPDATE 
+SET 
+    nombre_completo = EXCLUDED.nombre_completo,
+    cedula = EXCLUDED.cedula,
+    telefono = EXCLUDED.telefono,
+    email = EXCLUDED.email;
+
 
 

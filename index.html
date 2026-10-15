@@ -3412,6 +3412,29 @@
                 return this.state.apartamentos.filter(a => String(a.condoId) === String(condoId));
             },
 
+            // Dominio institucional según residencia
+            getCondoDomain(condo) {
+                if (!condo) return 'condohub.com';
+                const id = String(condo.id);
+                if (id === '1') return 'resdlossamanes.com';
+                if (id === '2') return 'resdchichisuggar.com';
+                const cleanSlug = (condo.slug || condo.nombre || 'condo').toLowerCase().replace(/[^a-z0-9]/g, '');
+                return `resd${cleanSlug}.com`;
+            },
+
+            // Correo institucional para cada apartamento (ej. aptopba@resdlossamanes.com o apto8a@resdchichisuggar.com)
+            getAptoEmail(condo, aptoCode) {
+                const domain = this.getCondoDomain(condo);
+                const cleanCode = (aptoCode || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                return `apto${cleanCode}@${domain}`;
+            },
+
+            // Correo institucional para el administrador del condominio (ej. admin@resdlossamanes.com)
+            getAdminEmail(condo) {
+                const domain = this.getCondoDomain(condo);
+                return `admin@${domain}`;
+            },
+
             renderHome() {
                 const condo = this.getActiveCondo();
                 if (!condo) return;
@@ -3476,7 +3499,8 @@
                             floors[pNum].forEach(u => {
                                 const opt = document.createElement('option');
                                 opt.value = u.codigo;
-                                opt.innerText = `Apto ${u.codigo} ${u.propietario ? '(' + u.propietario + ')' : '(Disponible)'}`;
+                                const userEmail = this.getAptoEmail(condo, u.codigo);
+                                opt.innerText = `Apto ${u.codigo} [${userEmail}] ${u.propietario ? '(' + u.propietario + ')' : '(Disponible)'}`;
                                 if (currentSelected && u.codigo === currentSelected) {
                                     opt.selected = true;
                                 }
@@ -3665,17 +3689,19 @@
                     }
                 }
 
-                // 1. SUPERADMINISTRADOR GLOBAL (clusterlg / glretsulc)
-                if (user === 'clusterlg' && pass === 'glretsulc') {
+                // 1. SUPERADMINISTRADOR GLOBAL (clusterlg / glretsulc o superadmin@condohub.com)
+                if ((user === 'clusterlg' || user === 'superadmin@condohub.com') && pass === 'glretsulc') {
                     this.logActivity('LOGIN', 'Inicio de sesión de Superadministrador Global (clusterlg)', 'clusterlg (Superadmin)', 'Plataforma Global');
                     this.openSuperAdminDashboard();
                     return;
                 }
 
-                // 2. ADMINISTRADOR LOCAL DEL CONDOMINIO (admin / admin123)
-                if (user === 'admin' && pass === 'admin123') {
+                // 2. ADMINISTRADOR LOCAL DEL CONDOMINIO (admin / admin123 o admin@resdlossamanes.com / admin@resdchichisuggar.com)
+                if ((user === 'admin' || user === 'admin@resdlossamanes.com' || user === 'admin@resdchichisuggar.com') && pass === 'admin123') {
+                    if (user === 'admin@resdlossamanes.com') this.switchCondominio(1);
+                    if (user === 'admin@resdchichisuggar.com') this.switchCondominio(2);
                     const condo = this.getActiveCondo();
-                    this.logActivity('LOGIN', `Inicio de sesión de Administrador Local en ${condo ? condo.nombre : 'Condominio'}`, 'admin (Admin)', condo ? condo.nombre : 'Condominio');
+                    this.logActivity('LOGIN', `Inicio de sesión de Administrador (${user}) en ${condo ? condo.nombre : 'Condominio'}`, `${user} (Admin)`, condo ? condo.nombre : 'Condominio');
                     this.openAdminDashboard('Admin');
                     return;
                 }
@@ -3999,8 +4025,9 @@
                         <td>${vehiculoHtml}</td>
                         <td>
                             <div style="display: flex; flex-direction: column; gap: 3px;">
-                                <span style="font-size: 0.78rem; color: var(--text-secondary);">Usuario: <code style="color: #fff;">${u.codigo}</code></span>
-                                <span style="font-size: 0.78rem; color: var(--text-secondary);">Clave: <code style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; font-weight: 700; padding: 2px 6px; border-radius: 4px;"><i class="bi bi-key-fill"></i> 123456</code></span>
+                                <span style="font-size: 0.78rem; color: var(--text-secondary);">Usuario / Email:</span>
+                                <code style="color: #60a5fa; font-size: 0.76rem; word-break: break-all;">${this.getAptoEmail(condo, u.codigo)}</code>
+                                <span style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">Clave: <code style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; font-weight: 700; padding: 2px 6px; border-radius: 4px;"><i class="bi bi-key-fill"></i> ${u.password || '123456'}</code></span>
                             </div>
                         </td>
                         <td>${solvenciaBadge}</td>
@@ -5807,7 +5834,8 @@
                 const u = this.getCondoUnits(condo.id).find(x => x.codigo === aptoCode);
 
                 document.getElementById('residentUnitTitle').innerText = `Apartamento ${aptoCode}`;
-                document.getElementById('residentOwnerSubtitle').innerText = u && u.propietario ? `Propietario: ${u.propietario}` : 'Sin propietario adjudicado';
+                const aptoEmail = this.getAptoEmail(condo, aptoCode);
+                document.getElementById('residentOwnerSubtitle').innerText = `${u && u.propietario ? 'Propietario: ' + u.propietario : 'Sin adjudicar'} • Usuario: ${aptoEmail}`;
 
                 if (u && !['resProfileName', 'resProfileCedula', 'resProfilePhone', 'resProfileEmail', 'resProfileVehiculo'].includes(document.activeElement?.id)) {
                     document.getElementById('resProfileName').value = u.propietario || '';
