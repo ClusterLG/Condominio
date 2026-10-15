@@ -46,14 +46,21 @@ if ($action === 'create') {
 
     $titulo = trim($_POST['titulo'] ?? '');
     $descripcion = trim($_POST['descripcion'] ?? '');
-    $tipo = in_array($_POST['tipo'] ?? '', ['ordinaria', 'extraordinaria']) ? $_POST['tipo'] : 'ordinaria';
+    $tipo = in_array($_POST['tipo'] ?? '', ['ordinaria', 'extraordinaria', 'individual']) ? $_POST['tipo'] : 'ordinaria';
+    $meses_duracion = max(1, (int)($_POST['meses_duracion'] ?? 1));
     $monto_usd = (float)($_POST['monto_usd'] ?? 0);
     $fecha_emision = $_POST['fecha_emision'] ?? date('Y-m-d');
     $fecha_vencimiento = $_POST['fecha_vencimiento'] ?? date('Y-m-d', strtotime('+15 days'));
-    $destino = $_POST['destino'] ?? 'todos'; // 'todos' o 'personalizado'
+    $destino = $_POST['destino'] ?? 'todos'; // 'todos', 'personalizado' o 'individual'
 
     if (empty($titulo) || $monto_usd <= 0) {
         jsonResponse(['success' => false, 'message' => 'Por favor ingrese el título y un monto válido en USD.'], 400);
+    }
+
+    if ($tipo === 'extraordinaria') {
+        $descripcion = trim($descripcion . " (Duración: {$meses_duracion} meses)");
+    } else if ($tipo === 'ordinaria' && empty($descripcion)) {
+        $descripcion = "Cuota ordinaria mensual recurrente";
     }
 
     $pdo->beginTransaction();
@@ -63,7 +70,13 @@ if ($action === 'create') {
         $cuotaId = $pdo->lastInsertId();
 
         // Obtener apartamentos residenciales o seleccionados para este condominio
-        if ($destino === 'todos') {
+        if ($tipo === 'individual') {
+            $aptoId = (int)($_POST['apartamento_individual_id'] ?? 0);
+            if ($aptoId <= 0) {
+                throw new Exception("Debe seleccionar un apartamento válido para la cuota individual.");
+            }
+            $aptos = [$aptoId];
+        } else if ($destino === 'todos') {
             $stmtAptos = $pdo->prepare("SELECT id FROM apartamentos WHERE condominio_id = ? AND tipo = 'apartamento'");
             $stmtAptos->execute([$cId]);
             $aptos = $stmtAptos->fetchAll(PDO::FETCH_COLUMN);

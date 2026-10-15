@@ -533,12 +533,13 @@ const AdminApp = {
                     <tr>
                         <td>
                             <strong>${c.titulo}</strong><br>
-                            <span class="badge badge-${c.tipo}">${c.tipo}</span>
+                            ${c.tipo === 'ordinaria' ? '<span class="badge badge-ordinaria"><i class="bi bi-arrow-repeat"></i> Ordinaria (Mensual)</span>' : 
+                              (c.tipo === 'extraordinaria' ? '<span class="badge badge-extraordinaria"><i class="bi bi-clock-history"></i> Extraordinaria</span>' : 
+                              '<span class="badge" style="background:#3b82f6; color:#fff;"><i class="bi bi-person"></i> Individual</span>')}
                             <small style="color:var(--text-secondary); display:block; margin-top:2px;">${c.descripcion || ''}</small>
                         </td>
                         <td>
-                            <strong style="font-family:'JetBrains Mono'">${c.monto_usd_formatted}</strong><br>
-                            <small style="color:var(--text-muted)">${c.monto_bs_formatted}</small>
+                            <strong style="font-family:'JetBrains Mono'">${c.monto_usd_formatted}</strong>
                         </td>
                         <td>${c.fecha_vencimiento}</td>
                         <td>

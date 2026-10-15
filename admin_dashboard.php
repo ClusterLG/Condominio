@@ -13,6 +13,10 @@ $tasaDolar = getTasaDolar($condominio['id'] ?? null);
 $fechaValorBCV = getConfig('tasa_bcv_fecha_valor', 'Oficial');
 $ultimaSyncBCV = getConfig('tasa_bcv_ultima_actualizacion', 'Hoy');
 $isSuperAdmin = isSuperAdmin();
+
+$stmtAptosList = $pdo->prepare("SELECT id, codigo, propietario_nombre FROM apartamentos WHERE condominio_id = ? ORDER BY piso ASC, codigo ASC");
+$stmtAptosList->execute([$condominio['id'] ?? 1]);
+$condoAptos = $stmtAptosList->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -594,9 +598,10 @@ $isSuperAdmin = isSuperAdmin();
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
                     <div class="form-group">
                         <label class="form-label">Tipo de Cuota:</label>
-                        <select name="tipo" class="form-control" required>
-                            <option value="ordinaria">Cuota Ordinaria</option>
-                            <option value="extraordinaria">Cuota Extraordinaria</option>
+                        <select name="tipo" id="php-cuota-tipo" class="form-control" onchange="togglePhpCuotaFields(this.value)" required>
+                            <option value="ordinaria">Cuota Ordinaria (Todos los meses)</option>
+                            <option value="extraordinaria">Cuota Extraordinaria (Temporal)</option>
+                            <option value="individual">Cuota Individual (Apto puntual)</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -604,6 +609,28 @@ $isSuperAdmin = isSuperAdmin();
                         <input type="number" step="0.01" name="monto_usd" class="form-control" placeholder="35.00" required>
                     </div>
                 </div>
+
+                <div id="php-cuota-extra-fields" style="display:none; background:rgba(234,179,8,0.08); border:1px solid rgba(234,179,8,0.3); border-radius:8px; padding:0.75rem; margin-bottom:1rem;">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="form-label" style="color:var(--text-primary); font-weight:600;"><i class="bi bi-clock-history"></i> Cantidad de meses a repetir:</label>
+                        <input type="number" min="1" max="60" name="meses_duracion" id="php-cuota-meses" class="form-control" value="1" placeholder="Ej: 3">
+                        <small style="color:var(--text-muted); display:block; margin-top:4px;">Indica durante cuántos meses se emitirá esta cuota extraordinaria.</small>
+                    </div>
+                </div>
+
+                <div id="php-cuota-individual-fields" style="display:none; background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.3); border-radius:8px; padding:0.75rem; margin-bottom:1rem;">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="form-label" style="color:var(--text-primary); font-weight:600;"><i class="bi bi-door-open"></i> Apartamento Específico Destino:</label>
+                        <select name="apartamento_individual_id" id="php-cuota-apto" class="form-control">
+                            <option value="">-- Seleccionar Apartamento --</option>
+                            <?php foreach ($condoAptos as $apt): ?>
+                                <option value="<?= $apt['id'] ?>">Apto <?= htmlspecialchars($apt['codigo']) ?> - <?= htmlspecialchars($apt['propietario_nombre'] ?: 'Sin propietario') ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <small style="color:var(--text-muted); display:block; margin-top:4px;">Asignada a un apartamento específico para solicitudes puntuales (ej. reposición de llave, control, etc.).</small>
+                    </div>
+                </div>
+
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
                     <div class="form-group">
                         <label class="form-label">Fecha de Emisión:</label>
@@ -613,11 +640,6 @@ $isSuperAdmin = isSuperAdmin();
                         <label class="form-label">Fecha de Vencimiento:</label>
                         <input type="date" name="fecha_vencimiento" class="form-control" value="<?= date('Y-m-d', strtotime('+15 days')) ?>" required>
                     </div>
-                <div class="form-group">
-                    <label class="form-label">Asignar a:</label>
-                    <select name="destino" class="form-control">
-                        <option value="todos">Todos los Apartamentos Residenciales (Edificio Completo)</option>
-                    </select>
                 </div>
             </div>
             <div class="modal-footer">
@@ -847,6 +869,16 @@ async function handleUpdateApto(e) {
     } else {
         showToast(res.message, 'error');
     }
+}
+
+function togglePhpCuotaFields(tipo) {
+    const extraDiv = document.getElementById('php-cuota-extra-fields');
+    const indDiv = document.getElementById('php-cuota-individual-fields');
+    const aptoSel = document.getElementById('php-cuota-apto');
+    
+    if (extraDiv) extraDiv.style.display = (tipo === 'extraordinaria') ? 'block' : 'none';
+    if (indDiv) indDiv.style.display = (tipo === 'individual') ? 'block' : 'none';
+    if (aptoSel) aptoSel.required = (tipo === 'individual');
 }
 
 async function handleCreateCuota(e) {

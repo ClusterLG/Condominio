@@ -274,6 +274,53 @@ ksort($pisosAgrupados);
                 <i class="bi bi-shield-check"></i> Ingresar al Dashboard
             </button>
         </form>
+
+        <div style="text-align: center; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px dashed var(--border-color);">
+            <button type="button" onclick="openResetPasswordModal()" style="background: none; border: none; color: #60a5fa; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.65rem; border-radius: 6px;">
+                <i class="bi bi-key-fill text-warning"></i> ¿Olvidó su contraseña? Solicitar restablecimiento
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Restablecer Contraseña -->
+<div id="modal-reset-password" class="modal-overlay">
+    <div class="modal-container" style="max-width: 480px;">
+        <div class="modal-header">
+            <div class="modal-title"><i class="bi bi-shield-lock text-warning"></i> Restablecer Contraseña</div>
+            <button type="button" class="btn-close-modal" onclick="closeModal('modal-reset-password')"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="modal-body">
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.25rem; line-height: 1.5;">
+                Seleccione su apartamento o usuario. Se enviará una solicitud al Superadministrador con los datos del condominio para que le proporcione su nueva clave vía WhatsApp.
+            </p>
+            <div class="form-group">
+                <label class="form-label"><i class="bi bi-buildings"></i> Condominio:</label>
+                <input type="text" id="php-reset-condo-name" class="form-control" readonly value="<?= htmlspecialchars($activeCondo['nombre']) ?>" style="background: var(--bg-card); color: #fff;">
+            </div>
+            <div class="form-group">
+                <label class="form-label"><i class="bi bi-door-open"></i> Apartamento o Usuario:</label>
+                <select id="php-reset-apto" class="form-control">
+                    <option value="admin">Administrador Local (admin)</option>
+                    <?php foreach ($aptos as $a): ?>
+                        <option value="<?= htmlspecialchars($a['codigo']) ?>">Apto <?= htmlspecialchars($a['codigo']) ?> (<?= htmlspecialchars($a['propietario_nombre']) ?>)</option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label"><i class="bi bi-whatsapp text-success"></i> Su Teléfono / WhatsApp de Contacto:</label>
+                <input type="text" id="php-reset-phone" class="form-control" placeholder="Ej: 0414-1234567">
+                <small style="color: var(--text-muted); font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                    Por este número el Superadministrador le responderá y le entregará su clave.
+                </small>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('modal-reset-password')">Cancelar</button>
+            <button type="button" class="btn btn-success" style="background: #25D366; border-color: #25D366;" onclick="sendPhpResetPassword()">
+                <i class="bi bi-whatsapp"></i> Solicitar al Superadministrador vía WhatsApp
+            </button>
+        </div>
     </div>
 </div>
 
@@ -406,6 +453,31 @@ function quickFillResident(codigo) {
     document.getElementById('res-codigo').value = codigo;
     document.getElementById('res-password').value = '123456';
     document.getElementById('form-login-resident').requestSubmit();
+}
+
+function openResetPasswordModal() {
+    openModal('modal-reset-password');
+}
+
+function sendPhpResetPassword() {
+    const condoName = document.getElementById('php-reset-condo-name').value;
+    const aptoSelect = document.getElementById('php-reset-apto');
+    const aptoText = aptoSelect.options[aptoSelect.selectedIndex].text;
+    const phone = document.getElementById('php-reset-phone').value.trim();
+
+    const superadminWhatsApp = '584141234567';
+
+    const mensaje = `🔒 *SOLICITUD DE RESTABLECIMIENTO DE CONTRASEÑA*\n\n` +
+        `🏢 *Condominio:* ${condoName}\n` +
+        `🔑 *Usuario / Apartamento:* ${aptoText}\n` +
+        (phone ? `📱 *Teléfono de contacto:* ${phone}\n\n` : `\n`) +
+        `Solicito por favor el restablecimiento y envío de mi contraseña de acceso para ingresar al sistema.`;
+
+    closeModal('modal-reset-password');
+    showToast('Abriendo WhatsApp del Superadministrador...', 'info');
+
+    const url = `https://wa.me/${superadminWhatsApp}?text=${encodeURIComponent(mensaje)}`;
+    window.open(url, '_blank');
 }
 </script>
 

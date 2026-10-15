@@ -648,6 +648,13 @@
                     <i class="bi bi-shield-check"></i> Ingresar al Dashboard
                 </button>
             </form>
+
+            <!-- ENLACE PARA SOLICITAR RESTABLECER CONTRASEÑA -->
+            <div style="text-align: center; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px dashed var(--border-color);">
+                <button type="button" onclick="app.showResetPasswordModal()" style="background: none; border: none; color: #60a5fa; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.65rem; border-radius: 6px; transition: var(--transition);">
+                    <i class="bi bi-key-fill text-warning"></i> ¿Olvidó su contraseña? Solicitar restablecimiento
+                </button>
+            </div>
         </div>
     </main>
 
@@ -1014,11 +1021,11 @@
                         <thead>
                             <tr>
                                 <th>Fecha</th>
-                                <th>Título</th>
-                                <th>Tipo</th>
+                                <th>Concepto / Título</th>
+                                <th>Tipo y Recurrencia</th>
                                 <th>Monto USD</th>
-                                <th>Equivalente Bs (BCV)</th>
-                                <th>Estado</th>
+                                <th>Destino / Asignación</th>
+                                <th>Acción</th>
                             </tr>
                         </thead>
                         <tbody id="cuotasTableBody">
@@ -1115,11 +1122,7 @@
         <!-- TAB: CUENTAS -->
         <div id="adminTabConfig" style="display: none;">
             <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; max-width: 650px;">
-                <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 1.25rem;"><i class="bi bi-wallet2 text-primary"></i> Cuentas Bancarias y Parámetros</h3>
-                <div class="form-group">
-                    <label class="form-label">Tasa Oficial BCV (Bs/$):</label>
-                    <input type="number" step="0.01" id="cfgTasaBcv" class="form-control" value="877.90">
-                </div>
+                <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 1.25rem;"><i class="bi bi-wallet2 text-primary"></i> Cuentas Bancarias</h3>
                 <div class="form-group">
                     <label class="form-label">Datos Pago Móvil (Solo Bs):</label>
                     <input type="text" id="cfgPagoMovil" class="form-control" value="Banco Banesco (0134) | RIF: J-12345678-0 | Teléfono: 0414-1234567">
@@ -1169,7 +1172,7 @@
                 <i class="bi bi-megaphone"></i> Cartelera Digital
             </button>
             <button class="tab-item-saas" onclick="app.switchResidentTab('perfil', this)">
-                <i class="bi bi-person-lines-fill"></i> Mi Perfil
+                <i class="bi bi-person-gear"></i> Mi Cuenta
             </button>
         </div>
 
@@ -1293,6 +1296,25 @@
                     <i class="bi bi-save"></i> Guardar Mi Perfil
                 </button>
             </div>
+
+            <!-- APARTADO DE CUENTA: ACTUALIZAR CONTRASEÑA -->
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; max-width: 950px; margin-top: 1.5rem;">
+                <h3 style="font-size: 1.15rem; color: #fff; margin-bottom: 0.35rem;"><i class="bi bi-shield-lock text-primary"></i> Seguridad de la Cuenta: Actualizar Contraseña</h3>
+                <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.25rem;">Establezca una nueva contraseña personal para el ingreso al portal de su apartamento.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">Nueva Contraseña:</label>
+                        <input type="password" id="resNewPassword" class="form-control" placeholder="Ingrese nueva contraseña">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirmar Nueva Contraseña:</label>
+                        <input type="password" id="resConfirmPassword" class="form-control" placeholder="Repita la nueva contraseña">
+                    </div>
+                </div>
+                <button class="btn-primary-saas" style="width: auto; padding: 0.65rem 1.25rem; background: #3b82f6;" onclick="app.updateResidentPassword()">
+                    <i class="bi bi-key-fill"></i> Actualizar Contraseña
+                </button>
+            </div>
         </div>
     </section>
 
@@ -1400,24 +1422,83 @@
             </div>
             <div>
                 <div class="form-group">
-                    <label class="form-label">Concepto:</label>
-                    <input type="text" id="cuotaTitulo" class="form-control" value="Mantenimiento General - Octubre 2026">
+                    <label class="form-label">Concepto / Título de la Cuota:</label>
+                    <input type="text" id="cuotaTitulo" class="form-control" placeholder="Ej: Mantenimiento Mensual, Pintura Fachada o Reposición Llave">
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+                <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.85rem;">
                     <div class="form-group">
-                        <label class="form-label">Tipo:</label>
-                        <select id="cuotaTipo" class="form-control">
-                            <option value="ordinaria">Ordinaria</option>
-                            <option value="extraordinaria">Extraordinaria</option>
+                        <label class="form-label">Tipo de Cuota:</label>
+                        <select id="cuotaTipo" class="form-control" onchange="app.handleCuotaTipoChange(this.value)">
+                            <option value="ordinaria">Cuota Ordinaria (Todos los meses)</option>
+                            <option value="extraordinaria">Cuota Extraordinaria (Indicar meses)</option>
+                            <option value="individual">Cuota Individual (Apto específico)</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Monto Base (USD):</label>
+                        <label class="form-label">Monto (USD $):</label>
                         <input type="number" step="0.5" id="cuotaMonto" class="form-control" value="35.00">
                     </div>
                 </div>
-                <button class="btn-primary-saas" onclick="app.executeEmitirCuota()">
-                    <i class="bi bi-broadcast"></i> Emitir Cuota a Todo el Edificio
+
+                <!-- Campo para Extraordinaria: Número de meses a repetirse -->
+                <div class="form-group" id="cuotaExtraordinariaGroup" style="display: none; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: var(--radius-sm); padding: 0.85rem; margin-bottom: 1rem;">
+                    <label class="form-label" style="color: #fbbf24;"><i class="bi bi-calendar-range"></i> ¿Cuántos meses se repetirá esta cuota extraordinaria?:</label>
+                    <input type="number" id="cuotaMeses" class="form-control" min="1" max="60" value="3" placeholder="Ej: 3 meses">
+                    <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.35rem; display: block;">
+                        Se computará el cargo correspondiente durante los meses indicados a todo el edificio.
+                    </small>
+                </div>
+
+                <!-- Campo para Individual: Seleccionar apartamento puntual -->
+                <div class="form-group" id="cuotaIndividualGroup" style="display: none; background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: var(--radius-sm); padding: 0.85rem; margin-bottom: 1rem;">
+                    <label class="form-label" style="color: #38bdf8;"><i class="bi bi-door-open"></i> Apartamento al que se asigna la cuota puntual:</label>
+                    <select id="cuotaAptoDestino" class="form-control">
+                        <!-- Llenado dinámico -->
+                    </select>
+                    <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.35rem; display: block;">
+                        Cargo exclusivo para solicitudes puntuales (ej: reposición de llave de acceso, control, sanción, etc.).
+                    </small>
+                </div>
+
+                <button class="btn-primary-saas" id="btnEmitirCuotaSubmit" onclick="app.executeEmitirCuota()">
+                    <i class="bi bi-broadcast"></i> Emitir Cuota Ordinaria (Todos los Meses)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: SOLICITAR RESTABLECER CONTRASEÑA (ENVÍO VÍA WHATSAPP AL SUPERADMINISTRADOR) -->
+    <div id="modalResetPassword" class="modal-backdrop-saas">
+        <div class="modal-box-saas">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                <h3 style="font-size: 1.2rem; color: #fff; margin: 0;"><i class="bi bi-shield-lock text-warning"></i> Restablecer Contraseña</h3>
+                <button class="close-btn" onclick="app.closeModal('modalResetPassword')">&times;</button>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.25rem; line-height: 1.5;">
+                Seleccione su apartamento o usuario. Se generará una solicitud formal dirigida al Superadministrador con los datos del condominio para que le proporcione su clave de acceso vía WhatsApp.
+            </p>
+            <div>
+                <div class="form-group">
+                    <label class="form-label"><i class="bi bi-buildings text-primary"></i> Condominio / Edificio:</label>
+                    <select id="resetCondoSelect" class="form-control" onchange="app.handleResetCondoChange(this.value)">
+                        <!-- Llenado dinámico -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label"><i class="bi bi-door-open text-primary"></i> Apartamento o Usuario a Recuperar:</label>
+                    <select id="resetAptoSelect" class="form-control">
+                        <!-- Llenado dinámico -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label"><i class="bi bi-whatsapp text-success"></i> Su Número de WhatsApp de Contacto:</label>
+                    <input type="text" id="resetContactPhone" class="form-control" placeholder="Ej: 0414-1234567 o +584141234567">
+                    <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                        Por este número el Superadministrador le responderá y le suministrará su clave de acceso.
+                    </small>
+                </div>
+                <button class="btn-primary-saas" style="background: #25D366; color: #fff; font-weight: 700; margin-top: 0.5rem;" onclick="app.sendResetPasswordRequest()">
+                    <i class="bi bi-whatsapp"></i> Solicitar al Superadministrador vía WhatsApp
                 </button>
             </div>
         </div>
@@ -2552,7 +2633,14 @@
             // Helper centralizado para balance de apartamento
             getAptoBalance(condoId, aptoCode) {
                 const condo = this.state.condominios.find(c => c.id === condoId) || this.getActiveCondo();
-                const cuotasCondo = this.state.cuotas.filter(c => c.condoId === condoId);
+                const cuotasCondo = this.state.cuotas.filter(c => {
+                    if (c.condoId !== condoId) return false;
+                    // Las cuotas individuales solo aplican al apartamento al que fueron asignadas
+                    if (c.tipo === 'individual') {
+                        return c.apto === aptoCode;
+                    }
+                    return true;
+                });
                 const totalDeudaUSD = cuotasCondo.reduce((acc, c) => acc + c.monto_usd, 0);
 
                 const pagosAprobados = this.state.pagos.filter(p => p.condoId === condoId && p.apto === aptoCode && p.estado === 'aprobado');
@@ -2757,14 +2845,105 @@
             handleResidentSubmit(e) {
                 e.preventDefault();
                 const aptoCode = document.getElementById('res-codigo').value;
+                const pass = document.getElementById('res-password').value.trim();
                 if (!aptoCode) {
                     alert('Por favor seleccione un apartamento');
                     return;
                 }
-                this.currentResidentApto = aptoCode;
                 const condo = this.getActiveCondo();
+                const unit = this.getCondoUnits(condo.id).find(u => u.codigo === aptoCode);
+                const validPass = unit && unit.password ? unit.password : '123456';
+                if (pass !== validPass) {
+                    alert(`Contraseña incorrecta para el Apto ${aptoCode}. Si la olvidó, puede utilizar la opción 'Solicitar restablecimiento' para recibir su clave vía WhatsApp.`);
+                    return;
+                }
+                this.currentResidentApto = aptoCode;
                 this.logActivity('LOGIN', `Inicio de sesión de residente en Apto ${aptoCode}`, `Apto ${aptoCode}`, condo ? condo.nombre : 'Condominio');
                 this.openResidentDashboard(aptoCode);
+            },
+
+            // GESTIÓN DE RESTABLECIMIENTO DE CONTRASEÑA VÍA WHATSAPP CON EL SUPERADMINISTRADOR
+            showResetPasswordModal() {
+                const condo = this.getActiveCondo();
+                const condoSelect = document.getElementById('resetCondoSelect');
+                if (condoSelect) {
+                    condoSelect.innerHTML = '';
+                    this.state.condominios.forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c.id;
+                        opt.innerText = c.nombre;
+                        if (c.id === condo.id) opt.selected = true;
+                        condoSelect.appendChild(opt);
+                    });
+                }
+                this.handleResetCondoChange(condo.id);
+                this.openModal('modalResetPassword');
+            },
+
+            handleResetCondoChange(condoId) {
+                condoId = parseInt(condoId);
+                const aptoSelect = document.getElementById('resetAptoSelect');
+                if (!aptoSelect) return;
+                aptoSelect.innerHTML = '<option value="admin">Administrador Local (admin)</option>';
+                const units = this.getCondoUnits(condoId);
+                units.forEach(u => {
+                    const opt = document.createElement('option');
+                    opt.value = u.codigo;
+                    opt.innerText = `Apto ${u.codigo} ${u.propietario ? '(' + u.propietario + ')' : ''}`;
+                    aptoSelect.appendChild(opt);
+                });
+            },
+
+            sendResetPasswordRequest() {
+                const condoSelect = document.getElementById('resetCondoSelect');
+                const aptoSelect = document.getElementById('resetAptoSelect');
+                const phoneInput = document.getElementById('resetContactPhone');
+
+                const condoId = parseInt(condoSelect ? condoSelect.value : this.state.activeCondoId);
+                const condo = this.state.condominios.find(c => c.id === condoId) || this.getActiveCondo();
+                const condoNombre = condo ? condo.nombre : 'Condominio';
+                const usuario = aptoSelect ? aptoSelect.value : '';
+                const usuarioTexto = aptoSelect && aptoSelect.options[aptoSelect.selectedIndex] ? aptoSelect.options[aptoSelect.selectedIndex].text : usuario;
+                const telefono = phoneInput ? phoneInput.value.trim() : '';
+
+                if (!usuario) {
+                    alert('Por favor seleccione el apartamento o usuario a recuperar');
+                    return;
+                }
+
+                // WhatsApp de contacto del Superadministrador (ClusterLG / Soporte Global)
+                const superadminPhone = '584141234567';
+
+                const mensaje = `🔒 *SOLICITUD DE RESTABLECIMIENTO DE CONTRASEÑA*\n\n` +
+                    `🏢 *Condominio:* ${condoNombre}\n` +
+                    `🔑 *Usuario / Apartamento:* ${usuarioTexto}\n` +
+                    (telefono ? `📱 *Teléfono de contacto:* ${telefono}\n\n` : `\n`) +
+                    `Solicito por favor el restablecimiento y envío de mi contraseña de acceso para ingresar al sistema CondoHub SaaS.`;
+
+                // Registrar solicitud en tickets/bitácora del sistema
+                const nuevoTicket = {
+                    id: Date.now(),
+                    condoId: condo.id,
+                    apto: usuario,
+                    propietario: usuarioTexto,
+                    tipo: 'solicitud',
+                    prioridad: 'alta',
+                    titulo: `Restablecimiento de Contraseña - ${usuarioTexto}`,
+                    descripcion: `Solicitud de clave para ${usuarioTexto} en ${condoNombre}. Teléfono de contacto: ${telefono || 'No indicado'}. Entrega acordada vía WhatsApp.`,
+                    estado: 'pendiente',
+                    respuestaAdmin: null,
+                    fecha: new Date().toISOString().split('T')[0]
+                };
+                if (!this.state.tickets) this.state.tickets = [];
+                this.state.tickets.push(nuevoTicket);
+                this.save();
+                this.logActivity('RESTABLECER_PASS', `Solicitud de restablecimiento de clave enviada al Superadministrador para ${usuarioTexto}`, usuario, condoNombre);
+
+                this.closeModal('modalResetPassword');
+                this.toast('✅ Solicitud registrada. Abriendo WhatsApp del Superadministrador...');
+
+                const url = `https://wa.me/${superadminPhone}?text=${encodeURIComponent(mensaje)}`;
+                window.open(url, '_blank');
             },
 
             handleAdminSubmit(e) {
@@ -3591,9 +3770,44 @@
                 }
             },
 
-            // 2. EMISIÓN INMEDIATA DE CUOTA
+            // 2. EMISIÓN DE CUOTAS (ORDINARIA, EXTRAORDINARIA E INDIVIDUAL)
             showEmitirCuotaModal() {
+                const condo = this.getActiveCondo();
+                const aptoSelect = document.getElementById('cuotaAptoDestino');
+                if (aptoSelect) {
+                    aptoSelect.innerHTML = '';
+                    const units = this.getCondoUnits(condo.id);
+                    units.forEach(u => {
+                        const opt = document.createElement('option');
+                        opt.value = u.codigo;
+                        opt.innerText = `Apto ${u.codigo} ${u.propietario ? '(' + u.propietario + ')' : '(Disponible)'}`;
+                        aptoSelect.appendChild(opt);
+                    });
+                }
+                const tipoSelect = document.getElementById('cuotaTipo');
+                if (tipoSelect) {
+                    this.handleCuotaTipoChange(tipoSelect.value);
+                }
                 this.openModal('modalEmitirCuota');
+            },
+
+            handleCuotaTipoChange(tipo) {
+                const extraGroup = document.getElementById('cuotaExtraordinariaGroup');
+                const indivGroup = document.getElementById('cuotaIndividualGroup');
+                const btnSubmit = document.getElementById('btnEmitirCuotaSubmit');
+
+                if (extraGroup) extraGroup.style.display = tipo === 'extraordinaria' ? 'block' : 'none';
+                if (indivGroup) indivGroup.style.display = tipo === 'individual' ? 'block' : 'none';
+
+                if (btnSubmit) {
+                    if (tipo === 'ordinaria') {
+                        btnSubmit.innerHTML = '<i class="bi bi-broadcast"></i> Emitir Cuota Ordinaria (Todos los Meses)';
+                    } else if (tipo === 'extraordinaria') {
+                        btnSubmit.innerHTML = '<i class="bi bi-calendar-check"></i> Emitir Cuota Extraordinaria';
+                    } else {
+                        btnSubmit.innerHTML = '<i class="bi bi-person-check"></i> Asignar Cuota Individual al Apartamento';
+                    }
+                }
             },
 
             async executeEmitirCuota() {
@@ -3601,12 +3815,26 @@
                 const titulo = document.getElementById('cuotaTitulo').value.trim();
                 const tipo = document.getElementById('cuotaTipo').value;
                 const monto = parseFloat(document.getElementById('cuotaMonto').value) || 35.0;
+                const meses = parseInt(document.getElementById('cuotaMeses').value) || 1;
+                const aptoIndividual = document.getElementById('cuotaAptoDestino') ? document.getElementById('cuotaAptoDestino').value : null;
+
+                if (!titulo) {
+                    alert('Por favor ingrese el concepto o título de la cuota');
+                    return;
+                }
+
+                if (tipo === 'individual' && !aptoIndividual) {
+                    alert('Por favor seleccione el apartamento para asignar la cuota individual');
+                    return;
+                }
 
                 const nuevaCuota = {
                     id: Date.now(),
                     condoId: condo.id,
                     titulo: titulo,
-                    tipo: tipo,
+                    tipo: tipo, // 'ordinaria', 'extraordinaria', 'individual'
+                    meses: tipo === 'extraordinaria' ? meses : 1,
+                    apto: tipo === 'individual' ? aptoIndividual : null,
                     monto_usd: monto,
                     fecha: new Date().toISOString().split('T')[0]
                 };
@@ -3620,8 +3848,16 @@
                 const tabCuotasBtn = document.querySelectorAll('.tab-item-saas')[1];
                 this.switchAdminTab('cuotas', tabCuotasBtn);
 
-                this.toast(`✅ Cuota "${titulo}" emitida a todo el edificio ($${monto.toFixed(2)})`);
-                this.logActivity('CUOTA_EMITIDA', `Emisión de cuota "${nuevaCuota.titulo}" (${nuevaCuota.tipo}) por $${nuevaCuota.monto_usd.toFixed(2)} USD a todo el edificio`, this.currentRole || 'Admin', condo.nombre);
+                let mensajeToast = '';
+                if (tipo === 'ordinaria') {
+                    mensajeToast = `✅ Cuota Ordinaria "${titulo}" emitida a todo el edificio ($${monto.toFixed(2)} USD / recurrente)`;
+                } else if (tipo === 'extraordinaria') {
+                    mensajeToast = `✅ Cuota Extraordinaria "${titulo}" emitida ($${monto.toFixed(2)} USD x ${meses} meses)`;
+                } else {
+                    mensajeToast = `✅ Cuota Individual "${titulo}" asignada al Apto ${aptoIndividual} ($${monto.toFixed(2)} USD puntual)`;
+                }
+                this.toast(mensajeToast);
+                this.logActivity('CUOTA_EMITIDA', mensajeToast, this.currentRole || 'Admin', condo.nombre);
 
                 if (sbClient) {
                     try {
@@ -3652,18 +3888,47 @@
 
                 tbody.innerHTML = '';
                 cuotas.slice().reverse().forEach(c => {
-                    const montoBs = (c.monto_usd * condo.tasa_dolar).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    let tipoBadge = '';
+                    let destinoBadge = '';
+
+                    if (c.tipo === 'ordinaria') {
+                        tipoBadge = `<span class="stat-badge clean"><i class="bi bi-arrow-repeat"></i> ORDINARIA</span><br><small style="color:var(--text-secondary);">Mensual Recurrente</small>`;
+                        destinoBadge = `<span class="stat-badge"><i class="bi bi-buildings"></i> Todo el Edificio</span>`;
+                    } else if (c.tipo === 'extraordinaria') {
+                        const mCant = c.meses || 1;
+                        tipoBadge = `<span class="stat-badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3);"><i class="bi bi-calendar-range"></i> EXTRAORDINARIA</span><br><small style="color:#fbbf24;">Se repite por ${mCant} ${mCant === 1 ? 'mes' : 'meses'}</small>`;
+                        destinoBadge = `<span class="stat-badge"><i class="bi bi-buildings"></i> Todo el Edificio</span>`;
+                    } else if (c.tipo === 'individual') {
+                        tipoBadge = `<span class="stat-badge" style="background: rgba(14, 165, 233, 0.15); color: #38bdf8; border-color: rgba(14, 165, 233, 0.3);"><i class="bi bi-person-fill"></i> INDIVIDUAL</span><br><small style="color:#38bdf8;">Solicitud Puntual</small>`;
+                        destinoBadge = `<span class="stat-badge" style="color:#38bdf8; border-color:rgba(14, 165, 233, 0.4);"><i class="bi bi-door-open"></i> Apto ${c.apto || 'Asignado'}</span>`;
+                    } else {
+                        tipoBadge = `<span class="stat-badge">${(c.tipo || 'GENERAL').toUpperCase()}</span>`;
+                        destinoBadge = `<span class="stat-badge">Todo el Edificio</span>`;
+                    }
+
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td>${c.fecha}</td>
                         <td><strong>${c.titulo}</strong></td>
-                        <td><span class="stat-badge">${c.tipo.toUpperCase()}</span></td>
-                        <td>$${c.monto_usd.toFixed(2)} USD</td>
-                        <td>Bs. ${montoBs}</td>
-                        <td><span class="stat-badge clean"><i class="bi bi-broadcast"></i> Activa (50 Aptos)</span></td>
+                        <td>${tipoBadge}</td>
+                        <td><strong style="color: #60a5fa; font-size: 1.05rem;">$${c.monto_usd.toFixed(2)} USD</strong></td>
+                        <td>${destinoBadge}</td>
+                        <td>
+                            <button type="button" class="demo-btn" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3);" onclick="app.deleteCuota(${c.id})" title="Eliminar Cuota">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
                     `;
                     tbody.appendChild(tr);
                 });
+            },
+
+            deleteCuota(cuotaId) {
+                if (!confirm('¿Está seguro de eliminar esta cuota emitida?')) return;
+                this.state.cuotas = this.state.cuotas.filter(c => c.id !== cuotaId);
+                this.save();
+                this.renderCuotasTable();
+                this.toast('Cuota eliminada correctamente');
             },
 
             // 7. AUDITORÍA DE PAGOS POR PARTE DE ADMINISTRACIÓN
@@ -4320,6 +4585,50 @@
                         }).match({ condominio_id: condo.id, codigo: this.currentResidentApto });
                     } catch (e) {
                         console.error('Error perfil Supabase:', e);
+                    }
+                }
+            },
+
+            async updateResidentPassword() {
+                const newPass = document.getElementById('resNewPassword').value.trim();
+                const confirmPass = document.getElementById('resConfirmPassword').value.trim();
+
+                if (!newPass) {
+                    alert('Por favor ingrese la nueva contraseña de acceso.');
+                    return;
+                }
+                if (newPass.length < 4) {
+                    alert('La contraseña debe tener al menos 4 caracteres.');
+                    return;
+                }
+                if (newPass !== confirmPass) {
+                    alert('Las contraseñas no coinciden. Por favor verifique que sean idénticas.');
+                    return;
+                }
+
+                const condo = this.getActiveCondo();
+                const u = this.getCondoUnits(condo.id).find(x => x.codigo === this.currentResidentApto);
+                if (!u) return;
+
+                u.password = newPass;
+                this.save();
+                this.toast('✅ Contraseña actualizada exitosamente');
+                this.logActivity('SEGURIDAD', `Apto ${this.currentResidentApto} actualizó su contraseña de acceso personal`, `Apto ${this.currentResidentApto}`, condo.nombre);
+
+                document.getElementById('resNewPassword').value = '';
+                document.getElementById('resConfirmPassword').value = '';
+
+                // Actualizar campo en formulario de login si estuviera presente
+                const loginPass = document.getElementById('res-password');
+                if (loginPass) loginPass.value = newPass;
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('apartamentos').update({
+                            password: newPass
+                        }).match({ condominio_id: condo.id, codigo: this.currentResidentApto });
+                    } catch (e) {
+                        console.error('Error guardando contraseña en Supabase:', e);
                     }
                 }
             },
