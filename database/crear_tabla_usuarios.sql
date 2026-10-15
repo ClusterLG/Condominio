@@ -84,7 +84,7 @@ SELECT
             ELSE CONCAT('resd', LOWER(REPLACE(c.slug, '-', '')), '.com')
         END
     )) AS email,
-    COALESCE(NULLIF(a.cedula, ''), '123456') AS password, -- Clave por defecto inicial 123456
+    '123456' AS password, -- Clave por defecto inicial unificada: 123456
     COALESCE(a.propietario, CONCAT('Copropietario Apto ', a.codigo)),
     a.cedula,
     a.telefono,
@@ -95,7 +95,12 @@ FROM public.apartamentos a
 JOIN public.condominios c ON c.id = a.condominio_id
 ON CONFLICT (username) DO UPDATE 
 SET 
+    password = EXCLUDED.password,
     nombre_completo = EXCLUDED.nombre_completo,
     cedula = EXCLUDED.cedula,
     telefono = EXCLUDED.telefono,
     email = EXCLUDED.email;
+
+-- 5. ASEGURAR QUE TODOS LOS USUARIOS RESIDENCIALES TENGAN LA CLAVE 123456 Y LOS ADMINS admin123
+UPDATE public.usuarios SET password = '123456' WHERE rol = 'residente';
+UPDATE public.usuarios SET password = 'admin123' WHERE rol = 'admin';

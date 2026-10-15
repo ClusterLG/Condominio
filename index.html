@@ -849,7 +849,7 @@
                     </label>
                     <input type="password" id="login-password" class="form-control" placeholder="Ingrese su contraseña" required autocomplete="current-password">
                     <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 8px; padding: 0.55rem 0.75rem; margin-top: 0.5rem; font-size: 0.75rem; color: #94a3b8; line-height: 1.45;">
-                        <i class="bi bi-info-circle-fill text-primary"></i> Clave inicial por defecto: <code style="color: #60a5fa; font-weight: 700; background: rgba(56, 189, 248, 0.15); padding: 2px 6px; border-radius: 4px;">123456</code>. 
+                        <i class="bi bi-info-circle-fill text-primary"></i> Clave inicial: <code style="color: #60a5fa; font-weight: 700; background: rgba(56, 189, 248, 0.15); padding: 2px 6px; border-radius: 4px;">123456</code> (Residentes) | <code style="color: #a78bfa; font-weight: 700; background: rgba(167, 139, 250, 0.15); padding: 2px 6px; border-radius: 4px;">admin123</code> (Admin).
                         <strong style="color: #fbbf24; display: block; margin-top: 3px;"><i class="bi bi-shield-exclamation"></i> Recuerde personalizar su clave una vez ingrese a su cuenta.</strong>
                     </div>
                 </div>
@@ -3124,6 +3124,24 @@
                     this.save();
                 }
 
+                // Estandarización de claves por defecto (Comencemos de nuevo):
+                // Todos los administradores con admin123, todos los residentes con 123456
+                if (!this.state.passwordsResetV3) {
+                    if (this.state.apartamentos) {
+                        this.state.apartamentos.forEach(a => {
+                            a.password = '123456';
+                        });
+                    }
+                    if (this.state.usuarios) {
+                        this.state.usuarios.forEach(u => {
+                            if (u.rol === 'residente') u.password = '123456';
+                            if (u.rol === 'admin') u.password = 'admin123';
+                        });
+                    }
+                    this.state.passwordsResetV3 = true;
+                    this.save();
+                }
+
                 // Asegurar tasa BCV oficial
                 const condo = this.getActiveCondo();
                 if (!condo.tasa_dolar || condo.tasa_dolar < 100) {
@@ -3552,21 +3570,28 @@
                 }
 
                 // 2. ADMINS LOCALES POR CORREO INSTITUCIONAL O CLAVE LOCAL (admin / admin123)
-                if (lowerUser === 'admin@resdlossamanes.com' && pass === 'admin123') {
-                    this.switchCondominio(1);
-                    this.logActivity('LOGIN', 'Inicio de sesión de Administrador (admin@resdlossamanes.com)', 'admin (Admin)', 'Residencias Los Samanes');
-                    this.openAdminDashboard('Admin');
-                    return;
+                let matchedAdminCondo = null;
+                for (const c of this.state.condominios) {
+                    const adminEmail = this.getAdminEmail(c).toLowerCase();
+                    if (lowerUser === adminEmail) {
+                        matchedAdminCondo = c;
+                        break;
+                    }
                 }
-                if (lowerUser === 'admin@resdchichisuggar.com' && pass === 'admin123') {
-                    this.switchCondominio(2);
-                    this.logActivity('LOGIN', 'Inicio de sesión de Administrador (admin@resdchichisuggar.com)', 'admin (Admin)', 'Residencia Chichi Suggar');
-                    this.openAdminDashboard('Admin');
-                    return;
+                if (!matchedAdminCondo) {
+                    if (lowerUser === 'admin@resdlossamanes.com') matchedAdminCondo = this.state.condominios.find(c => c.id === 1) || this.getActiveCondo();
+                    else if (lowerUser === 'admin@resdchichisuggar.com') matchedAdminCondo = this.state.condominios.find(c => c.id === 2) || this.getActiveCondo();
+                    else if (lowerUser === 'admin' || lowerUser === 'administrador') matchedAdminCondo = this.getActiveCondo();
                 }
-                if (lowerUser === 'admin' && pass === 'admin123') {
-                    const condo = this.getActiveCondo();
-                    this.logActivity('LOGIN', `Inicio de sesión de Administrador Local en ${condo ? condo.nombre : 'Condominio'}`, 'admin (Admin)', condo ? condo.nombre : 'Condominio');
+
+                if (matchedAdminCondo) {
+                    if (pass !== 'admin123') {
+                        alert('Contraseña incorrecta para el usuario administrador. La clave por defecto es admin123.');
+                        return;
+                    }
+                    this.switchCondominio(matchedAdminCondo.id);
+                    const adminEmail = this.getAdminEmail(matchedAdminCondo);
+                    this.logActivity('LOGIN', `Inicio de sesión de Administrador (${adminEmail}) en ${matchedAdminCondo.nombre}`, 'admin (Admin)', matchedAdminCondo.nombre);
                     this.openAdminDashboard('Admin');
                     return;
                 }
@@ -6280,21 +6305,20 @@
                 document.getElementById('resNewPassword').value = '';
                 document.getElementById('resConfirmPassword').value = '';
 
-                // 3. PERSISTENCIA EN SUPABASE DATA CENTER (TABLAS apartamentos Y usuarios)
+                // 3. PERSISTENCIA EN DATA CENTER (TABLA usuarios)
                 if (sbClient) {
                     try {
-                        await sbClient.from('apartamentos').update({
-                            password: newPass
-                        }).match({ condominio_id: condo.id, codigo: this.currentResidentApto });
-                    } catch (e) {
-                        console.warn('Nota actualización apartamentos en Supabase:', e);
-                    }
-                    try {
-                        await sbClient.from('usuarios').update({
+                        const { error } = await sbClient.from('usuarios').update({
                             password: newPass
                         }).match({ condominio_id: condo.id, apto_codigo: this.currentResidentApto });
+                        if (error) {
+                            console.warn('Nota actualización usuarios por apto_codigo:', error);
+                            await sbClient.from('usuarios').update({
+                                password: newPass
+                            }).match({ email: aptoEmail });
+                        }
                     } catch (e) {
-                        console.warn('Nota actualización usuarios en Supabase:', e);
+                        console.warn('Nota actualización usuarios en Data Center:', e);
                     }
                 }
             },

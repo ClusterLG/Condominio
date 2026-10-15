@@ -156,10 +156,15 @@ FROM public.apartamentos a
 JOIN public.condominios c ON c.id = a.condominio_id
 ON CONFLICT (username) DO UPDATE 
 SET 
+    password = EXCLUDED.password,
     nombre_completo = EXCLUDED.nombre_completo,
     cedula = EXCLUDED.cedula,
     telefono = EXCLUDED.telefono,
     email = EXCLUDED.email;
+
+-- ASEGURAR QUE TODOS LOS USUARIOS RESIDENCIALES TENGAN LA CLAVE 123456 Y LOS ADMINS admin123
+UPDATE public.usuarios SET password = '123456' WHERE rol = 'residente';
+UPDATE public.usuarios SET password = 'admin123' WHERE rol = 'admin';
 
 
 
