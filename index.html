@@ -2278,6 +2278,56 @@
                             nota: 'Colocar número de apartamento en el concepto'
                         }
                     ]
+                },
+                {
+                    id: 2,
+                    slug: 'residencia-chichi-suggar',
+                    nombre: 'Residencia Chichi Suggar',
+                    rif: 'J-4658975-1',
+                    direccion: 'La Atlántida',
+                    pisos_cant: 8,
+                    tiene_pb: 1,
+                    aptos_pb_cant: 3,
+                    aptos_por_piso: 3,
+                    tasa_dolar: 877.90,
+                    banco_pago_movil: 'Banco Mercantil (0105) | RIF: J-4658975-1 | Teléfono: 0414-9988776',
+                    banco_transferencia: 'Banco Mercantil Cta Corriente: 0105-1234-56-7890123456 | RIF: J-4658975-1',
+                    cuenta_zelle: 'chichi.suggar.condo@gmail.com (Titular: Condominio Chichi Suggar)',
+                    cuentas_bancarias: [
+                        {
+                            id: 'acc_chichi_pm',
+                            tipo: 'pago_movil',
+                            bancoCodigo: '0105',
+                            bancoNombre: 'Banco Mercantil',
+                            prefijo: '0414',
+                            telefono: '9988776',
+                            docTipo: 'J',
+                            docNumero: '4658975-1',
+                            titular: 'Condominio Chichi Suggar',
+                            nota: 'Pago móvil Mercantil directo'
+                        },
+                        {
+                            id: 'acc_chichi_tr',
+                            tipo: 'transferencia',
+                            bancoCodigo: '0105',
+                            bancoNombre: 'Banco Mercantil',
+                            tipoCuenta: 'Cuenta Corriente',
+                            numeroCuenta: '01051234567890123456',
+                            docTipo: 'J',
+                            docNumero: '4658975-1',
+                            titular: 'Condominio Chichi Suggar',
+                            nota: 'Cuenta corriente jurídica'
+                        },
+                        {
+                            id: 'acc_chichi_zl',
+                            tipo: 'zelle',
+                            bancoCodigo: 'ZELLE',
+                            bancoNombre: 'Zelle (EE.UU. USD)',
+                            identificador: 'chichi.suggar.condo@gmail.com',
+                            titular: 'Condominio Chichi Suggar',
+                            nota: 'Colocar número de apartamento en el memo'
+                        }
+                    ]
                 }
             ],
             // 50 Apartamentos limpios (sin adjudicatarios previos, sin deudas, sin pagos)
@@ -2831,7 +2881,35 @@
         "telefono": null,
         "email": null,
         "vehiculo": null
-    }
+    },
+    // Residencia Chichi Suggar (Condo 2: PB + 8 Pisos, 27 Apartamentos)
+    { "condoId": 2, "piso": 0, "codigo": "PB-A", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 0, "codigo": "PB-B", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 0, "codigo": "PB-C", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 1, "codigo": "1A", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 1, "codigo": "1B", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 1, "codigo": "1C", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 2, "codigo": "2A", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 2, "codigo": "2B", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 2, "codigo": "2C", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 3, "codigo": "3A", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 3, "codigo": "3B", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 3, "codigo": "3C", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 4, "codigo": "4A", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 4, "codigo": "4B", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 4, "codigo": "4C", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 5, "codigo": "5A", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 5, "codigo": "5B", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 5, "codigo": "5C", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 6, "codigo": "6A", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 6, "codigo": "6B", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 6, "codigo": "6C", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 7, "codigo": "7A", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 7, "codigo": "7B", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 7, "codigo": "7C", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 8, "codigo": "8A", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 8, "codigo": "8B", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null },
+    { "condoId": 2, "piso": 8, "codigo": "8C", "alicuota": 3.70, "propietario": null, "cedula": null, "telefono": null, "email": null, "vehiculo": null }
 ],
             cuotas: [],
             pagos: [],
@@ -3029,19 +3107,56 @@
                 }
 
                 try {
-                    const [resCondos, resAptos, resCuotas, resPagos, resComunicados, resTickets] = await Promise.all([
+                    const [resCondos, resAptos, resCuotas, resPagos, resComunicados, resTickets, resCuentas] = await Promise.all([
                         sbClient.from('condominios').select('*').order('id'),
                         sbClient.from('apartamentos').select('*').order('id'),
                         sbClient.from('cuotas').select('*').order('id'),
                         sbClient.from('pagos').select('*').order('id'),
                         sbClient.from('comunicados').select('*').order('id'),
-                        sbClient.from('tickets').select('*').order('id')
+                        sbClient.from('tickets').select('*').order('id'),
+                        sbClient.from('cuentas_bancarias').select('*').order('created_at')
                     ]);
 
                     let updated = false;
 
                     if (resCondos.data && resCondos.data.length > 0) {
-                        this.state.condominios = resCondos.data;
+                        this.state.condominios = resCondos.data.map(nc => {
+                            const prev = (this.state.condominios || []).find(c => String(c.id) === String(nc.id));
+                            return {
+                                ...nc,
+                                cuentas_bancarias: (prev && Array.isArray(prev.cuentas_bancarias) && prev.cuentas_bancarias.length > 0)
+                                    ? prev.cuentas_bancarias
+                                    : []
+                            };
+                        });
+                        updated = true;
+                    }
+
+                    if (resCuentas && resCuentas.data && resCuentas.data.length > 0) {
+                        this.state.condominios.forEach(condo => {
+                            const condoCuentas = resCuentas.data
+                                .filter(c => String(c.condominio_id) === String(condo.id))
+                                .map(c => ({
+                                    id: c.id,
+                                    condoId: c.condominio_id,
+                                    tipo: c.tipo,
+                                    bancoCodigo: c.banco_codigo,
+                                    bancoNombre: c.banco_nombre,
+                                    tipoCuenta: c.tipo_cuenta,
+                                    numeroCuenta: c.numero_cuenta,
+                                    prefijo: c.prefijo,
+                                    telefono: c.telefono,
+                                    docTipo: c.doc_tipo,
+                                    docNumero: c.doc_numero,
+                                    titular: c.titular,
+                                    identificador: c.identificador,
+                                    nota: c.nota,
+                                    activo: c.activo !== false
+                                }));
+                            if (condoCuentas.length > 0) {
+                                condo.cuentas_bancarias = condoCuentas;
+                            }
+                        });
                         updated = true;
                     }
 
@@ -3188,11 +3303,11 @@
 
             // Helper centralizado para balance de apartamento
             getAptoBalance(condoId, aptoCode) {
-                const condo = this.state.condominios.find(c => c.id === condoId) || this.getActiveCondo();
+                const condo = this.state.condominios.find(c => String(c.id) === String(condoId)) || this.getActiveCondo();
                 const targetNorm = this.normCode(aptoCode);
 
                 const cuotasCondo = this.state.cuotas.filter(c => {
-                    if (c.condoId !== condoId) return false;
+                    if (String(c.condoId) !== String(condoId)) return false;
                     // Las cuotas individuales solo aplican al apartamento al que fueron asignadas
                     if (c.tipo === 'individual') {
                         return this.normCode(c.apto) === targetNorm;
@@ -3202,7 +3317,7 @@
                 const totalDeudaUSD = cuotasCondo.reduce((acc, c) => acc + (parseFloat(c.monto_usd) || 0), 0);
 
                 const pagosAprobados = this.state.pagos.filter(p => {
-                    return p.condoId === condoId && this.normCode(p.apto) === targetNorm && p.estado === 'aprobado';
+                    return String(p.condoId) === String(condoId) && this.normCode(p.apto) === targetNorm && p.estado === 'aprobado';
                 });
                 const totalPagadoUSD = pagosAprobados.reduce((acc, p) => {
                     let montoUSD = p.moneda === 'USD' ? p.monto : (p.monto / condo.tasa_dolar);
@@ -3273,11 +3388,11 @@
             },
 
             getActiveCondo() {
-                return this.state.condominios.find(c => c.id === this.state.activeCondoId) || this.state.condominios[0];
+                return this.state.condominios.find(c => String(c.id) === String(this.state.activeCondoId)) || this.state.condominios[0];
             },
 
             getCondoUnits(condoId) {
-                return this.state.apartamentos.filter(a => a.condoId === condoId);
+                return this.state.apartamentos.filter(a => String(a.condoId) === String(condoId));
             },
 
             renderHome() {
@@ -3781,7 +3896,7 @@
                 }
 
                 filtered.forEach(u => {
-                    const pagosApto = this.state.pagos.filter(p => p.condoId === condo.id && p.apto === u.codigo);
+                    const pagosApto = this.state.pagos.filter(p => String(p.condoId) === String(condo.id) && this.normCode(p.apto) === this.normCode(u.codigo));
                     const tr = document.createElement('tr');
 
                     // Formato Estado Financiero
@@ -3862,9 +3977,9 @@
 
             // AUDITORÍA DE PAGOS INDIVIDUALES DE LA UNIDAD DESDE SUPERADMIN
             showSuperResidentPayments(condoId, aptoCode) {
-                const condo = this.state.condominios.find(c => c.id === condoId) || this.getActiveCondo();
-                const u = this.getCondoUnits(condoId).find(x => x.codigo === aptoCode);
-                const pagos = this.state.pagos.filter(p => p.condoId === condoId && p.apto === aptoCode);
+                const condo = this.state.condominios.find(c => String(c.id) === String(condoId)) || this.getActiveCondo();
+                const u = this.getCondoUnits(condoId).find(x => this.normCode(x.codigo) === this.normCode(aptoCode));
+                const pagos = this.state.pagos.filter(p => String(p.condoId) === String(condoId) && this.normCode(p.apto) === this.normCode(aptoCode));
                 const balance = this.getAptoBalance(condoId, aptoCode);
 
                 const pagosAprobados = pagos.filter(p => p.estado === 'aprobado');
@@ -3895,7 +4010,7 @@
                 // Llenar tabla de cuotas y cargos aplicados a la unidad
                 const targetNorm = this.normCode(aptoCode);
                 const cuotasApto = this.state.cuotas.filter(c => {
-                    if (c.condoId !== condoId) return false;
+                    if (String(c.condoId) !== String(condoId)) return false;
                     if (c.tipo === 'individual') {
                         return this.normCode(c.apto) === targetNorm;
                     }
@@ -4185,12 +4300,12 @@
                     elInfo.innerText = `${condo.nombre} | RIF: ${condo.rif || 'N/A'} | ${pb}${condo.pisos_cant} Pisos | ${condo.direccion || 'Caracas, Venezuela'}`;
                 }
 
-                const cuotasCondo = this.state.cuotas.filter(c => c.condoId === condo.id);
+                const cuotasCondo = this.state.cuotas.filter(c => String(c.condoId) === String(condo.id));
                 if (elLastCuota) {
                     elLastCuota.innerText = cuotasCondo.length > 0 ? cuotasCondo[cuotasCondo.length - 1].fecha : 'Al día';
                 }
 
-                const pendingPagos = this.state.pagos.filter(p => p.condoId === condo.id && p.estado === 'revision');
+                const pendingPagos = this.state.pagos.filter(p => String(p.condoId) === String(condo.id) && (p.estado === 'pendiente' || p.estado === 'revision'));
                 if (elPendingPagos) {
                     elPendingPagos.innerText = pendingPagos.length;
                 }
@@ -4574,7 +4689,7 @@
 
             renderCuotasTable() {
                 const condo = this.getActiveCondo();
-                const cuotas = this.state.cuotas.filter(c => c.condoId === condo.id);
+                const cuotas = this.state.cuotas.filter(c => String(c.condoId) === String(condo.id));
                 const tbody = document.getElementById('cuotasTableBody');
                 if (!tbody) return;
 
@@ -4620,19 +4735,26 @@
                 });
             },
 
-            deleteCuota(cuotaId) {
+            async deleteCuota(cuotaId) {
                 if (!confirm('¿Está seguro de eliminar esta cuota emitida?')) return;
-                this.state.cuotas = this.state.cuotas.filter(c => c.id !== cuotaId);
+                this.state.cuotas = this.state.cuotas.filter(c => String(c.id) !== String(cuotaId));
                 this.save();
                 this.renderCuotasTable();
                 this.renderAdminMetrics();
                 this.toast('Cuota eliminada correctamente');
+                if (sbClient) {
+                    try {
+                        await sbClient.from('cuotas').delete().eq('id', cuotaId);
+                    } catch(e) {
+                        console.error('Error eliminando cuota Supabase:', e);
+                    }
+                }
             },
 
             // 7. AUDITORÍA DE PAGOS POR PARTE DE ADMINISTRACIÓN
             renderPagosTable() {
                 const condo = this.getActiveCondo();
-                const pagos = this.state.pagos.filter(p => p.condoId === condo.id);
+                const pagos = this.state.pagos.filter(p => String(p.condoId) === String(condo.id));
                 const tbody = document.getElementById('pagosTableBody');
                 if (!tbody) return;
 
@@ -4946,80 +5068,140 @@
                 if (!condo) return [];
                 if (!Array.isArray(condo.cuentas_bancarias) || condo.cuentas_bancarias.length === 0) {
                     condo.cuentas_bancarias = [];
-                    // Migración automática a partir de los datos existentes
-                    if (condo.banco_pago_movil && condo.banco_pago_movil !== 'No configurado') {
+
+                    const isChichi = String(condo.id) === '2' || (condo.slug && condo.slug.includes('chichi')) || (condo.nombre && condo.nombre.includes('Chichi'));
+                    const isSamanes = String(condo.id) === '1' || (condo.slug && condo.slug.includes('samanes')) || (condo.nombre && condo.nombre.includes('Samanes'));
+
+                    if (isChichi) {
+                        // Piloto 2: Residencia Chichi Suggar (Mercantil)
                         condo.cuentas_bancarias.push({
-                            id: 'acc_pm_' + Date.now(),
+                            id: 'acc_chichi_pm',
+                            condoId: condo.id,
+                            tipo: 'pago_movil',
+                            bancoCodigo: '0105',
+                            bancoNombre: 'Banco Mercantil',
+                            prefijo: '0414',
+                            telefono: '9988776',
+                            docTipo: 'J',
+                            docNumero: '4658975-1',
+                            titular: 'Condominio Chichi Suggar',
+                            nota: 'Pago móvil Mercantil directo'
+                        });
+                        condo.cuentas_bancarias.push({
+                            id: 'acc_chichi_tr',
+                            condoId: condo.id,
+                            tipo: 'transferencia',
+                            bancoCodigo: '0105',
+                            bancoNombre: 'Banco Mercantil',
+                            tipoCuenta: 'Cuenta Corriente',
+                            numeroCuenta: '01051234567890123456',
+                            docTipo: 'J',
+                            docNumero: '4658975-1',
+                            titular: 'Condominio Chichi Suggar',
+                            nota: 'Cuenta corriente jurídica'
+                        });
+                        condo.cuentas_bancarias.push({
+                            id: 'acc_chichi_zl',
+                            condoId: condo.id,
+                            tipo: 'zelle',
+                            bancoCodigo: 'ZELLE',
+                            bancoNombre: 'Zelle (EE.UU. USD)',
+                            identificador: 'chichi.suggar.condo@gmail.com',
+                            titular: 'Condominio Chichi Suggar',
+                            nota: 'Colocar número de apartamento en el memo'
+                        });
+                    } else if (isSamanes) {
+                        // Piloto 1: Residencias Los Samanes (Banesco)
+                        condo.cuentas_bancarias.push({
+                            id: 'acc_samanes_pm',
+                            condoId: condo.id,
                             tipo: 'pago_movil',
                             bancoCodigo: '0134',
                             bancoNombre: 'Banesco Banco Universal',
                             prefijo: '0414',
                             telefono: '1234567',
                             docTipo: 'J',
-                            docNumero: condo.rif ? condo.rif.replace(/^[VJEG]-?/i, '') : '12345678-0',
-                            titular: 'Junta de Condominio ' + (condo.nombre || ''),
-                            nota: ''
+                            docNumero: '12345678-0',
+                            titular: 'Junta de Condominio Residencias Los Samanes',
+                            nota: 'Reportar referencia exacta'
                         });
-                    }
-                    if (condo.banco_transferencia && condo.banco_transferencia !== 'No configurado') {
                         condo.cuentas_bancarias.push({
-                            id: 'acc_tr_' + (Date.now() + 1),
+                            id: 'acc_samanes_tr',
+                            condoId: condo.id,
                             tipo: 'transferencia',
                             bancoCodigo: '0134',
                             bancoNombre: 'Banesco Banco Universal',
                             tipoCuenta: 'Cuenta Corriente',
                             numeroCuenta: '01340000000000000000',
                             docTipo: 'J',
-                            docNumero: condo.rif ? condo.rif.replace(/^[VJEG]-?/i, '') : '12345678-0',
-                            titular: 'Junta de Condominio ' + (condo.nombre || ''),
-                            nota: ''
+                            docNumero: '12345678-0',
+                            titular: 'Junta de Condominio Residencias Los Samanes',
+                            nota: 'Acreditación inmediata'
                         });
-                    }
-                    if (condo.cuenta_zelle && condo.cuenta_zelle !== 'No configurado') {
                         condo.cuentas_bancarias.push({
-                            id: 'acc_zl_' + (Date.now() + 2),
+                            id: 'acc_samanes_zl',
+                            condoId: condo.id,
                             tipo: 'zelle',
                             bancoCodigo: 'ZELLE',
                             bancoNombre: 'Zelle (EE.UU. USD)',
                             identificador: 'condominio.samanes@gmail.com',
                             titular: 'Junta de Condominio',
-                            nota: 'Indicar N° de Apto en el concepto'
+                            nota: 'Indicar número de apartamento en el concepto'
                         });
-                    }
-                    if (condo.cuentas_bancarias.length === 0) {
-                        condo.cuentas_bancarias.push({
-                            id: 'acc_pm_demo',
-                            tipo: 'pago_movil',
-                            bancoCodigo: '0134',
-                            bancoNombre: 'Banesco Banco Universal',
-                            prefijo: '0414',
-                            telefono: '1234567',
-                            docTipo: 'J',
-                            docNumero: '12345678-0',
-                            titular: 'Junta de Condominio ' + (condo.nombre || ''),
-                            nota: ''
-                        });
-                        condo.cuentas_bancarias.push({
-                            id: 'acc_tr_demo',
-                            tipo: 'transferencia',
-                            bancoCodigo: '0102',
-                            bancoNombre: 'Banco de Venezuela',
-                            tipoCuenta: 'Cuenta Corriente',
-                            numeroCuenta: '01020000000000000000',
-                            docTipo: 'J',
-                            docNumero: '12345678-0',
-                            titular: 'Junta de Condominio ' + (condo.nombre || ''),
-                            nota: ''
-                        });
-                        condo.cuentas_bancarias.push({
-                            id: 'acc_zl_demo',
-                            tipo: 'zelle',
-                            bancoCodigo: 'ZELLE',
-                            bancoNombre: 'Zelle (EE.UU. USD)',
-                            identificador: 'condominio.samanes@gmail.com',
-                            titular: 'Junta de Condominio',
-                            nota: 'Colocar N° de Apto en el memo'
-                        });
+                    } else {
+                        // Extracción dinámica para cualquier otro condominio
+                        if (condo.banco_pago_movil && condo.banco_pago_movil !== 'No configurado') {
+                            const codeMatch = condo.banco_pago_movil.match(/\((0\d{3})\)/);
+                            const phoneMatch = condo.banco_pago_movil.match(/(0412|0414|0424|0416|0426)[- ]?(\d{7})/);
+                            const docMatch = condo.banco_pago_movil.match(/([VJEG])-?(\d+[-]?\d*)/i);
+                            const bCode = codeMatch ? codeMatch[1] : '0102';
+                            const bObj = (typeof BANCOS_VE !== 'undefined') ? BANCOS_VE.find(b => b.codigo === bCode) : null;
+                            condo.cuentas_bancarias.push({
+                                id: 'acc_pm_' + Date.now(),
+                                condoId: condo.id,
+                                tipo: 'pago_movil',
+                                bancoCodigo: bCode,
+                                bancoNombre: bObj ? bObj.nombre : 'Banco Pago Móvil',
+                                prefijo: phoneMatch ? phoneMatch[1] : '0414',
+                                telefono: phoneMatch ? phoneMatch[2] : '1234567',
+                                docTipo: docMatch ? docMatch[1].toUpperCase() : 'J',
+                                docNumero: docMatch ? docMatch[2] : (condo.rif || '12345678-0'),
+                                titular: condo.nombre || 'Junta de Condominio',
+                                nota: ''
+                            });
+                        }
+                        if (condo.banco_transferencia && condo.banco_transferencia !== 'No configurado') {
+                            const numMatch = condo.banco_transferencia.match(/\d{20}/) || condo.banco_transferencia.match(/\d{4}[- ]?\d{4}[- ]?\d{2}[- ]?\d{10}/);
+                            const numClean = numMatch ? numMatch[0].replace(/[- ]/g, '') : '01020000000000000000';
+                            const bCode = numClean.slice(0, 4);
+                            const bObj = (typeof BANCOS_VE !== 'undefined') ? BANCOS_VE.find(b => b.codigo === bCode) : null;
+                            condo.cuentas_bancarias.push({
+                                id: 'acc_tr_' + (Date.now() + 1),
+                                condoId: condo.id,
+                                tipo: 'transferencia',
+                                bancoCodigo: bCode,
+                                bancoNombre: bObj ? bObj.nombre : 'Transferencia Bancaria',
+                                tipoCuenta: 'Cuenta Corriente',
+                                numeroCuenta: numClean,
+                                docTipo: 'J',
+                                docNumero: condo.rif ? condo.rif.replace(/^[VJEG]-?/i, '') : '12345678-0',
+                                titular: condo.nombre || 'Junta de Condominio',
+                                nota: ''
+                            });
+                        }
+                        if (condo.cuenta_zelle && condo.cuenta_zelle !== 'No configurado') {
+                            const emailMatch = condo.cuenta_zelle.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+                            condo.cuentas_bancarias.push({
+                                id: 'acc_zl_' + (Date.now() + 2),
+                                condoId: condo.id,
+                                tipo: 'zelle',
+                                bancoCodigo: 'ZELLE',
+                                bancoNombre: 'Zelle (EE.UU. USD)',
+                                identificador: emailMatch ? emailMatch[1] : (condo.slug + '@gmail.com'),
+                                titular: condo.nombre || 'Junta de Condominio',
+                                nota: 'Indicar N° de Apto en el concepto'
+                            });
+                        }
                     }
                     this.syncLegacyCondoBankStrings(condo);
                 }
@@ -5403,13 +5585,34 @@
 
                 if (sbClient) {
                     try {
+                        await sbClient.from('cuentas_bancarias').upsert([{
+                            id: cuentaData.id,
+                            condominio_id: condo.id,
+                            tipo: cuentaData.tipo,
+                            banco_codigo: cuentaData.bancoCodigo || null,
+                            banco_nombre: cuentaData.bancoNombre || null,
+                            tipo_cuenta: cuentaData.tipoCuenta || null,
+                            numero_cuenta: cuentaData.numeroCuenta || null,
+                            prefijo: cuentaData.prefijo || null,
+                            telefono: cuentaData.telefono || null,
+                            doc_tipo: cuentaData.docTipo || null,
+                            doc_numero: cuentaData.docNumero || null,
+                            titular: cuentaData.titular || null,
+                            identificador: cuentaData.identificador || null,
+                            nota: cuentaData.nota || null,
+                            activo: true
+                        }]);
+                    } catch (e) {
+                        console.warn('Advertencia guardando en tabla cuentas_bancarias Supabase:', e);
+                    }
+                    try {
                         await sbClient.from('condominios').update({
                             banco_pago_movil: condo.banco_pago_movil,
                             banco_transferencia: condo.banco_transferencia,
                             cuenta_zelle: condo.cuenta_zelle
                         }).eq('id', condo.id);
                     } catch (e) {
-                        console.error('Error sincronizando cuentas en Supabase:', e);
+                        console.error('Error sincronizando cuentas en condominios Supabase:', e);
                     }
                 }
             },
@@ -5425,6 +5628,11 @@
                 this.logActivity('CONDOMINIO', `Eliminación de cuenta bancaria #${id}`, this.currentRole || 'Admin', condo.nombre);
 
                 if (sbClient) {
+                    try {
+                        await sbClient.from('cuentas_bancarias').delete().eq('id', id);
+                    } catch (e) {
+                        console.warn('Advertencia eliminando en tabla cuentas_bancarias Supabase:', e);
+                    }
                     try {
                         await sbClient.from('condominios').update({
                             banco_pago_movil: condo.banco_pago_movil,
@@ -5799,7 +6007,7 @@
                 const targetNorm = this.normCode(aptoCode);
 
                 const cuotasApto = this.state.cuotas.filter(c => {
-                    if (c.condoId !== condo.id) return false;
+                    if (String(c.condoId) !== String(condo.id)) return false;
                     if (c.tipo === 'individual') {
                         return this.normCode(c.apto) === targetNorm;
                     }
@@ -5838,7 +6046,7 @@
             renderResidentPagos() {
                 const condo = this.getActiveCondo();
                 const targetNorm = this.normCode(this.currentResidentApto);
-                const pagos = this.state.pagos.filter(p => p.condoId === condo.id && this.normCode(p.apto) === targetNorm);
+                const pagos = this.state.pagos.filter(p => String(p.condoId) === String(condo.id) && this.normCode(p.apto) === targetNorm);
                 const tbody = document.getElementById('residentPagosTableBody');
                 if (!tbody) return;
 
@@ -6152,6 +6360,7 @@
                 if (el) el.classList.remove('active');
             }
         };
+        window.app = app;
 
         document.addEventListener('DOMContentLoaded', () => {
             app.init();

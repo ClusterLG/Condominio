@@ -21,6 +21,9 @@ CREATE POLICY "Public full access" ON comunicados FOR ALL TO public USING (true)
 ALTER TABLE tickets ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Public full access" ON tickets;
 CREATE POLICY "Public full access" ON tickets FOR ALL TO public USING (true) WITH CHECK (true);
+ALTER TABLE cuentas_bancarias ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public full access" ON cuentas_bancarias;
+CREATE POLICY "Public full access" ON cuentas_bancarias FOR ALL TO public USING (true) WITH CHECK (true);
 
 GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;
@@ -86,3 +89,16 @@ INSERT INTO apartamentos (condominio_id, piso, codigo, alicuota, propietario, ce
 (1, 12, '12B', 2, NULL, NULL, NULL, NULL, NULL),
 (1, 12, '12C', 2, 'Diego Armando Cordero', 'V-16.627.769', '0414-2386011', 'diego.cordero@gmail.com', NULL),
 (1, 12, '12D', 2, NULL, NULL, NULL, NULL, NULL);
+
+-- CUENTAS BANCARIAS INICIALES (LOS SAMANES Y CHICHI SUGGAR)
+DELETE FROM cuentas_bancarias WHERE condominio_id IN (1, 2);
+INSERT INTO cuentas_bancarias 
+(id, condominio_id, tipo, banco_codigo, banco_nombre, tipo_cuenta, numero_cuenta, prefijo, telefono, doc_tipo, doc_numero, titular, identificador, nota, activo)
+VALUES
+('acc_samanes_pm', 1, 'pago_movil', '0134', 'Banesco Banco Universal', NULL, NULL, '0414', '1234567', 'J', '12345678-0', 'Junta de Condominio Residencias Los Samanes', NULL, 'Reportar referencia exacta de 6 a 8 dígitos', true),
+('acc_samanes_tr', 1, 'transferencia', '0134', 'Banesco Banco Universal', 'Cuenta Corriente', '01340000000000000000', NULL, NULL, 'J', '12345678-0', 'Junta de Condominio Residencias Los Samanes', NULL, 'Mismo banco se acredita de inmediato', true),
+('acc_samanes_zl', 1, 'zelle', 'ZELLE', 'Zelle (EE.UU. USD)', NULL, NULL, NULL, NULL, NULL, NULL, 'Junta de Condominio', 'condominio.samanes@gmail.com', 'Indicar número de apartamento en el concepto / memo', true),
+('acc_chichi_pm', 2, 'pago_movil', '0105', 'Banco Mercantil', NULL, NULL, '0414', '9988776', 'J', '4658975-1', 'Condominio Chichi Suggar', NULL, 'Pago móvil verificado automáticamente', true),
+('acc_chichi_tr', 2, 'transferencia', '0105', 'Banco Mercantil', 'Cuenta Corriente', '01051234567890123456', NULL, NULL, 'J', '4658975-1', 'Condominio Chichi Suggar', NULL, 'Cuenta corriente jurídica Mercantil', true),
+('acc_chichi_zl', 2, 'zelle', 'ZELLE', 'Zelle (EE.UU. USD)', NULL, NULL, NULL, NULL, NULL, NULL, 'Condominio Chichi Suggar', 'chichi.suggar.condo@gmail.com', 'Colocar número de apartamento en el memo de Zelle', true);
+
