@@ -741,7 +741,7 @@
                                 <th>Estructura</th>
                                 <th>Ocupación</th>
                                 <th>Balance & Solvencia</th>
-                                <th>Tasa BCV</th>
+                                <th>Ocupación Efectiva</th>
                                 <th>Acción de Auditoría</th>
                             </tr>
                         </thead>
@@ -970,6 +970,71 @@
                 <button class="demo-btn" style="padding: 0.6rem 1rem; font-size: 0.88rem;" onclick="app.showHome()">
                     <i class="bi bi-box-arrow-left"></i> Cambiar Edificio / Salir
                 </button>
+            </div>
+        </div>
+
+        <!-- DASHBOARD GENERAL SINTETIZADO (MÉTRICAS Y AUDITORÍA GENERAL DEL CONDOMINIO) -->
+        <div id="adminSummaryDashboard" style="margin-bottom: 1.5rem;">
+            <!-- Tarjetas de Métricas Globales del Inmueble -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                <div class="stat-card-saas">
+                    <div class="stat-icon-saas" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;"><i class="bi bi-door-open"></i></div>
+                    <div>
+                        <div style="font-size: 1.45rem; font-weight: 800; color: #fff;" id="adminStatUnits">0</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Total Apartamentos</div>
+                    </div>
+                </div>
+                <div class="stat-card-saas">
+                    <div class="stat-icon-saas" style="background: rgba(139, 92, 246, 0.15); color: #c084fc;"><i class="bi bi-people-fill"></i></div>
+                    <div>
+                        <div style="font-size: 1.45rem; font-weight: 800; color: #fff;" id="adminStatOcupacion">0%</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);" id="adminStatOcupacionLabel">Ocupación Adjudicada</div>
+                    </div>
+                </div>
+                <div class="stat-card-saas">
+                    <div class="stat-icon-saas" style="background: rgba(16, 185, 129, 0.15); color: #34d399;"><i class="bi bi-shield-check"></i></div>
+                    <div>
+                        <div style="font-size: 1.45rem; font-weight: 800; color: #34d399;" id="adminStatOcupacionEfectiva">0%</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);" id="adminStatOcupacionEfectivaLabel">Ocupación Efectiva</div>
+                    </div>
+                </div>
+                <div class="stat-card-saas">
+                    <div class="stat-icon-saas" style="background: rgba(16, 185, 129, 0.15); color: #34d399;"><i class="bi bi-check2-circle"></i></div>
+                    <div>
+                        <div style="font-size: 1.45rem; font-weight: 800; color: #34d399;" id="adminStatSolventes">0</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Residentes Solventes (Al Día)</div>
+                    </div>
+                </div>
+                <div class="stat-card-saas">
+                    <div class="stat-icon-saas" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;"><i class="bi bi-exclamation-octagon"></i></div>
+                    <div>
+                        <div style="font-size: 1.45rem; font-weight: 800; color: #ef4444;" id="adminStatMorosos">0</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Residentes Morosos</div>
+                    </div>
+                </div>
+                <div class="stat-card-saas">
+                    <div class="stat-icon-saas" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;"><i class="bi bi-cash-stack"></i></div>
+                    <div>
+                        <div style="font-size: 1.35rem; font-weight: 800; color: #fbbf24;" id="adminStatDeudaTotal">$0.00 USD</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);" id="adminStatDeudaTotalBs">Total Deuda Acumulada</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ficha Sintética del Inmueble -->
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 0.85rem 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+                <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+                    <strong style="color: #fff;"><i class="bi bi-info-circle-fill text-primary"></i> Inmueble:</strong>
+                    <span id="adminCondoInfoText" style="margin-left: 0.4rem;"></span>
+                </div>
+                <div style="display: flex; gap: 0.75rem; align-items: center; font-size: 0.82rem; flex-wrap: wrap;">
+                    <span style="background: var(--bg-card); padding: 0.35rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); color: var(--text-secondary);">
+                        <i class="bi bi-calendar3"></i> Última cuota: <strong style="color: #fff;" id="adminLastCuotaDate">Al día</strong>
+                    </span>
+                    <span style="background: var(--bg-card); padding: 0.35rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); color: var(--text-secondary);">
+                        <i class="bi bi-bank"></i> Pagos por auditar: <strong style="color: #fbbf24;" id="adminPendingPagosCount">0</strong>
+                    </span>
+                </div>
             </div>
         </div>
 
@@ -3164,6 +3229,9 @@
                         else morosos++;
                     });
 
+                    // Porcentaje de ocupación efectiva (apartamentos ocupados con saldo positivo o nulo)
+                    const efPct = units.length > 0 ? ((solventes / units.length) * 100).toFixed(1) : 0;
+
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td>
@@ -3180,7 +3248,11 @@
                             <span style="color: var(--text-muted); margin: 0 4px;">•</span>
                             <span style="color: #ef4444; font-size: 0.82rem; font-weight: 600;"><i class="bi bi-exclamation-triangle-fill"></i> ${morosos} morosos</span>
                         </td>
-                        <td><strong style="color: #fbbf24;">Bs. ${(c.tasa_dolar || 877.90).toFixed(2)}</strong></td>
+                        <td>
+                            <span class="stat-badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; font-weight: 700; border-color: rgba(16, 185, 129, 0.3);">
+                                <i class="bi bi-shield-check"></i> ${solventes}/${units.length} (${efPct}%)
+                            </span>
+                        </td>
                         <td>
                             <button class="btn-primary-saas" style="width: auto; padding: 0.4rem 0.85rem; font-size: 0.82rem; background: #8b5cf6;" onclick="app.openSuperCondoAudit(${c.id})">
                                 <i class="bi bi-search"></i> Inspeccionar Residencia
@@ -3642,6 +3714,75 @@
                 }
             },
 
+            // 3.5. DASHBOARD SINTETIZADO DE MÉTRICAS GENERALES DEL PANEL DE ADMIN
+            renderAdminMetrics() {
+                const condo = this.getActiveCondo();
+                if (!condo) return;
+
+                const allUnits = this.getCondoUnits(condo.id);
+                const occupiedUnits = allUnits.filter(u => u.propietario !== null);
+                const occPct = allUnits.length > 0 ? ((occupiedUnits.length / allUnits.length) * 100).toFixed(1) : 0;
+
+                let solventes = 0;
+                let morosos = 0;
+                let totalDeudaUSD = 0;
+
+                allUnits.forEach(u => {
+                    if (u.propietario !== null) {
+                        const balance = this.getAptoBalance(condo.id, u.codigo);
+                        if (balance <= 0.005) {
+                            solventes++;
+                        } else {
+                            morosos++;
+                            totalDeudaUSD += balance;
+                        }
+                    }
+                });
+
+                // Ocupación Efectiva: porcentaje de apartamentos ocupados cuyo saldo sea positivo o nulo
+                const efectivaPct = allUnits.length > 0 ? ((solventes / allUnits.length) * 100).toFixed(1) : 0;
+
+                const elUnits = document.getElementById('adminStatUnits');
+                const elOcc = document.getElementById('adminStatOcupacion');
+                const elOccLbl = document.getElementById('adminStatOcupacionLabel');
+                const elEf = document.getElementById('adminStatOcupacionEfectiva');
+                const elEfLbl = document.getElementById('adminStatOcupacionEfectivaLabel');
+                const elSolv = document.getElementById('adminStatSolventes');
+                const elMoro = document.getElementById('adminStatMorosos');
+                const elDeuda = document.getElementById('adminStatDeudaTotal');
+                const elDeudaBs = document.getElementById('adminStatDeudaTotalBs');
+                const elInfo = document.getElementById('adminCondoInfoText');
+                const elLastCuota = document.getElementById('adminLastCuotaDate');
+                const elPendingPagos = document.getElementById('adminPendingPagosCount');
+
+                if (elUnits) elUnits.innerText = `${allUnits.length} Aptos`;
+                if (elOcc) elOcc.innerText = `${occupiedUnits.length} / ${allUnits.length} (${occPct}%)`;
+                if (elOccLbl) elOccLbl.innerText = `${allUnits.length - occupiedUnits.length} Disponibles`;
+                if (elEf) elEf.innerText = `${efectivaPct}%`;
+                if (elEfLbl) elEfLbl.innerText = `${solventes} de ${allUnits.length} Solvente(s)`;
+                if (elSolv) elSolv.innerText = `${solventes} Solventes`;
+                if (elMoro) elMoro.innerText = `${morosos} Morosos`;
+                if (elDeuda) elDeuda.innerText = `$${totalDeudaUSD.toFixed(2)} USD`;
+                if (elDeudaBs) {
+                    const bsDeuda = (totalDeudaUSD * condo.tasa_dolar).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    elDeudaBs.innerText = `Equiv: Bs. ${bsDeuda}`;
+                }
+                if (elInfo) {
+                    const pb = condo.tiene_pb ? 'PB + ' : '';
+                    elInfo.innerText = `${condo.nombre} | RIF: ${condo.rif || 'N/A'} | ${pb}${condo.pisos_cant} Pisos | ${condo.direccion || 'Caracas, Venezuela'}`;
+                }
+
+                const cuotasCondo = this.state.cuotas.filter(c => c.condoId === condo.id);
+                if (elLastCuota) {
+                    elLastCuota.innerText = cuotasCondo.length > 0 ? cuotasCondo[cuotasCondo.length - 1].fecha : 'Al día';
+                }
+
+                const pendingPagos = this.state.pagos.filter(p => p.condoId === condo.id && p.estado === 'revision');
+                if (elPendingPagos) {
+                    elPendingPagos.innerText = pendingPagos.length;
+                }
+            },
+
             openAdminDashboard(role) {
                 window.scrollTo(0, 0);
                 this.currentRole = role;
@@ -3653,6 +3794,7 @@
 
                 const condo = this.getActiveCondo();
                 document.getElementById('adminViewCondoTitle').innerText = `${condo.nombre} (${role})`;
+                this.renderAdminMetrics();
                 this.renderAdminFloors();
                 this.renderCuotasTable();
                 this.renderPagosTable();
@@ -3705,6 +3847,9 @@
                 if (cAdj) cAdj.innerText = adjUnitsCount;
                 if (cSolv) cSolv.innerText = solventeUnitsCount;
                 if (cMoro) cMoro.innerText = morosoUnitsCount;
+
+                // Actualizar métricas del dashboard sintetizado
+                this.renderAdminMetrics();
 
                 // Filtrar unidades según selección
                 let units = unitsWithStatus;
@@ -3962,6 +4107,7 @@
 
                 // CARGA INMEDIATA: Actualizar tabla y cambiar a la pestaña 'cuotas' al instante
                 this.renderCuotasTable();
+                this.renderAdminMetrics();
                 const tabCuotasBtn = document.querySelectorAll('.tab-item-saas')[1];
                 this.switchAdminTab('cuotas', tabCuotasBtn);
 
@@ -4063,6 +4209,7 @@
                 this.state.cuotas = this.state.cuotas.filter(c => c.id !== cuotaId);
                 this.save();
                 this.renderCuotasTable();
+                this.renderAdminMetrics();
                 this.toast('Cuota eliminada correctamente');
             },
 
@@ -4119,6 +4266,7 @@
                     p.estado = 'aprobado';
                     this.save();
                     this.renderPagosTable();
+                    this.renderAdminMetrics();
                     this.toast('✅ Pago verificado y acreditado al residente.');
                     this.logActivity('PAGO_APROBADO', `Aprobación de pago de Apto ${p.apto} por ${p.monto} ${p.moneda} (Ref: ${p.ref}, ${p.metodo})`, this.currentRole || 'Admin', condo.nombre);
 
@@ -4139,6 +4287,7 @@
                     p.estado = 'rechazado';
                     this.save();
                     this.renderPagosTable();
+                    this.renderAdminMetrics();
                     this.toast('❌ Pago rechazado por la administración.');
                     this.logActivity('PAGO_RECHAZADO', `Rechazo de pago de Apto ${p.apto} por ${p.monto} ${p.moneda} (Ref: ${p.ref})`, this.currentRole || 'Admin', condo.nombre);
 
