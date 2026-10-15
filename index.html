@@ -1231,22 +1231,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Ficha Sintética del Inmueble -->
-            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 0.85rem 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
-                <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
-                    <strong style="color: #fff;"><i class="bi bi-info-circle-fill text-primary"></i> Inmueble:</strong>
-                    <span id="adminCondoInfoText" style="margin-left: 0.4rem;"></span>
-                </div>
-                <div style="display: flex; gap: 0.75rem; align-items: center; font-size: 0.82rem; flex-wrap: wrap;">
-                    <span style="background: var(--bg-card); padding: 0.35rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); color: var(--text-secondary);">
-                        <i class="bi bi-calendar3"></i> Última cuota: <strong style="color: #fff;" id="adminLastCuotaDate">Al día</strong>
-                    </span>
-                    <span style="background: var(--bg-card); padding: 0.35rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); color: var(--text-secondary);">
-                        <i class="bi bi-bank"></i> Pagos por auditar: <strong style="color: #fbbf24;" id="adminPendingPagosCount">0</strong>
-                    </span>
-                </div>
-            </div>
         </div>
 
         <!-- TABS DE GESTIÓN -->
@@ -1397,23 +1381,49 @@
 
         <!-- TAB: CUENTAS -->
         <div id="adminTabConfig" style="display: none;">
-            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; max-width: 650px;">
-                <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 1.25rem;"><i class="bi bi-wallet2 text-primary"></i> Cuentas Bancarias</h3>
-                <div class="form-group">
-                    <label class="form-label">Datos Pago Móvil (Solo Bs):</label>
-                    <input type="text" id="cfgPagoMovil" class="form-control" value="Banco Banesco (0134) | RIF: J-12345678-0 | Teléfono: 0414-1234567">
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 1.25rem;">
+                    <div>
+                        <h3 style="font-size: 1.25rem; color: #fff; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="bi bi-wallet2 text-primary"></i> Cuentas Bancarias y Métodos de Cobro
+                        </h3>
+                        <p style="color: var(--text-secondary); font-size: 0.88rem; margin: 0.35rem 0 0 0;">
+                            Configure una o varias cuentas de banco, pago móviles o cuentas en divisas. Use los desplegables para seleccionar la entidad bancaria rápidamente.
+                        </p>
+                    </div>
+                    <div>
+                        <button type="button" class="btn-primary-saas" style="width: auto; padding: 0.65rem 1.25rem; font-weight: 700; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);" onclick="app.openModalNuevaCuenta()">
+                            <i class="bi bi-plus-circle-fill"></i> Agregar Nueva Cuenta / Pago Móvil
+                        </button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Cuenta Transferencia (Solo Bs):</label>
-                    <input type="text" id="cfgTransferencia" class="form-control" value="Banesco Cta Corriente: 0134-0000-00-0000000000 | RIF: J-12345678-0">
+
+                <!-- CONTENEDOR DINÁMICO DE TARJETAS DE CUENTAS BANCARIAS -->
+                <div id="adminCuentasCardsContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;">
+                    <!-- Renderizado dinámicamente con app.renderAdminCuentas() -->
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Cuenta Zelle (Solo USD):</label>
-                    <input type="text" id="cfgZelle" class="form-control" value="condominio.samanes@gmail.com (Titular: Junta de Condominio)">
+            </div>
+
+            <!-- Parámetros Generales: Tasa Oficial BCV -->
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; max-width: 580px;">
+                <h4 style="font-size: 1rem; color: #fff; margin: 0 0 0.85rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="bi bi-sliders text-warning"></i> Parámetro de Cambio Oficial BCV
+                </h4>
+                <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 180px;">
+                        <label class="form-label" style="font-size: 0.78rem;">Tasa Oficial BCV (Bs/USD):</label>
+                        <input type="number" step="0.01" id="cfgTasaBcv" class="form-control" style="font-weight: 700; color: #34d399;" value="877.90">
+                    </div>
+                    <div style="align-self: flex-end;">
+                        <button type="button" class="btn-primary-saas" style="width: auto; padding: 0.6rem 1rem;" onclick="app.saveCondoSettings()">
+                            <i class="bi bi-save"></i> Guardar Tasa
+                        </button>
+                    </div>
                 </div>
-                <button class="btn-primary-saas" onclick="app.saveCondoSettings()">
-                    <i class="bi bi-save"></i> Guardar Cambios
-                </button>
+                <!-- Inputs ocultos de sincronización retrocompatible -->
+                <input type="hidden" id="cfgPagoMovil">
+                <input type="hidden" id="cfgTransferencia">
+                <input type="hidden" id="cfgZelle">
             </div>
         </div>
     </section>
@@ -1833,6 +1843,12 @@
                         <option value="Efectivo USD">Efectivo USD (Solo Dólares USD)</option>
                     </select>
                 </div>
+                <div class="form-group" id="groupPagoCuentaDestino" style="display: none;">
+                    <label class="form-label"><i class="bi bi-bank2 text-primary"></i> Banco / Cuenta Destino del Condominio:</label>
+                    <select id="pagoCuentaDestino" class="form-control" style="background: var(--bg-card); font-weight: 600;">
+                        <!-- Se llena dinámicamente con las cuentas registradas -->
+                    </select>
+                </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
                     <div class="form-group">
                         <label class="form-label" id="pagoMontoLabel">Monto en Bolívares (Bs):</label>
@@ -2046,6 +2062,135 @@
         </div>
     </div>
 
+    <!-- MODAL: AGREGAR / EDITAR CUENTA BANCARIA O PAGO MÓVIL (CON DESPLEGABLES RÁPIDOS) -->
+    <div id="modalCuentaBancaria" class="modal-backdrop-saas">
+        <div class="modal-box-saas" style="max-width: 580px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                <h3 style="font-size: 1.2rem; color: #fff; margin: 0; display: flex; align-items: center; gap: 0.5rem;" id="modalCuentaTitle">
+                    <i class="bi bi-wallet2 text-primary"></i> Registrar Cuenta / Pago Móvil
+                </h3>
+                <button class="close-btn" onclick="app.closeModal('modalCuentaBancaria')">&times;</button>
+            </div>
+            <div>
+                <input type="hidden" id="cuentaEditId" value="">
+
+                <!-- 1. DESPLEGABLE: TIPO DE CUENTA O MÉTODO -->
+                <div class="form-group">
+                    <label class="form-label"><i class="bi bi-tag-fill text-primary"></i> Tipo de Método de Pago:</label>
+                    <select id="cuentaTipoSelect" class="form-control" onchange="app.handleCuentaTipoChange()" style="font-weight: 700;">
+                        <option value="pago_movil">📱 Pago Móvil (Bolívares Bs)</option>
+                        <option value="transferencia">🏛️ Transferencia Bancaria (Bolívares Bs)</option>
+                        <option value="zelle">💵 Zelle (Dólares USD)</option>
+                        <option value="internacional">🌐 Cuenta Internacional / Banesco Panamá / Facebank (USD)</option>
+                        <option value="binance">🪙 Binance Pay / Cripto (USDT)</option>
+                        <option value="otro">📝 Otro / Efectivo en Custodia</option>
+                    </select>
+                </div>
+
+                <!-- 2. DESPLEGABLE: BANCO O ENTIDAD FINANCIERA (CON CÓDIGO SUDEBAN PARA SELECCIÓN ULTRA RÁPIDA) -->
+                <div class="form-group" id="groupCuentaBanco">
+                    <label class="form-label" id="cuentaBancoLabel"><i class="bi bi-bank text-primary"></i> Seleccionar Banco / Entidad:</label>
+                    <select id="cuentaBancoSelect" class="form-control" onchange="app.handleCuentaBancoChange()" style="font-weight: 600;">
+                        <!-- Opciones cargadas dinámicamente con BANCOS_VE y BANCOS_INT -->
+                    </select>
+                </div>
+
+                <!-- SECCIÓN DINÁMICA: PAGO MÓVIL -->
+                <div id="seccionCamposPagoMovil">
+                    <div style="display: grid; grid-template-columns: 140px 1fr; gap: 0.75rem;">
+                        <div class="form-group">
+                            <label class="form-label">Prefijo Celular:</label>
+                            <select id="pmPrefijo" class="form-control" style="font-weight: 700;">
+                                <option value="0414">0414</option>
+                                <option value="0424">0424</option>
+                                <option value="0412">0412</option>
+                                <option value="0416">0416</option>
+                                <option value="0426">0426</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Número de Teléfono (7 dígitos):</label>
+                            <input type="tel" id="pmTelefono" class="form-control" placeholder="1234567" maxlength="7">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 110px 1fr; gap: 0.75rem;">
+                        <div class="form-group">
+                            <label class="form-label">Tipo Doc:</label>
+                            <select id="pmDocTipo" class="form-control" style="font-weight: 700;">
+                                <option value="J">J - RIF</option>
+                                <option value="V">V - Venezolano</option>
+                                <option value="G">G - Gubernamental</option>
+                                <option value="E">E - Extranjero</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Número C.I. / RIF:</label>
+                            <input type="text" id="pmDocNumero" class="form-control" placeholder="12345678-0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN DINÁMICA: TRANSFERENCIA BANCARIA -->
+                <div id="seccionCamposTransferencia" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Cuenta:</label>
+                        <select id="transTipoCuenta" class="form-control">
+                            <option value="Cuenta Corriente">Cuenta Corriente</option>
+                            <option value="Cuenta de Ahorros">Cuenta de Ahorros</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Número de Cuenta (20 dígitos):</label>
+                        <input type="text" id="transNumeroCuenta" class="form-control" placeholder="01340000000000000000" maxlength="20" style="font-family: monospace; letter-spacing: 0.5px;">
+                        <small style="color: var(--text-muted); font-size: 0.75rem;">Los primeros 4 dígitos corresponden al código del banco seleccionado en el desplegable.</small>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 110px 1fr; gap: 0.75rem;">
+                        <div class="form-group">
+                            <label class="form-label">Tipo Doc:</label>
+                            <select id="transDocTipo" class="form-control" style="font-weight: 700;">
+                                <option value="J">J - RIF</option>
+                                <option value="V">V - Venezolano</option>
+                                <option value="G">G - Gubernamental</option>
+                                <option value="E">E - Extranjero</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Número C.I. / RIF:</label>
+                            <input type="text" id="transDocNumero" class="form-control" placeholder="12345678-0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN DINÁMICA: ZELLE / DIVISAS / BINANCE / OTRO -->
+                <div id="seccionCamposZelle" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label" id="lblZelleIdentificador">Correo Electrónico / Identificador:</label>
+                        <input type="text" id="zelleIdentificador" class="form-control" placeholder="condominio.samanes@gmail.com">
+                    </div>
+                </div>
+
+                <!-- CAMPO COMÚN: TITULAR O RAZÓN SOCIAL -->
+                <div class="form-group">
+                    <label class="form-label">Nombre del Titular / Beneficiario:</label>
+                    <input type="text" id="cuentaTitular" class="form-control" placeholder="Junta de Condominio Residencias Los Samanes">
+                </div>
+
+                <!-- CAMPO COMÚN: NOTA O MEMO -->
+                <div class="form-group">
+                    <label class="form-label">Nota o Instrucción Adicional (Opcional):</label>
+                    <input type="text" id="cuentaNota" class="form-control" placeholder="Ej: Indicar número de apartamento en el concepto">
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.08);">
+                    <button type="button" class="demo-btn" onclick="app.closeModal('modalCuentaBancaria')">Cancelar</button>
+                    <button type="button" class="btn-primary-saas" style="width: auto; padding: 0.6rem 1.25rem;" onclick="app.guardarCuentaBancaria()">
+                        <i class="bi bi-check2-circle"></i> Guardar Cuenta
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- CONTROLADOR JAVASCRIPT -->
     <script>
         const SUPABASE_URL = 'https://xlyfbwsfojzmcgjgcsrw.supabase.co';
@@ -2058,6 +2203,43 @@
         } catch (e) {
             console.warn('Supabase client error:', e);
         }
+
+        // CATÁLOGO OFICIAL DE BANCOS NACIONALES SUDEBAN (SELECCIÓN RÁPIDA CON CÓDIGO)
+        const BANCOS_VE = [
+            { codigo: '0134', nombre: 'Banesco Banco Universal' },
+            { codigo: '0102', nombre: 'Banco de Venezuela' },
+            { codigo: '0105', nombre: 'Banco Mercantil' },
+            { codigo: '0108', nombre: 'Banco Provincial (BBVA)' },
+            { codigo: '0172', nombre: 'Bancamiga Banco Universal' },
+            { codigo: '0191', nombre: 'Banco Nacional de Crédito (BNC)' },
+            { codigo: '0114', nombre: 'Bancaribe' },
+            { codigo: '0115', nombre: 'Banco Exterior' },
+            { codigo: '0163', nombre: 'Banco del Tesoro' },
+            { codigo: '0175', nombre: 'Banco Bicentenario' },
+            { codigo: '0151', nombre: 'BFC Banco Fondo Común' },
+            { codigo: '0174', nombre: 'Banplus Banco Universal' },
+            { codigo: '0104', nombre: 'Banco Venezolano de Crédito' },
+            { codigo: '0128', nombre: 'Banco Caroní' },
+            { codigo: '0138', nombre: 'Banco Plaza' },
+            { codigo: '0156', nombre: '100% Banco' },
+            { codigo: '0157', nombre: 'DelSur Banco Universal' },
+            { codigo: '0168', nombre: 'Bancrecer' },
+            { codigo: '0169', nombre: 'Mi Banco' },
+            { codigo: '0171', nombre: 'Banco Activo' },
+            { codigo: '0177', nombre: 'BANFANB' }
+        ];
+
+        // CATÁLOGO DE MÉTODOS Y BANCOS EN DIVISAS / INTERNACIONALES
+        const BANCOS_INT = [
+            { codigo: 'ZELLE', nombre: 'Zelle (EE.UU. USD)' },
+            { codigo: 'BANESCO_PA', nombre: 'Banesco Panamá (USD)' },
+            { codigo: 'MERCANTIL_PA', nombre: 'Mercantil Banco Panamá (USD)' },
+            { codigo: 'FACEBANK', nombre: 'Facebank Internacional (USD)' },
+            { codigo: 'PIPOLPAY', nombre: 'Pipol Pay (USD)' },
+            { codigo: 'BINANCE', nombre: 'Binance Pay / USDT' },
+            { codigo: 'EFECTIVO', nombre: 'Efectivo en Custodia / Caja' },
+            { codigo: 'OTRO', nombre: 'Otro Banco / Plataforma' }
+        ];
 
         const INITIAL_STATE = {
             activeCondoId: 1,
@@ -2075,7 +2257,42 @@
                     tasa_dolar: 877.90,
                     banco_pago_movil: 'Banco Banesco (0134) | RIF: J-12345678-0 | Teléfono: 0414-1234567',
                     banco_transferencia: 'Banesco Cta Corriente: 0134-0000-00-0000000000 | RIF: J-12345678-0',
-                    cuenta_zelle: 'condominio.samanes@gmail.com (Titular: Junta de Condominio)'
+                    cuenta_zelle: 'condominio.samanes@gmail.com (Titular: Junta de Condominio)',
+                    cuentas_bancarias: [
+                        {
+                            id: 'acc_pm_demo',
+                            tipo: 'pago_movil',
+                            bancoCodigo: '0134',
+                            bancoNombre: 'Banesco Banco Universal',
+                            prefijo: '0414',
+                            telefono: '1234567',
+                            docTipo: 'J',
+                            docNumero: '12345678-0',
+                            titular: 'Junta de Condominio Residencias Los Samanes',
+                            nota: ''
+                        },
+                        {
+                            id: 'acc_tr_demo',
+                            tipo: 'transferencia',
+                            bancoCodigo: '0134',
+                            bancoNombre: 'Banesco Banco Universal',
+                            tipoCuenta: 'Cuenta Corriente',
+                            numeroCuenta: '01340000000000000000',
+                            docTipo: 'J',
+                            docNumero: '12345678-0',
+                            titular: 'Junta de Condominio Residencias Los Samanes',
+                            nota: ''
+                        },
+                        {
+                            id: 'acc_zl_demo',
+                            tipo: 'zelle',
+                            bancoCodigo: 'ZELLE',
+                            bancoNombre: 'Zelle (EE.UU. USD)',
+                            identificador: 'condominio.samanes@gmail.com',
+                            titular: 'Junta de Condominio',
+                            nota: 'Colocar número de apartamento en el concepto'
+                        }
+                    ]
                 }
             ],
             // 50 Apartamentos limpios (sin adjudicatarios previos, sin deudas, sin pagos)
@@ -4004,11 +4221,13 @@
                 adminView.classList.add('active');
 
                 const condo = this.getActiveCondo();
+                this.ensureCondoCuentas(condo);
                 document.getElementById('adminViewCondoTitle').innerText = `${condo.nombre} (${role})`;
                 this.renderAdminMetrics();
                 this.renderAdminFloors();
                 this.renderCuotasTable();
                 this.renderPagosTable();
+                this.renderAdminCuentas();
             },
 
             // 4. FILTROS DEL MAPA DE PISOS (TODOS, DISPONIBLES, ADJUDICADOS, AL DÍA, MOROSOS)
@@ -4161,6 +4380,7 @@
                 if (tabName === 'pagos') this.renderPagosTable();
                 if (tabName === 'tickets') this.renderAdminTickets();
                 if (tabName === 'comunicados') this.renderComunicados();
+                if (tabName === 'config') this.renderAdminCuentas();
             },
 
             // ADJUDICAR
@@ -4736,17 +4956,597 @@
                 }
             },
 
+            // GESTIÓN INTEGRAL DE CUENTAS BANCARIAS Y PAGO MÓVIL
+            ensureCondoCuentas(condo) {
+                if (!condo) return [];
+                if (!Array.isArray(condo.cuentas_bancarias) || condo.cuentas_bancarias.length === 0) {
+                    condo.cuentas_bancarias = [];
+                    // Migración automática a partir de los datos existentes
+                    if (condo.banco_pago_movil && condo.banco_pago_movil !== 'No configurado') {
+                        condo.cuentas_bancarias.push({
+                            id: 'acc_pm_' + Date.now(),
+                            tipo: 'pago_movil',
+                            bancoCodigo: '0134',
+                            bancoNombre: 'Banesco Banco Universal',
+                            prefijo: '0414',
+                            telefono: '1234567',
+                            docTipo: 'J',
+                            docNumero: condo.rif ? condo.rif.replace(/^[VJEG]-?/i, '') : '12345678-0',
+                            titular: 'Junta de Condominio ' + (condo.nombre || ''),
+                            nota: ''
+                        });
+                    }
+                    if (condo.banco_transferencia && condo.banco_transferencia !== 'No configurado') {
+                        condo.cuentas_bancarias.push({
+                            id: 'acc_tr_' + (Date.now() + 1),
+                            tipo: 'transferencia',
+                            bancoCodigo: '0134',
+                            bancoNombre: 'Banesco Banco Universal',
+                            tipoCuenta: 'Cuenta Corriente',
+                            numeroCuenta: '01340000000000000000',
+                            docTipo: 'J',
+                            docNumero: condo.rif ? condo.rif.replace(/^[VJEG]-?/i, '') : '12345678-0',
+                            titular: 'Junta de Condominio ' + (condo.nombre || ''),
+                            nota: ''
+                        });
+                    }
+                    if (condo.cuenta_zelle && condo.cuenta_zelle !== 'No configurado') {
+                        condo.cuentas_bancarias.push({
+                            id: 'acc_zl_' + (Date.now() + 2),
+                            tipo: 'zelle',
+                            bancoCodigo: 'ZELLE',
+                            bancoNombre: 'Zelle (EE.UU. USD)',
+                            identificador: 'condominio.samanes@gmail.com',
+                            titular: 'Junta de Condominio',
+                            nota: 'Indicar N° de Apto en el concepto'
+                        });
+                    }
+                    if (condo.cuentas_bancarias.length === 0) {
+                        condo.cuentas_bancarias.push({
+                            id: 'acc_pm_demo',
+                            tipo: 'pago_movil',
+                            bancoCodigo: '0134',
+                            bancoNombre: 'Banesco Banco Universal',
+                            prefijo: '0414',
+                            telefono: '1234567',
+                            docTipo: 'J',
+                            docNumero: '12345678-0',
+                            titular: 'Junta de Condominio ' + (condo.nombre || ''),
+                            nota: ''
+                        });
+                        condo.cuentas_bancarias.push({
+                            id: 'acc_tr_demo',
+                            tipo: 'transferencia',
+                            bancoCodigo: '0102',
+                            bancoNombre: 'Banco de Venezuela',
+                            tipoCuenta: 'Cuenta Corriente',
+                            numeroCuenta: '01020000000000000000',
+                            docTipo: 'J',
+                            docNumero: '12345678-0',
+                            titular: 'Junta de Condominio ' + (condo.nombre || ''),
+                            nota: ''
+                        });
+                        condo.cuentas_bancarias.push({
+                            id: 'acc_zl_demo',
+                            tipo: 'zelle',
+                            bancoCodigo: 'ZELLE',
+                            bancoNombre: 'Zelle (EE.UU. USD)',
+                            identificador: 'condominio.samanes@gmail.com',
+                            titular: 'Junta de Condominio',
+                            nota: 'Colocar N° de Apto en el memo'
+                        });
+                    }
+                    this.syncLegacyCondoBankStrings(condo);
+                }
+                return condo.cuentas_bancarias;
+            },
+
+            syncLegacyCondoBankStrings(condo) {
+                if (!condo || !Array.isArray(condo.cuentas_bancarias)) return;
+                const pm = condo.cuentas_bancarias.find(c => c.tipo === 'pago_movil');
+                if (pm) {
+                    condo.banco_pago_movil = `${pm.bancoNombre} (${pm.bancoCodigo}) | RIF: ${pm.docTipo}-${pm.docNumero} | Tel: ${pm.prefijo}-${pm.telefono}`;
+                }
+                const tr = condo.cuentas_bancarias.find(c => c.tipo === 'transferencia');
+                if (tr) {
+                    condo.banco_transferencia = `${tr.bancoNombre} (${tr.tipoCuenta || 'Cta'}): ${tr.numeroCuenta} | RIF: ${tr.docTipo}-${tr.docNumero}`;
+                }
+                const zl = condo.cuentas_bancarias.find(c => c.tipo === 'zelle' || c.tipo === 'internacional' || c.tipo === 'binance');
+                if (zl) {
+                    condo.cuenta_zelle = `${zl.identificador} (Titular: ${zl.titular || 'Junta de Condominio'})`;
+                }
+
+                const elPm = document.getElementById('cfgPagoMovil');
+                if (elPm) elPm.value = condo.banco_pago_movil || '';
+                const elTr = document.getElementById('cfgTransferencia');
+                if (elTr) elTr.value = condo.banco_transferencia || '';
+                const elZl = document.getElementById('cfgZelle');
+                if (elZl) elZl.value = condo.cuenta_zelle || '';
+            },
+
+            renderAdminCuentas() {
+                const condo = this.getActiveCondo();
+                const cuentas = this.ensureCondoCuentas(condo);
+                const container = document.getElementById('adminCuentasCardsContainer');
+                if (!container) return;
+
+                if (cuentas.length === 0) {
+                    container.innerHTML = `
+                        <div style="grid-column: 1 / -1; background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: var(--radius-lg); padding: 2.5rem 1rem; text-align: center;">
+                            <i class="bi bi-wallet2" style="font-size: 2.5rem; color: var(--text-muted); display: block; margin-bottom: 0.75rem;"></i>
+                            <h4 style="color: #fff; margin: 0 0 0.5rem 0;">No hay cuentas ni pago móviles configurados</h4>
+                            <p style="color: var(--text-secondary); font-size: 0.85rem; max-width: 420px; margin: 0 auto 1.25rem auto;">
+                                Agregue una o varias cuentas bancarias nacionales o métodos en divisas para que los residentes puedan reportar sus pagos rápidamente.
+                            </p>
+                            <button type="button" class="btn-primary-saas" style="width: auto; margin: 0 auto;" onclick="app.openModalNuevaCuenta()">
+                                <i class="bi bi-plus-circle-fill"></i> Agregar Primera Cuenta
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                cuentas.forEach((c) => {
+                    let tipoBadge = '';
+                    let detailsHtml = '';
+                    let copyText = '';
+
+                    if (c.tipo === 'pago_movil') {
+                        tipoBadge = `<span style="background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700;"><i class="bi bi-phone"></i> Pago Móvil (Bs)</span>`;
+                        const telCompleto = `${c.prefijo || ''}-${c.telefono || ''}`;
+                        const docCompleto = `${c.docTipo || 'V'}-${c.docNumero || ''}`;
+                        copyText = `Pago Móvil:\nBanco: ${c.bancoNombre} (${c.bancoCodigo})\nTeléfono: ${telCompleto}\nRIF/CI: ${docCompleto}\nTitular: ${c.titular || ''}`;
+                        detailsHtml = `
+                            <div style="margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.84rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.35rem 0.6rem; border-radius: 6px;">
+                                    <span style="color: var(--text-secondary); font-size: 0.78rem;">Teléfono:</span>
+                                    <span style="font-weight: 700; color: #fff;">${telCompleto}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.35rem 0.6rem; border-radius: 6px;">
+                                    <span style="color: var(--text-secondary); font-size: 0.78rem;">RIF / C.I.:</span>
+                                    <span style="font-weight: 700; color: #fff;">${docCompleto}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.35rem 0.6rem; border-radius: 6px;">
+                                    <span style="color: var(--text-secondary); font-size: 0.78rem;">Titular:</span>
+                                    <span style="font-weight: 600; color: #e2e8f0; text-align: right; max-width: 60%;">${c.titular || 'Junta de Condominio'}</span>
+                                </div>
+                            </div>
+                        `;
+                    } else if (c.tipo === 'transferencia') {
+                        tipoBadge = `<span style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700;"><i class="bi bi-bank"></i> Transferencia Bs</span>`;
+                        const docCompleto = `${c.docTipo || 'J'}-${c.docNumero || ''}`;
+                        copyText = `Transferencia Bancaria:\nBanco: ${c.bancoNombre} (${c.bancoCodigo})\nCuenta (${c.tipoCuenta || 'Corriente'}): ${c.numeroCuenta || ''}\nRIF/CI: ${docCompleto}\nTitular: ${c.titular || ''}`;
+                        detailsHtml = `
+                            <div style="margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.84rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.35rem 0.6rem; border-radius: 6px;">
+                                    <span style="color: var(--text-secondary); font-size: 0.78rem;">Tipo:</span>
+                                    <span style="font-weight: 700; color: #fff;">${c.tipoCuenta || 'Cuenta Corriente'}</span>
+                                </div>
+                                <div style="background: rgba(0,0,0,0.2); padding: 0.45rem 0.6rem; border-radius: 6px;">
+                                    <div style="color: var(--text-secondary); font-size: 0.74rem;">N° de Cuenta (20 dígitos):</div>
+                                    <div style="font-family: monospace; font-size: 0.85rem; font-weight: 700; color: #38bdf8; word-break: break-all; margin-top: 2px;">${c.numeroCuenta || 'No indicado'}</div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.35rem 0.6rem; border-radius: 6px;">
+                                    <span style="color: var(--text-secondary); font-size: 0.78rem;">RIF / Titular:</span>
+                                    <span style="font-weight: 600; color: #e2e8f0; text-align: right; font-size: 0.8rem;">${docCompleto} | ${c.titular || ''}</span>
+                                </div>
+                            </div>
+                        `;
+                    } else if (c.tipo === 'zelle') {
+                        tipoBadge = `<span style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700;"><i class="bi bi-currency-dollar"></i> Zelle (USD)</span>`;
+                        copyText = `Zelle:\nCorreo/ID: ${c.identificador || ''}\nTitular: ${c.titular || ''}\nInstrucciones: ${c.nota || ''}`;
+                        detailsHtml = `
+                            <div style="margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.84rem;">
+                                <div style="background: rgba(0,0,0,0.2); padding: 0.45rem 0.6rem; border-radius: 6px;">
+                                    <div style="color: var(--text-secondary); font-size: 0.74rem;">Correo / Identificador Zelle:</div>
+                                    <div style="font-weight: 700; color: #34d399; font-size: 0.88rem; word-break: break-all;">${c.identificador || 'N/A'}</div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.35rem 0.6rem; border-radius: 6px;">
+                                    <span style="color: var(--text-secondary); font-size: 0.78rem;">Titular:</span>
+                                    <span style="font-weight: 600; color: #fff;">${c.titular || 'Junta de Condominio'}</span>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        const badgeColor = c.tipo === 'binance' ? '#f59e0b' : '#38bdf8';
+                        const badgeBg = c.tipo === 'binance' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(56, 189, 248, 0.15)';
+                        const icon = c.tipo === 'binance' ? 'bi-coin' : 'bi-globe2';
+                        tipoBadge = `<span style="background: ${badgeBg}; color: ${badgeColor}; border: 1px solid ${badgeColor}40; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700;"><i class="bi ${icon}"></i> ${c.bancoNombre || 'Divisas USD'}</span>`;
+                        copyText = `${c.bancoNombre}:\nID/Cuenta: ${c.identificador || ''}\nTitular: ${c.titular || ''}\nNota: ${c.nota || ''}`;
+                        detailsHtml = `
+                            <div style="margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.84rem;">
+                                <div style="background: rgba(0,0,0,0.2); padding: 0.45rem 0.6rem; border-radius: 6px;">
+                                    <div style="color: var(--text-secondary); font-size: 0.74rem;">Cuenta / Identificador / Wallet:</div>
+                                    <div style="font-weight: 700; color: #fff; font-size: 0.85rem; word-break: break-all;">${c.identificador || 'N/A'}</div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 0.35rem 0.6rem; border-radius: 6px;">
+                                    <span style="color: var(--text-secondary); font-size: 0.78rem;">Titular:</span>
+                                    <span style="font-weight: 600; color: #fff;">${c.titular || 'Junta de Condominio'}</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    if (c.nota) {
+                        detailsHtml += `
+                            <div style="font-size: 0.76rem; color: var(--text-muted); font-style: italic; margin-top: 0.3rem;">
+                                <i class="bi bi-info-circle"></i> ${c.nota}
+                            </div>
+                        `;
+                    }
+
+                    const safeCopyJson = JSON.stringify(copyText).replace(/"/g, '&quot;');
+
+                    html += `
+                        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, border-color 0.2s;" onmouseenter="this.style.borderColor='var(--primary)'" onmouseleave="this.style.borderColor='var(--border-color)'">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.6rem;">
+                                    <div>
+                                        <div style="font-size: 0.95rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.4rem;">
+                                            <i class="bi bi-bank2" style="color: #60a5fa;"></i> ${c.bancoNombre || 'Banco'}
+                                        </div>
+                                        ${c.bancoCodigo && c.bancoCodigo.match(/^[0-9]+$/) ? `<span style="font-size: 0.72rem; color: var(--text-muted); font-family: monospace;">Código: ${c.bancoCodigo}</span>` : ''}
+                                    </div>
+                                    <div>${tipoBadge}</div>
+                                </div>
+                                ${detailsHtml}
+                            </div>
+                            <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.25rem; padding-top: 0.85rem; border-top: 1px solid rgba(255,255,255,0.06);">
+                                <button type="button" class="demo-btn" style="padding: 0.35rem 0.65rem; font-size: 0.78rem;" onclick="app.copiarAlPortapapeles(${safeCopyJson}, 'Datos bancarios')" title="Copiar datos al portapapeles">
+                                    <i class="bi bi-clipboard"></i> Copiar
+                                </button>
+                                <button type="button" class="demo-btn" style="padding: 0.35rem 0.65rem; font-size: 0.78rem;" onclick="app.editarCuentaBancaria('${c.id}')" title="Editar cuenta">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </button>
+                                <button type="button" class="demo-btn" style="padding: 0.35rem 0.65rem; font-size: 0.78rem; color: #ef4444; border-color: rgba(239,68,68,0.3);" onclick="app.eliminarCuentaBancaria('${c.id}')" title="Eliminar cuenta">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+            },
+
+            populateCuentaBancoSelect(tipo, selectedValue = '') {
+                const sel = document.getElementById('cuentaBancoSelect');
+                if (!sel) return;
+                sel.innerHTML = '';
+
+                let lista = BANCOS_VE;
+                if (['zelle', 'internacional', 'binance', 'otro'].includes(tipo)) {
+                    lista = BANCOS_INT;
+                }
+
+                lista.forEach(b => {
+                    const opt = document.createElement('option');
+                    opt.value = `${b.codigo}|${b.nombre}`;
+                    opt.textContent = b.codigo.match(/^[0-9]+$/) ? `${b.codigo} - ${b.nombre}` : b.nombre;
+                    if (selectedValue && (selectedValue === b.codigo || selectedValue === `${b.codigo}|${b.nombre}` || selectedValue === b.nombre)) {
+                        opt.selected = true;
+                    }
+                    sel.appendChild(opt);
+                });
+            },
+
+            openModalNuevaCuenta() {
+                document.getElementById('modalCuentaTitle').innerHTML = '<i class="bi bi-wallet2 text-primary"></i> Registrar Nueva Cuenta / Método';
+                document.getElementById('cuentaEditId').value = '';
+                document.getElementById('cuentaTipoSelect').value = 'pago_movil';
+                this.populateCuentaBancoSelect('pago_movil', '0134');
+
+                const condo = this.getActiveCondo();
+                document.getElementById('pmPrefijo').value = '0414';
+                document.getElementById('pmTelefono').value = '';
+                document.getElementById('pmDocTipo').value = 'J';
+                document.getElementById('pmDocNumero').value = (condo.rif ? condo.rif.replace(/^[VJEG]-?/i, '') : '');
+                document.getElementById('transTipoCuenta').value = 'Cuenta Corriente';
+                document.getElementById('transNumeroCuenta').value = '0134';
+                document.getElementById('transDocTipo').value = 'J';
+                document.getElementById('transDocNumero').value = (condo.rif ? condo.rif.replace(/^[VJEG]-?/i, '') : '');
+                document.getElementById('zelleIdentificador').value = '';
+                document.getElementById('cuentaTitular').value = 'Junta de Condominio ' + (condo.nombre || '');
+                document.getElementById('cuentaNota').value = '';
+
+                this.handleCuentaTipoChange();
+                this.openModal('modalCuentaBancaria');
+            },
+
+            editarCuentaBancaria(id) {
+                const condo = this.getActiveCondo();
+                const c = (condo.cuentas_bancarias || []).find(x => x.id === id);
+                if (!c) return;
+
+                document.getElementById('modalCuentaTitle').innerHTML = '<i class="bi bi-pencil-square text-primary"></i> Editar Cuenta / Método';
+                document.getElementById('cuentaEditId').value = c.id;
+                document.getElementById('cuentaTipoSelect').value = c.tipo;
+                this.populateCuentaBancoSelect(c.tipo, c.bancoCodigo);
+
+                if (c.tipo === 'pago_movil') {
+                    document.getElementById('pmPrefijo').value = c.prefijo || '0414';
+                    document.getElementById('pmTelefono').value = c.telefono || '';
+                    document.getElementById('pmDocTipo').value = c.docTipo || 'J';
+                    document.getElementById('pmDocNumero').value = c.docNumero || '';
+                } else if (c.tipo === 'transferencia') {
+                    document.getElementById('transTipoCuenta').value = c.tipoCuenta || 'Cuenta Corriente';
+                    document.getElementById('transNumeroCuenta').value = c.numeroCuenta || '';
+                    document.getElementById('transDocTipo').value = c.docTipo || 'J';
+                    document.getElementById('transDocNumero').value = c.docNumero || '';
+                } else {
+                    document.getElementById('zelleIdentificador').value = c.identificador || '';
+                }
+
+                document.getElementById('cuentaTitular').value = c.titular || '';
+                document.getElementById('cuentaNota').value = c.nota || '';
+
+                this.handleCuentaTipoChange();
+                this.openModal('modalCuentaBancaria');
+            },
+
+            handleCuentaTipoChange() {
+                const tipo = document.getElementById('cuentaTipoSelect').value;
+                const secPm = document.getElementById('seccionCamposPagoMovil');
+                const secTr = document.getElementById('seccionCamposTransferencia');
+                const secZl = document.getElementById('seccionCamposZelle');
+                const lblZl = document.getElementById('lblZelleIdentificador');
+
+                const currentBanco = document.getElementById('cuentaBancoSelect').value;
+                this.populateCuentaBancoSelect(tipo, currentBanco);
+
+                secPm.style.display = tipo === 'pago_movil' ? 'block' : 'none';
+                secTr.style.display = tipo === 'transferencia' ? 'block' : 'none';
+                secZl.style.display = (tipo !== 'pago_movil' && tipo !== 'transferencia') ? 'block' : 'none';
+
+                if (tipo === 'zelle') {
+                    lblZl.innerText = 'Correo Electrónico o Teléfono Zelle:';
+                    document.getElementById('zelleIdentificador').placeholder = 'condominio.samanes@gmail.com';
+                } else if (tipo === 'binance') {
+                    lblZl.innerText = 'Binance Pay ID / Correo / Pay QR:';
+                    document.getElementById('zelleIdentificador').placeholder = 'ID de Usuario o Correo Binance';
+                } else {
+                    lblZl.innerText = 'N° de Cuenta / Identificador / IBAN / Swift:';
+                    document.getElementById('zelleIdentificador').placeholder = 'Ej: N° de Cuenta Panamá o Instrucción';
+                }
+
+                this.handleCuentaBancoChange();
+            },
+
+            handleCuentaBancoChange() {
+                const tipo = document.getElementById('cuentaTipoSelect').value;
+                const bancoVal = document.getElementById('cuentaBancoSelect').value;
+                if (!bancoVal) return;
+                const [codigo] = bancoVal.split('|');
+
+                if (tipo === 'transferencia' && codigo && codigo.match(/^[0-9]{4}$/)) {
+                    const accInput = document.getElementById('transNumeroCuenta');
+                    const curVal = accInput.value.replace(/[^0-9]/g, '');
+                    if (!curVal || curVal.length <= 4) {
+                        accInput.value = codigo;
+                    }
+                }
+            },
+
+            async guardarCuentaBancaria() {
+                const condo = this.getActiveCondo();
+                this.ensureCondoCuentas(condo);
+
+                const editId = document.getElementById('cuentaEditId').value.trim();
+                const tipo = document.getElementById('cuentaTipoSelect').value;
+                const bancoVal = document.getElementById('cuentaBancoSelect').value;
+                const [bancoCodigo, bancoNombre] = bancoVal.split('|');
+                const titular = document.getElementById('cuentaTitular').value.trim();
+                const nota = document.getElementById('cuentaNota').value.trim();
+
+                let cuentaData = {
+                    id: editId || ('acc_' + Date.now()),
+                    tipo: tipo,
+                    bancoCodigo: bancoCodigo || '',
+                    bancoNombre: bancoNombre || bancoCodigo || '',
+                    titular: titular || ('Junta de Condominio ' + condo.nombre),
+                    nota: nota
+                };
+
+                if (tipo === 'pago_movil') {
+                    const prefijo = document.getElementById('pmPrefijo').value;
+                    const telefono = document.getElementById('pmTelefono').value.replace(/[^0-9]/g, '');
+                    const docTipo = document.getElementById('pmDocTipo').value;
+                    const docNumero = document.getElementById('pmDocNumero').value.trim();
+
+                    if (!telefono || telefono.length < 7) {
+                        alert('Por favor ingrese los 7 dígitos del número de teléfono del Pago Móvil.');
+                        return;
+                    }
+                    if (!docNumero) {
+                        alert('Por favor ingrese el número de C.I. o RIF.');
+                        return;
+                    }
+
+                    cuentaData.prefijo = prefijo;
+                    cuentaData.telefono = telefono;
+                    cuentaData.docTipo = docTipo;
+                    cuentaData.docNumero = docNumero;
+
+                } else if (tipo === 'transferencia') {
+                    const tipoCuenta = document.getElementById('transTipoCuenta').value;
+                    const numeroCuenta = document.getElementById('transNumeroCuenta').value.replace(/[^0-9]/g, '');
+                    const docTipo = document.getElementById('transDocTipo').value;
+                    const docNumero = document.getElementById('transDocNumero').value.trim();
+
+                    if (!numeroCuenta || numeroCuenta.length !== 20) {
+                        if (!confirm('El número de cuenta bancaria suele tener 20 dígitos (actualmente tiene ' + numeroCuenta.length + '). ¿Desea guardarlo de todas formas?')) {
+                            return;
+                        }
+                    }
+                    if (!docNumero) {
+                        alert('Por favor ingrese el número de C.I. o RIF del titular.');
+                        return;
+                    }
+
+                    cuentaData.tipoCuenta = tipoCuenta;
+                    cuentaData.numeroCuenta = numeroCuenta;
+                    cuentaData.docTipo = docTipo;
+                    cuentaData.docNumero = docNumero;
+
+                } else {
+                    const identificador = document.getElementById('zelleIdentificador').value.trim();
+                    if (!identificador) {
+                        alert('Por favor ingrese el correo electrónico o identificador de la cuenta.');
+                        return;
+                    }
+                    cuentaData.identificador = identificador;
+                }
+
+                if (editId) {
+                    const idx = condo.cuentas_bancarias.findIndex(x => x.id === editId);
+                    if (idx !== -1) {
+                        condo.cuentas_bancarias[idx] = cuentaData;
+                    } else {
+                        condo.cuentas_bancarias.push(cuentaData);
+                    }
+                } else {
+                    condo.cuentas_bancarias.push(cuentaData);
+                }
+
+                this.syncLegacyCondoBankStrings(condo);
+                this.save();
+                this.closeModal('modalCuentaBancaria');
+                this.renderAdminCuentas();
+                this.toast('✅ Cuenta bancaria guardada con éxito');
+                this.logActivity('CONDOMINIO', `${editId ? 'Edición' : 'Registro'} de cuenta bancaria: ${cuentaData.bancoNombre} (${cuentaData.tipo})`, this.currentRole || 'Admin', condo.nombre);
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('condominios').update({
+                            banco_pago_movil: condo.banco_pago_movil,
+                            banco_transferencia: condo.banco_transferencia,
+                            cuenta_zelle: condo.cuenta_zelle
+                        }).eq('id', condo.id);
+                    } catch (e) {
+                        console.error('Error sincronizando cuentas en Supabase:', e);
+                    }
+                }
+            },
+
+            async eliminarCuentaBancaria(id) {
+                if (!confirm('¿Está seguro de eliminar esta cuenta bancaria del sistema?')) return;
+                const condo = this.getActiveCondo();
+                condo.cuentas_bancarias = (condo.cuentas_bancarias || []).filter(x => x.id !== id);
+                this.syncLegacyCondoBankStrings(condo);
+                this.save();
+                this.renderAdminCuentas();
+                this.toast('Cuenta bancaria eliminada');
+                this.logActivity('CONDOMINIO', `Eliminación de cuenta bancaria #${id}`, this.currentRole || 'Admin', condo.nombre);
+
+                if (sbClient) {
+                    try {
+                        await sbClient.from('condominios').update({
+                            banco_pago_movil: condo.banco_pago_movil,
+                            banco_transferencia: condo.banco_transferencia,
+                            cuenta_zelle: condo.cuenta_zelle
+                        }).eq('id', condo.id);
+                    } catch (e) {
+                        console.error('Error cuentas Supabase:', e);
+                    }
+                }
+            },
+
+            copiarAlPortapapeles(texto, etiqueta) {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(texto).then(() => {
+                        this.toast(`📋 ¡${etiqueta || 'Datos'} copiado(s) al portapapeles!`);
+                    }).catch(() => {
+                        this.fallbackCopyText(texto, etiqueta);
+                    });
+                } else {
+                    this.fallbackCopyText(texto, etiqueta);
+                }
+            },
+
+            fallbackCopyText(texto, etiqueta) {
+                const ta = document.createElement('textarea');
+                ta.value = texto;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.focus();
+                ta.select();
+                try {
+                    document.execCommand('copy');
+                    this.toast(`📋 ¡${etiqueta || 'Datos'} copiado(s) al portapapeles!`);
+                } catch (err) {
+                    alert('No se pudo copiar automáticamente. Por favor copie manualmente:\n' + texto);
+                }
+                document.body.removeChild(ta);
+            },
+
+            renderResidentBankInfo(condo) {
+                const el = document.getElementById('residentBankInfo');
+                if (!el) return;
+                const cuentas = this.ensureCondoCuentas(condo);
+
+                if (cuentas.length === 0) {
+                    el.innerHTML = '<span style="color: var(--text-muted); font-style: italic;">Consultar con administración para datos de pago.</span>';
+                    return;
+                }
+
+                let html = '<div style="display: flex; flex-direction: column; gap: 0.65rem;">';
+                cuentas.forEach(c => {
+                    let tipoTag = '';
+                    let copyText = '';
+                    let mainInfo = '';
+
+                    if (c.tipo === 'pago_movil') {
+                        tipoTag = '<strong style="color: #c084fc;"><i class="bi bi-phone"></i> Pago Móvil (Bs):</strong>';
+                        const tel = `${c.prefijo || ''}-${c.telefono || ''}`;
+                        const doc = `${c.docTipo || 'V'}-${c.docNumero || ''}`;
+                        mainInfo = `${c.bancoNombre} (${c.bancoCodigo}) | ${doc} | Tel: ${tel}`;
+                        copyText = `Pago Móvil:\nBanco: ${c.bancoNombre} (${c.bancoCodigo})\nTeléfono: ${tel}\nRIF/CI: ${doc}\nTitular: ${c.titular || ''}`;
+                    } else if (c.tipo === 'transferencia') {
+                        tipoTag = '<strong style="color: #60a5fa;"><i class="bi bi-bank"></i> Transferencia (Bs):</strong>';
+                        const doc = `${c.docTipo || 'J'}-${c.docNumero || ''}`;
+                        mainInfo = `${c.bancoNombre} (${c.tipoCuenta || 'Cta'}) | Cta: ${c.numeroCuenta} | ${doc}`;
+                        copyText = `Transferencia:\nBanco: ${c.bancoNombre} (${c.bancoCodigo})\nCuenta: ${c.numeroCuenta}\nRIF/CI: ${doc}\nTitular: ${c.titular || ''}`;
+                    } else if (c.tipo === 'zelle') {
+                        tipoTag = '<strong style="color: #34d399;"><i class="bi bi-currency-dollar"></i> Zelle (USD):</strong>';
+                        mainInfo = `${c.identificador} (Titular: ${c.titular || 'Junta de Condominio'})`;
+                        copyText = `Zelle: ${c.identificador}\nTitular: ${c.titular || ''}`;
+                    } else {
+                        tipoTag = `<strong style="color: #fbbf24;"><i class="bi bi-wallet2"></i> ${c.bancoNombre}:</strong>`;
+                        mainInfo = `${c.identificador || ''} (Titular: ${c.titular || 'Junta de Condominio'})`;
+                        copyText = `${c.bancoNombre}: ${c.identificador}\nTitular: ${c.titular || ''}`;
+                    }
+
+                    const safeCopyJson = JSON.stringify(copyText).replace(/"/g, '&quot;');
+
+                    html += `
+                        <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 0.5rem 0.65rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <div style="font-size: 0.82rem; line-height: 1.4;">
+                                ${tipoTag} <span style="color: #e2e8f0;">${mainInfo}</span>
+                            </div>
+                            <button type="button" class="demo-btn" style="padding: 0.2rem 0.5rem; font-size: 0.72rem;" onclick="app.copiarAlPortapapeles(${safeCopyJson}, 'Datos de pago')">
+                                <i class="bi bi-clipboard"></i> Copiar
+                            </button>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                el.innerHTML = html;
+            },
+
             async saveCondoSettings() {
                 const condo = this.getActiveCondo();
-                condo.tasa_dolar = parseFloat(document.getElementById('cfgTasaBcv').value) || 877.90;
-                condo.banco_pago_movil = document.getElementById('cfgPagoMovil').value;
-                condo.banco_transferencia = document.getElementById('cfgTransferencia').value;
-                condo.cuenta_zelle = document.getElementById('cfgZelle').value;
+                const bcvInput = document.getElementById('cfgTasaBcv');
+                if (bcvInput) {
+                    condo.tasa_dolar = parseFloat(bcvInput.value) || 877.90;
+                }
+                this.syncLegacyCondoBankStrings(condo);
 
                 this.save();
                 this.renderHome();
-                this.toast('Cuentas bancarias y parámetros guardados');
-                this.logActivity('CONDOMINIO', `Actualización de cuentas bancarias y tasa oficial (${condo.tasa_dolar.toFixed(2)} Bs/USD)`, this.currentRole || 'Admin', condo.nombre);
+                this.toast('Parámetros y cuentas guardados');
+                this.logActivity('CONDOMINIO', `Actualización de parámetros y tasa oficial (${condo.tasa_dolar.toFixed(2)} Bs/USD)`, this.currentRole || 'Admin', condo.nombre);
 
                 if (sbClient) {
                     try {
@@ -4789,11 +5589,7 @@
                     document.getElementById('resProfileVehiculo').value = u.vehiculo || '';
                 }
 
-                document.getElementById('residentBankInfo').innerHTML = `
-                    <strong>Pago Móvil (Solo Bs):</strong> ${condo.banco_pago_movil || 'No configurado'}<br>
-                    <strong>Transferencia (Solo Bs):</strong> ${condo.banco_transferencia || 'No configurado'}<br>
-                    <strong>Zelle (Solo USD):</strong> ${condo.cuenta_zelle || 'No configurado'}
-                `;
+                this.renderResidentBankInfo(condo);
 
                 // CÁLCULO CENTRALIZADO DE DEUDA:
                 const balance = this.getAptoBalance(condo.id, aptoCode);
@@ -5206,6 +6002,35 @@
                     montoLabel.innerText = "Monto en Dólares (USD):";
                     montoInput.value = deudaUSD > 0 ? deudaUSD.toFixed(2) : "35.00";
                 }
+
+                // Filtrar y poblar cuentas bancarias receptoras de este método
+                const groupDestino = document.getElementById('groupPagoCuentaDestino');
+                const selDestino = document.getElementById('pagoCuentaDestino');
+                if (groupDestino && selDestino) {
+                    selDestino.innerHTML = '';
+                    const cuentas = this.ensureCondoCuentas(condo);
+                    let targetTipo = '';
+                    if (metodo === 'Pago Móvil') targetTipo = 'pago_movil';
+                    else if (metodo === 'Transferencia Bs') targetTipo = 'transferencia';
+                    else if (metodo === 'Zelle') targetTipo = 'zelle';
+
+                    const matching = cuentas.filter(c => targetTipo ? c.tipo === targetTipo : true);
+                    if (matching.length > 0) {
+                        groupDestino.style.display = 'block';
+                        matching.forEach(c => {
+                            const opt = document.createElement('option');
+                            let desc = c.bancoNombre;
+                            if (c.tipo === 'pago_movil') desc += ` (${c.bancoCodigo}) - Tel: ${c.prefijo}-${c.telefono} (RIF: ${c.docTipo}-${c.docNumero})`;
+                            else if (c.tipo === 'transferencia') desc += ` (${c.tipoCuenta || 'Cta'}) - Cta: ...${(c.numeroCuenta || '').slice(-4)} (RIF: ${c.docTipo}-${c.docNumero})`;
+                            else if (c.tipo === 'zelle') desc += ` - ${c.identificador}`;
+                            opt.value = `${c.bancoNombre} (${c.bancoCodigo || ''}) - ${c.tipo}`;
+                            opt.textContent = desc;
+                            selDestino.appendChild(opt);
+                        });
+                    } else {
+                        groupDestino.style.display = 'none';
+                    }
+                }
             },
 
             async submitResidentPago() {
@@ -5299,7 +6124,8 @@
                     tasa_dolar: 877.90,
                     banco_pago_movil: 'No configurado',
                     banco_transferencia: 'No configurado',
-                    cuenta_zelle: 'No configurado'
+                    cuenta_zelle: 'No configurado',
+                    cuentas_bancarias: []
                 };
 
                 const newUnits = generateCleanUnits(newId, pisos, aptosPiso, tienePB, aptosPB);
