@@ -783,85 +783,50 @@
         <i class="bi bi-check-circle-fill"></i> <span id="toastMsg">Operación completada</span>
     </div>
 
-    <!-- PANTALLA PRINCIPAL: CUADRÍCULA ÚNICA DE INGRESO (TAL COMO ESTABA ANTES) -->
+    <!-- PANTALLA PRINCIPAL: ACCESO CENTRAL CONDOHUB -->
     <main id="viewHome" class="login-wrapper">
         <div class="login-box">
-            <!-- 1. DESPLEGABLE SUPERIOR: SELECCIONE EL CONDOMINIO -->
-            <div class="condo-select-box">
-                <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.35rem; font-weight: 700; text-transform: uppercase;">
-                    <i class="bi bi-buildings text-primary"></i> Seleccione el Condominio:
-                </label>
-                <select id="select-condominio" class="form-control" style="font-weight: 600; color: #fff; background: var(--bg-primary);" onchange="app.switchCondominio(this.value)">
-                    <!-- Opciones de condominios dinámicas -->
-                </select>
-            </div>
-
-            <!-- ENCABEZADO DEL CONDOMINIO SELECCIONADO -->
-            <div style="text-align: center; margin-bottom: 1.5rem;">
-                <div class="brand-icon" style="margin: 0 auto 0.85rem; width: 50px; height: 50px; font-size: 1.5rem;">
-                    <i class="bi bi-building"></i>
+            <!-- 2. PRESENTACIÓN CENTRAL DE LA PLATAFORMA CONDOHUB CON LOGO Y SLOGAN -->
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div class="brand-icon" style="margin: 0 auto 1rem; width: 68px; height: 68px; font-size: 2rem; box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5);">
+                    <i class="bi bi-buildings-fill"></i>
                 </div>
-                <h2 id="condo-display-name" style="font-size: 1.35rem; font-weight: 800; color: #fff; margin: 0;">Residencias Los Samanes</h2>
-                <p id="condo-display-specs" style="font-size: 0.84rem; color: var(--text-secondary); margin-top: 0.3rem;">
-                    PB + 12 Pisos (50 Apartamentos Residenciales)
+                <h1 style="font-size: 1.85rem; font-weight: 900; color: #fff; margin: 0; letter-spacing: -0.5px;">CondoHub <span style="font-size: 1rem; font-weight: 500; color: #38bdf8; background: rgba(56, 189, 248, 0.12); padding: 3px 8px; border-radius: 6px; vertical-align: middle;">SaaS</span></h1>
+                <p style="font-size: 0.92rem; color: var(--text-secondary); margin-top: 0.45rem; font-weight: 500;">
+                    Gestión inteligente y transparente de condominios residenciales
                 </p>
-                <div class="bcv-pill" style="margin-top: 0.6rem;">
-                    <i class="bi bi-shield-check"></i>
-                    <span>Demo 70% Adjudicado (35/50) • Sin Pagos (Limpio)</span>
-                </div>
             </div>
 
-            <!-- PESTAÑAS DENTRO DEL MISMO CUADRO: RESIDENTE / ADMINISTRACIÓN -->
-            <div class="tab-switch">
-                <button class="tab-btn active" id="tab-resident-btn" onclick="app.showLoginTab('resident')">
-                    <i class="bi bi-door-open"></i> Propietario / Apto
-                </button>
-                <button class="tab-btn" id="tab-admin-btn" onclick="app.showLoginTab('admin')">
-                    <i class="bi bi-shield-lock"></i> Administración
-                </button>
-            </div>
-
-            <!-- PESTAÑA 1: FORMULARIO RESIDENTE -->
-            <form id="form-login-resident" onsubmit="app.handleResidentSubmit(event)">
+            <!-- FORMULARIO ÚNICO DE ACCESO POR USUARIO O CORREO INSTITUCIONAL -->
+            <form id="form-login-universal" onsubmit="app.handleUniversalSubmit(event)">
                 <div class="form-group">
-                    <label class="form-label"><i class="bi bi-house"></i> Apartamento Residencial:</label>
-                    <select id="res-codigo" class="form-control" required onchange="app.selectedResidentApto = this.value">
-                        <!-- Apartamentos llenados dinámicamente -->
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label"><i class="bi bi-key"></i> Contraseña de Acceso:</label>
-                    <input type="password" id="res-password" class="form-control" value="123456" placeholder="Contraseña (123456)" required>
-                    <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.25rem; display: block;">
-                        Clave inicial por defecto: <code style="color: var(--primary);">123456</code>
+                    <label class="form-label" style="font-weight: 600; color: #e2e8f0;">
+                        <i class="bi bi-person-circle text-primary"></i> Usuario:
+                    </label>
+                    <input type="text" id="login-identifier" class="form-control" placeholder="Ej: aptopba@resdlossamanes.com o admin@..." required autocomplete="username" autofocus>
+                    <small style="color: var(--text-muted); font-size: 0.74rem; margin-top: 0.35rem; display: block;">
+                        Ingrese su usuario o correo institucional (apto o admin).
                     </small>
                 </div>
 
-                <button type="submit" class="btn-primary-saas">
-                    <i class="bi bi-box-arrow-in-right"></i> Entrar al Portal del Apartamento
-                </button>
-            </form>
-
-            <!-- PESTAÑA 2: FORMULARIO ADMINISTRACIÓN (ADMIN Y SUPERADMIN) -->
-            <form id="form-login-admin" style="display: none;" onsubmit="app.handleAdminSubmit(event)">
                 <div class="form-group">
-                    <label class="form-label"><i class="bi bi-person-badge"></i> Usuario Administrador:</label>
-                    <input type="text" id="admin-user" class="form-control" placeholder="Usuario administrador" required autocomplete="username">
+                    <label class="form-label" style="font-weight: 600; color: #e2e8f0;">
+                        <i class="bi bi-key-fill text-primary"></i> Contraseña de Acceso:
+                    </label>
+                    <input type="password" id="login-password" class="form-control" placeholder="Ingrese su contraseña" required autocomplete="current-password">
+                    <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 8px; padding: 0.55rem 0.75rem; margin-top: 0.5rem; font-size: 0.75rem; color: #94a3b8; line-height: 1.45;">
+                        <i class="bi bi-info-circle-fill text-primary"></i> Clave inicial por defecto: <code style="color: #60a5fa; font-weight: 700; background: rgba(56, 189, 248, 0.15); padding: 2px 6px; border-radius: 4px;">123456</code>. 
+                        <strong style="color: #fbbf24; display: block; margin-top: 3px;"><i class="bi bi-shield-exclamation"></i> Recuerde personalizar su clave una vez ingrese a su cuenta.</strong>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label"><i class="bi bi-key"></i> Contraseña:</label>
-                    <input type="password" id="admin-pass" class="form-control" placeholder="Contraseña" required autocomplete="current-password">
-                </div>
-
-                <button type="submit" class="btn-primary-saas">
-                    <i class="bi bi-shield-check"></i> Ingresar al Dashboard
+                <button type="submit" class="btn-primary-saas" style="margin-top: 1.25rem; font-weight: 700; font-size: 0.95rem; padding: 0.75rem 1.25rem;">
+                    <i class="bi bi-box-arrow-in-right"></i> Ingresar a CondoHub
                 </button>
             </form>
 
             <!-- ENLACE PARA SOLICITAR RESTABLECER CONTRASEÑA -->
-            <div style="text-align: center; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px dashed var(--border-color);">
+            <div style="text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed var(--border-color);">
                 <button type="button" onclick="app.showResetPasswordModal()" style="background: none; border: none; color: #60a5fa; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.65rem; border-radius: 6px; transition: var(--transition);">
                     <i class="bi bi-key-fill text-warning"></i> ¿Olvidó su contraseña? Solicitar restablecimiento
                 </button>
@@ -1791,6 +1756,29 @@
                 </div>
                 <button class="btn-primary-saas" style="background: #25D366; color: #fff; font-weight: 700; margin-top: 0.5rem;" onclick="app.sendResetPasswordRequest()">
                     <i class="bi bi-whatsapp"></i> Solicitar al Superadministrador vía WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EMERGENTE: RECOMENDACIÓN DE PERSONALIZAR CLAVE POR DEFECTO -->
+    <div id="modalChangeDefaultPassword" class="modal-backdrop-saas">
+        <div class="modal-box-saas" style="max-width: 480px; text-align: center; border: 1px solid rgba(245, 158, 11, 0.4); box-shadow: 0 20px 40px rgba(0,0,0,0.6);">
+            <div style="width: 60px; height: 60px; background: rgba(245, 158, 11, 0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; font-size: 1.8rem; color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);">
+                <i class="bi bi-shield-lock-fill"></i>
+            </div>
+            <h3 style="font-size: 1.3rem; color: #fff; margin: 0 0 0.5rem; font-weight: 800;">
+                ¡Proteja su Cuenta!
+            </h3>
+            <p style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.5; margin-bottom: 1.25rem;">
+                Está utilizando la <strong style="color: #fbbf24;">contraseña inicial por defecto (123456)</strong>. Por la seguridad y privacidad de los datos de su apartamento, le recomendamos enfáticamente personalizar su clave de acceso ahora mismo.
+            </p>
+            <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+                <button type="button" class="btn-primary-saas" style="width: auto; padding: 0.7rem 1.4rem; background: #3b82f6; font-weight: 700;" onclick="app.goToResidentProfilePassword()">
+                    <i class="bi bi-key-fill"></i> Personalizar mi Clave Ahora
+                </button>
+                <button type="button" class="demo-btn" style="padding: 0.7rem 1.2rem; font-size: 0.88rem;" onclick="app.closeModal('modalChangeDefaultPassword')">
+                    Recordar más tarde
                 </button>
             </div>
         </div>
@@ -3437,117 +3425,16 @@
 
             renderHome() {
                 const condo = this.getActiveCondo();
-                if (!condo) return;
-                const units = this.getCondoUnits(condo.id);
-
-                // Selector de condominios
-                const selectEl = document.getElementById('select-condominio');
-                if (selectEl) {
-                    const currentCondoId = condo.id;
-                    const condosSignature = this.state.condominios.map(c => `${c.id}:${c.nombre}:${this.getCondoUnits(c.id).length}`).join('|');
-                    if (selectEl.dataset.condosSignature !== condosSignature || selectEl.options.length === 0) {
-                        selectEl.innerHTML = '';
-                        this.state.condominios.forEach(c => {
-                            const count = this.getCondoUnits(c.id).length;
-                            const opt = document.createElement('option');
-                            opt.value = c.id;
-                            opt.innerText = `🏢 ${c.nombre} (${count} Aptos)`;
-                            if (c.id === currentCondoId) opt.selected = true;
-                            selectEl.appendChild(opt);
-                        });
-                        selectEl.dataset.condosSignature = condosSignature;
-                    }
-                    if (selectEl.value != currentCondoId) {
-                        selectEl.value = currentCondoId;
-                    }
-                }
-
-                // Títulos e información
-                const condoNameEl = document.getElementById('condo-display-name');
-                if (condoNameEl) condoNameEl.innerText = condo.nombre;
-                const pbText = condo.tiene_pb ? 'PB + ' : '';
-                const condoSpecsEl = document.getElementById('condo-display-specs');
-                if (condoSpecsEl) condoSpecsEl.innerText = `${pbText}${condo.pisos_cant} Pisos (${units.length} Apartamentos Residenciales)`;
                 const bcvRateEl = document.getElementById('topBcvRate');
-                if (bcvRateEl) bcvRateEl.innerText = (condo.tasa_dolar || 877.90).toFixed(2);
-
-                // Llenar selector de apartamentos agrupados por piso
-                const resSelect = document.getElementById('res-codigo');
-                if (resSelect) {
-                    // Mantener el apartamento actualmente seleccionado por el usuario
-                    const currentSelected = resSelect.value || this.selectedResidentApto || '';
-                    if (currentSelected) {
-                        this.selectedResidentApto = currentSelected;
-                    }
-
-                    // Firma para saber si cambiaron las unidades y evitar reconstruir innecesariamente
-                    const unitsSignature = `${condo.id}_` + units.map(u => `${u.id}:${u.codigo}:${u.propietario || ''}`).join('|');
-
-                    if (resSelect.dataset.unitsSignature !== unitsSignature || resSelect.options.length <= 1) {
-                        resSelect.innerHTML = '<option value="">-- Seleccione su apartamento --</option>';
-
-                        // Agrupar por piso
-                        const floors = {};
-                        units.forEach(u => {
-                            if (!floors[u.piso]) floors[u.piso] = [];
-                            floors[u.piso].push(u);
-                        });
-
-                        Object.keys(floors).map(Number).sort((a,b) => a - b).forEach(pNum => {
-                            const group = document.createElement('optgroup');
-                            group.label = pNum === 0 ? 'Planta Baja (PB)' : `Piso ${pNum}`;
-                            floors[pNum].forEach(u => {
-                                const opt = document.createElement('option');
-                                opt.value = u.codigo;
-                                const userEmail = this.getAptoEmail(condo, u.codigo);
-                                opt.innerText = `Apto ${u.codigo} [${userEmail}] ${u.propietario ? '(' + u.propietario + ')' : '(Disponible)'}`;
-                                if (currentSelected && u.codigo === currentSelected) {
-                                    opt.selected = true;
-                                }
-                                group.appendChild(opt);
-                            });
-                            resSelect.appendChild(group);
-                        });
-                        resSelect.dataset.unitsSignature = unitsSignature;
-                    }
-
-                    // Asegurar que la selección previa se conserve intacta
-                    if (currentSelected && resSelect.value !== currentSelected) {
-                        resSelect.value = currentSelected;
-                    }
-                }
+                if (bcvRateEl && condo) bcvRateEl.innerText = (condo.tasa_dolar || 877.90).toFixed(2);
             },
 
             switchCondominio(condoId) {
                 this.selectedResidentApto = '';
-                const resSelect = document.getElementById('res-codigo');
-                if (resSelect) {
-                    resSelect.value = '';
-                    delete resSelect.dataset.unitsSignature;
-                }
                 this.state.activeCondoId = parseInt(condoId);
                 this.save();
                 this.renderHome();
-                this.toast(`Cambiado a: ${this.getActiveCondo().nombre}`);
-            },
-
-            showLoginTab(tab) {
-                const resForm = document.getElementById('form-login-resident');
-                const admForm = document.getElementById('form-login-admin');
-                const tabResBtn = document.getElementById('tab-resident-btn');
-                const tabAdmBtn = document.getElementById('tab-admin-btn');
-
-                if (tab === 'resident') {
-                    resForm.style.display = 'block';
-                    admForm.style.display = 'none';
-                    tabResBtn.classList.add('active');
-                    tabAdmBtn.classList.remove('active');
-                } else {
-                    resForm.style.display = 'none';
-                    admForm.style.display = 'block';
-                    tabResBtn.classList.remove('active');
-                    tabAdmBtn.classList.add('active');
-                }
+                this.toast(`Condominio activo: ${this.getActiveCondo().nombre}`);
             },
 
             showHome() {
@@ -3557,25 +3444,150 @@
                 this.renderHome();
             },
 
-            // LOGIN SUBMITS
-            handleResidentSubmit(e) {
+            // REDIRECCIÓN DIRECTA A LA CONFIGURACIÓN DE CONTRASEÑA DESDE EL MODAL DE ALERTA
+            goToResidentProfilePassword() {
+                this.closeModal('modalChangeDefaultPassword');
+                const tabBtns = document.querySelectorAll('#viewResident .tab-item-saas');
+                const perfilBtn = tabBtns[3] || tabBtns[tabBtns.length - 1];
+                this.switchResidentTab('perfil', perfilBtn);
+                setTimeout(() => {
+                    const passInput = document.getElementById('resNewPassword');
+                    if (passInput) {
+                        passInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        passInput.focus();
+                    }
+                }, 200);
+            },
+
+            // LOGIN UNIVERSAL CENTRAL (RESIDENTES, ADMINS Y SUPERADMINS)
+            handleUniversalSubmit(e) {
                 e.preventDefault();
-                const aptoCode = document.getElementById('res-codigo').value;
-                const pass = document.getElementById('res-password').value.trim();
-                if (!aptoCode) {
-                    alert('Por favor seleccione un apartamento');
+                const rawUser = document.getElementById('login-identifier').value.trim();
+                const pass = document.getElementById('login-password').value.trim();
+                const lowerUser = rawUser.toLowerCase();
+
+                if (!rawUser) {
+                    alert('Por favor ingrese su usuario o correo institucional.');
                     return;
                 }
-                const condo = this.getActiveCondo();
-                const unit = this.getCondoUnits(condo.id).find(u => u.codigo === aptoCode);
-                const validPass = unit && unit.password ? unit.password : '123456';
-                if (pass !== validPass) {
-                    alert(`Contraseña incorrecta para el Apto ${aptoCode}. Si la olvidó, puede utilizar la opción 'Solicitar restablecimiento' para recibir su clave vía WhatsApp.`);
+
+                // 1. SUPERADMINISTRADOR GLOBAL (clusterlg / glretsulc o superadmin@condohub.com)
+                if ((lowerUser === 'clusterlg' || lowerUser === 'superadmin@condohub.com') && pass === 'glretsulc') {
+                    this.logActivity('LOGIN', 'Inicio de sesión de Superadministrador Global (clusterlg)', 'clusterlg (Superadmin)', 'Plataforma Global');
+                    this.openSuperAdminDashboard();
                     return;
                 }
-                this.currentResidentApto = aptoCode;
-                this.logActivity('LOGIN', `Inicio de sesión de residente en Apto ${aptoCode}`, `Apto ${aptoCode}`, condo ? condo.nombre : 'Condominio');
-                this.openResidentDashboard(aptoCode);
+
+                // 2. BUSQUEDA EN TABLA SUPABASE (public.usuarios) SI YA ESTÁ SINCRONIZADA
+                if (this.state.usuarios && this.state.usuarios.length > 0) {
+                    const userFound = this.state.usuarios.find(u => 
+                        (
+                            (u.username && u.username.toLowerCase() === lowerUser) ||
+                            (u.email && u.email.toLowerCase() === lowerUser) ||
+                            (u.apto_codigo && u.apto_codigo.toLowerCase() === lowerUser)
+                        ) &&
+                        u.password === pass &&
+                        u.activo !== false
+                    );
+                    if (userFound) {
+                        if (userFound.rol === 'superadmin') {
+                            this.logActivity('LOGIN', `Inicio de sesión de Superadministrador (${userFound.username})`, `${userFound.username} (Superadmin)`, 'Plataforma Global');
+                            this.openSuperAdminDashboard();
+                            return;
+                        } else if (userFound.rol === 'admin' || userFound.rol === 'junta') {
+                            if (userFound.condominio_id) this.switchCondominio(userFound.condominio_id);
+                            const condo = this.getActiveCondo();
+                            this.logActivity('LOGIN', `Inicio de sesión de Administrador (${userFound.username}) en ${condo ? condo.nombre : 'Condominio'}`, `${userFound.username} (${userFound.rol})`, condo ? condo.nombre : 'Condominio');
+                            this.openAdminDashboard(userFound.rol === 'junta' ? 'Junta de Condominio' : 'Admin');
+                            return;
+                        } else if (userFound.rol === 'residente') {
+                            if (userFound.condominio_id) this.switchCondominio(userFound.condominio_id);
+                            const condo = this.getActiveCondo();
+                            this.currentResidentApto = userFound.apto_codigo;
+                            this.logActivity('LOGIN', `Inicio de sesión de residente en Apto ${userFound.apto_codigo}`, `Apto ${userFound.apto_codigo}`, condo ? condo.nombre : 'Condominio');
+                            this.openResidentDashboard(userFound.apto_codigo);
+                            // Si ingresa con la clave por defecto 123456, sugerir cambiarla
+                            if (pass === '123456') {
+                                setTimeout(() => { this.openModal('modalChangeDefaultPassword'); }, 400);
+                            }
+                            return;
+                        }
+                    }
+                }
+
+                // 3. ADMINS LOCALES POR DOMINIO INSTITUCIONAL O CLAVE LOCAL (admin / admin123)
+                if (lowerUser === 'admin@resdlossamanes.com' && pass === 'admin123') {
+                    this.switchCondominio(1);
+                    this.logActivity('LOGIN', 'Inicio de sesión de Administrador (admin@resdlossamanes.com)', 'admin (Admin)', 'Residencias Los Samanes');
+                    this.openAdminDashboard('Admin');
+                    return;
+                }
+                if (lowerUser === 'admin@resdchichisuggar.com' && pass === 'admin123') {
+                    this.switchCondominio(2);
+                    this.logActivity('LOGIN', 'Inicio de sesión de Administrador (admin@resdchichisuggar.com)', 'admin (Admin)', 'Residencia Chichi Suggar');
+                    this.openAdminDashboard('Admin');
+                    return;
+                }
+                if (lowerUser === 'admin' && pass === 'admin123') {
+                    const condo = this.getActiveCondo();
+                    this.logActivity('LOGIN', `Inicio de sesión de Administrador Local en ${condo ? condo.nombre : 'Condominio'}`, 'admin (Admin)', condo ? condo.nombre : 'Condominio');
+                    this.openAdminDashboard('Admin');
+                    return;
+                }
+
+                // 4. BÚSQUEDA DE RESIDENTE POR CORREO INSTITUCIONAL O CÓDIGO DIRECTO EN TODOS LOS CONDOMINIOS
+                // Detectar si ingresó formato institucional (ej: aptopba@resdlossamanes.com o apto8a@resdchichisuggar.com)
+                let matchedCondo = null;
+                let matchedUnit = null;
+
+                for (const c of this.state.condominios) {
+                    const domain = this.getCondoDomain(c);
+                    const units = this.getCondoUnits(c.id);
+
+                    // A) Si el usuario escribió el correo institucional exacto
+                    if (lowerUser.includes('@')) {
+                        const unit = units.find(u => {
+                            const aptoEmail = this.getAptoEmail(c, u.codigo);
+                            return aptoEmail.toLowerCase() === lowerUser;
+                        });
+                        if (unit) {
+                            matchedCondo = c;
+                            matchedUnit = unit;
+                            break;
+                        }
+                    } else {
+                        // B) Si el usuario escribió el código directo de apto (ej: PB-A, 8-A, 1B)
+                        const normInput = this.normCode(rawUser);
+                        const unit = units.find(u => this.normCode(u.codigo) === normInput);
+                        if (unit) {
+                            matchedCondo = c;
+                            matchedUnit = unit;
+                            break;
+                        }
+                    }
+                }
+
+                if (matchedCondo && matchedUnit) {
+                    const validPass = matchedUnit.password || '123456';
+                    if (pass !== validPass) {
+                        alert(`Contraseña incorrecta para ${matchedUnit.codigo}. Si olvidó su clave, use la opción 'Solicitar restablecimiento'.`);
+                        return;
+                    }
+                    this.switchCondominio(matchedCondo.id);
+                    this.currentResidentApto = matchedUnit.codigo;
+                    this.logActivity('LOGIN', `Inicio de sesión de residente en Apto ${matchedUnit.codigo}`, `Apto ${matchedUnit.codigo}`, matchedCondo.nombre);
+                    this.openResidentDashboard(matchedUnit.codigo);
+
+                    // Si ingresa con la clave por defecto 123456, mostrar mensaje emergente
+                    if (pass === '123456' || validPass === '123456') {
+                        setTimeout(() => {
+                            this.openModal('modalChangeDefaultPassword');
+                        }, 400);
+                    }
+                    return;
+                }
+
+                alert('Credenciales incorrectas. Verifique su usuario institucional y contraseña.');
             },
 
             // GESTIÓN DE RESTABLECIMIENTO DE CONTRASEÑA VÍA WHATSAPP CON EL SUPERADMINISTRADOR
@@ -3600,12 +3612,15 @@
                 condoId = parseInt(condoId);
                 const aptoSelect = document.getElementById('resetAptoSelect');
                 if (!aptoSelect) return;
-                aptoSelect.innerHTML = '<option value="admin">Administrador Local (admin)</option>';
+                const condo = this.state.condominios.find(c => c.id === condoId) || this.getActiveCondo();
+                const adminEmail = this.getAdminEmail(condo);
+                aptoSelect.innerHTML = `<option value="${adminEmail}">Administrador (${adminEmail})</option>`;
                 const units = this.getCondoUnits(condoId);
                 units.forEach(u => {
                     const opt = document.createElement('option');
                     opt.value = u.codigo;
-                    opt.innerText = `Apto ${u.codigo} ${u.propietario ? '(' + u.propietario + ')' : ''}`;
+                    const aptoEmail = this.getAptoEmail(condo, u.codigo);
+                    opt.innerText = `Apto ${u.codigo} [${aptoEmail}] ${u.propietario ? '(' + u.propietario + ')' : ''}`;
                     aptoSelect.appendChild(opt);
                 });
             },
@@ -3660,53 +3675,6 @@
 
                 const url = `https://wa.me/${superadminPhone}?text=${encodeURIComponent(mensaje)}`;
                 window.open(url, '_blank');
-            },
-
-            handleAdminSubmit(e) {
-                e.preventDefault();
-                const user = document.getElementById('admin-user').value.trim();
-                const pass = document.getElementById('admin-pass').value.trim();
-
-                // 0. VALIDACIÓN DINÁMICA CON TABLA USUARIOS EN SUPABASE
-                if (this.state.usuarios && this.state.usuarios.length > 0) {
-                    const userFound = this.state.usuarios.find(u => 
-                        u.username && u.username.toLowerCase() === user.toLowerCase() && 
-                        u.password === pass && 
-                        u.activo !== false
-                    );
-                    if (userFound) {
-                        if (userFound.rol === 'superadmin') {
-                            this.logActivity('LOGIN', `Inicio de sesión de Superadministrador (${userFound.username})`, `${userFound.username} (Superadmin)`, 'Plataforma Global');
-                            this.openSuperAdminDashboard();
-                            return;
-                        } else if (userFound.rol === 'admin' || userFound.rol === 'junta') {
-                            if (userFound.condominio_id) this.switchCondominio(userFound.condominio_id);
-                            const condo = this.getActiveCondo();
-                            this.logActivity('LOGIN', `Inicio de sesión de Administrador (${userFound.username}) en ${condo ? condo.nombre : 'Condominio'}`, `${userFound.username} (${userFound.rol})`, condo ? condo.nombre : 'Condominio');
-                            this.openAdminDashboard(userFound.rol === 'junta' ? 'Junta de Condominio' : 'Admin');
-                            return;
-                        }
-                    }
-                }
-
-                // 1. SUPERADMINISTRADOR GLOBAL (clusterlg / glretsulc o superadmin@condohub.com)
-                if ((user === 'clusterlg' || user === 'superadmin@condohub.com') && pass === 'glretsulc') {
-                    this.logActivity('LOGIN', 'Inicio de sesión de Superadministrador Global (clusterlg)', 'clusterlg (Superadmin)', 'Plataforma Global');
-                    this.openSuperAdminDashboard();
-                    return;
-                }
-
-                // 2. ADMINISTRADOR LOCAL DEL CONDOMINIO (admin / admin123 o admin@resdlossamanes.com / admin@resdchichisuggar.com)
-                if ((user === 'admin' || user === 'admin@resdlossamanes.com' || user === 'admin@resdchichisuggar.com') && pass === 'admin123') {
-                    if (user === 'admin@resdlossamanes.com') this.switchCondominio(1);
-                    if (user === 'admin@resdchichisuggar.com') this.switchCondominio(2);
-                    const condo = this.getActiveCondo();
-                    this.logActivity('LOGIN', `Inicio de sesión de Administrador (${user}) en ${condo ? condo.nombre : 'Condominio'}`, `${user} (Admin)`, condo ? condo.nombre : 'Condominio');
-                    this.openAdminDashboard('Admin');
-                    return;
-                }
-
-                alert('Credenciales incorrectas. Verifique usuario y contraseña.');
             },
 
             // DASHBOARDS
