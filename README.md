@@ -18,8 +18,10 @@ Sistema web rápido, moderno y altamente escalable diseñado como **estructura b
    - Visión consolidada de todos los condominios registrados.
    - Métricas globales: total de condominios, unidades residenciales, pagos en auditoría y deuda global.
    - Conmutador instantáneo de edificio ("Administrar Edificio") para alternar la vista entre condominios sin cerrar sesión.
+   - **Control Exclusivo y Blindaje de Alícuotas**: Conforme a la Ley de Propiedad Horizontal, la modificación de porcentajes de alícuotas está reservada exclusivamente a este rol, bloqueada en los demás niveles y protegida por validación en backend.
 4. **Portal del Administrador Local (`admin_dashboard.php`)**:
-   - Mapa visual interactivo de pisos y unidades residenciales.
+   - Mapa visual interactivo de pisos y unidades residenciales con semáforo de solvencia en vivo.
+   - **Módulo de Perfil del Administrador**: Actualización de datos de contacto institucional (C.I., teléfono principal, secundario, cargo) y cambio de contraseña con verificación obligatoria de la clave actual.
    - Emisión de cuotas ordinarias y extraordinarias (al edificio completo o a unidades específicas).
    - Auditoría de pagos en Bolívares y Dólares con visualización de comprobantes.
    - Atención y resolución de quejas, averías y solicitudes.
@@ -29,11 +31,28 @@ Sistema web rápido, moderno y altamente escalable diseñado como **estructura b
    - Reporte de transferencias, pago móvil o Zelle con carga de comprobantes.
    - Registro de incidencias y quejas con seguimiento de respuestas.
    - Pestaña **"Mi Perfil"** para registrar habitantes, vehículos, mascotas y contacto de emergencia.
-6. **Sincronización Automatizada BCV**:
+6. **Experiencia de Usuario 2.0 (Menú Vertical Retráctil)**:
+   - Nuevo sidebar drawer vertical colapsable implementado transversalmente para los 3 roles (**Admin, Superadmin y Residente**).
+   - Elimina las barras horizontales con scroll molesto.
+   - Modo compacto (`w-16`) con iconos y modo expandido (`w-64`) con persistencia automática de estado en `localStorage`.
+   - Totalmente responsivo en dispositivos móviles mediante overlay táctil con efecto de difuminado (*backdrop blur*).
+7. **Sincronización Automatizada BCV**:
    - Extracción de la tasa oficial del dólar y fecha valor directamente desde [www.bcv.org.ve](https://www.bcv.org.ve/).
-7. **Seguridad y Compatibilidad con Cualquier Hosting**:
+8. **Seguridad y Compatibilidad con Cualquier Hosting**:
    - Configuración desacoplada con soporte para variables de entorno (`.env`).
    - Reglas de seguridad `.htaccess` para Apache/cPanel: protección de archivos sensibles y bloqueo de scripts en subcarpeta `uploads/`.
+
+---
+
+## 🌟 Resumen de Modificaciones Recientes en el Sistema
+
+| Modificación / Característica | Alcance / Rol | Detalle Técnico y Funcional |
+| :--- | :--- | :--- |
+| **Menú Vertical Retráctil** | Administrador, Superadmin y Residente | Sustitución completa de las pestañas horizontales por una barra lateral retráctil vertical (`sidebar-drawer`). Incluye botón flotante en móviles, backdrop blur y guardado del estado en `localStorage`. |
+| **Módulo de Perfil del Administrador** | Administrador Local | Nueva vista para actualizar Cédula de Identidad, teléfonos y cargo de la Junta. Incluye cambio seguro de contraseña validando primero la contraseña actual en frontend y backend (`api/auth.php`). |
+| **Blindaje de Alícuotas Inmobiliarias** | Superadmin Exclusivo | Restricción total de edición de alícuotas únicamente para el Superadmin. En los paneles de Administrador y Residente los campos quedan en modo solo lectura (`readonly`), y la API `api/apartamentos.php` rechaza cualquier alteración no autorizada. |
+| **Presentación Dinámica Remotion** | SaaS Presentation | Video de presentación corporativo actualizado en formatos horizontal (16:9 1080p) y vertical (9:16 reels/shorts) con 7 escenas secuenciales detallando las ventajas competitivas y la evolución tecnológica. |
+
 
 ---
 

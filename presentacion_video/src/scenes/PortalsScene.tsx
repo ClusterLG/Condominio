@@ -56,7 +56,7 @@ export const PortalsScene: React.FC = () => {
             letterSpacing: '0.12em',
           }}
         >
-          Experiencia Diseñada para Cada Actor
+          Experiencia Diseñada para Cada Actor • Superadmin • Junta • Residentes
         </span>
         <h2
           style={{
@@ -67,7 +67,7 @@ export const PortalsScene: React.FC = () => {
             letterSpacing: '-0.02em',
           }}
         >
-          Dos Portales Integrados en Perfecta Sincronía
+          Portales Especializados con Menú Vertical Retráctil
         </h2>
       </div>
 
@@ -135,8 +135,8 @@ export const PortalsScene: React.FC = () => {
                 '🗺️ Mapa de Pisos Interactivo con semáforo de solvencias al día.',
                 '💳 Emisión y reparto equitativo de cuotas ordinarias y extraordinarias.',
                 '🔍 Bandeja de auditoría con visor de captures bancarios y aprobación en 1 clic.',
-                '📢 Cartelera informativa digital para asambleas y comunicados oficiales.',
-                '🛠️ Gestión de mesa de ayuda para filtraciones, ascensores y áreas comunes.',
+                '👤 Módulo de Perfil con datos personales y cambio seguro de contraseña.',
+                '📂 Menú Vertical Retráctil con colapso animado, sin scroll horizontal.',
               ].map((item, idx) => (
                 <div
                   key={idx}
@@ -168,7 +168,7 @@ export const PortalsScene: React.FC = () => {
             }}
           >
             <span style={{ fontSize: 14, color: '#93c5fd', fontWeight: 600 }}>
-              Control Total de Finanzas y Mantenimiento
+              Control Total de Finanzas, Perfil y Mantenimiento
             </span>
             <span style={{ fontSize: 13, color: '#60a5fa', fontWeight: 700 }}>
               100% Digital
@@ -230,7 +230,7 @@ export const PortalsScene: React.FC = () => {
                 '💵 Consulta de saldo exacto en USD y Bolívares oficiales según BCV en vivo.',
                 '🏦 Acceso directo a las cuentas bancarias oficiales (Pago Móvil, Cuentas, Zelle).',
                 '📤 Reporte ágil de transferencias adjuntando el comprobante desde el celular.',
-                '📄 Recibos digitales y constancia de solvencia descargables en cualquier momento.',
+                '📂 Menú Lateral Retráctil adaptable a teléfonos, tablets y computadoras.',
                 '📝 Reporte de averías comunitarias con fotos y respuesta directa de la junta.',
               ].map((item, idx) => (
                 <div
@@ -263,7 +263,7 @@ export const PortalsScene: React.FC = () => {
             }}
           >
             <span style={{ fontSize: 14, color: '#a7f3d0', fontWeight: 600 }}>
-              Sin Aplicaciones Pesadas • Acceso Web Móvil
+              Sin Aplicaciones Pesadas • Navegación Lateral Ágil
             </span>
             <span style={{ fontSize: 13, color: '#34d399', fontWeight: 700 }}>
               Inmediato

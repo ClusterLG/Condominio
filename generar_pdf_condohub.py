@@ -181,11 +181,13 @@ def build_pdf():
         [
             Paragraph("<b>🏢 Para Administradores y Juntas de Condominio:</b><br/>"
                       "• <b>Mapeo Interactivo de Pisos:</b> Visualizacion en tiempo real de solvencia, morosidad y saldos a favor.<br/>"
-                      "• <b>Facturacion Multi-Moneda:</b> Emision de cuotas con alicuotas automaticas y conversion BCV diaria.<br/>"
-                      "• <b>Auditoria y Conciliacion de Pagos:</b> Aprobacion de comprobantes y gestion de saldos a favor.<br/>"
-                      "• <b>Multiples Cuentas Bancarias:</b> Registro de cuentas corrientes, Pago Movil y Zelle.", body_style),
+                      "• <b>Modulo de Perfil del Administrador:</b> Actualizacion de datos de contacto y cambio seguro de clave.<br/>"
+                      "• <b>Menu Vertical Retractil:</b> Navegacion lateral con colapso y memoria localStorage.<br/>"
+                      "• <b>Blindaje de Alicuotas:</b> Modificacion exclusiva por Superadmin segun Ley de Propiedad Horizontal.<br/>"
+                      "• <b>Auditoria y Conciliacion de Pagos:</b> Aprobacion de comprobantes y gestion de saldos a favor.", body_style),
             Paragraph("<b>👤 Para Propietarios y Residentes:</b><br/>"
                       "• <b>Portal Personalizado por Apartamento:</b> Consulta de balance exacto en tiempo real ($ USD y Bs).<br/>"
+                      "• <b>Menu Lateral Responsive:</b> Maximo espacio util en pantalla sin barras de scroll molestas.<br/>"
                       "• <b>Reporte de Pagos Intuitivo:</b> Carga de comprobantes por Pago Movil, Transferencia o Zelle.<br/>"
                       "• <b>Modulo de Atencion / Tickets:</b> Envio y seguimiento de quejas, averias y solicitudes formales.<br/>"
                       "• <b>Seguridad Institucional:</b> Credenciales unicas por apartamento con alerta de cambio de clave.", body_style)

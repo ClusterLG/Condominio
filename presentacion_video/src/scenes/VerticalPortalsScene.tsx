@@ -60,7 +60,7 @@ export const VerticalPortalsScene: React.FC = () => {
             letterSpacing: '0.12em',
           }}
         >
-          Diseñado para Administradores y Vecinos
+          Superadmin • Junta Administradora • Vecinos
         </span>
         <h2
           style={{
@@ -71,7 +71,7 @@ export const VerticalPortalsScene: React.FC = () => {
             letterSpacing: '-0.02em',
           }}
         >
-          Dos Portales en Perfecta Sincronía
+          Portales con Menú Vertical Retráctil
         </h2>
       </div>
 
@@ -125,9 +125,10 @@ export const VerticalPortalsScene: React.FC = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[
               '🗺️ Mapa de pisos con semáforo de solvencias al día.',
-              '💳 Emisión y reparto equitativo de cuotas ordinarias y extraordinarias.',
+              '💳 Emisión y reparto equitativo de cuotas con alícuotas blindadas.',
               '🔍 Auditoría de pagos con visor de comprobantes y validación en 1 clic.',
-              '📢 Cartelera informativa digital para asambleas y comunicados oficiales.',
+              '👤 Nuevo Módulo de Perfil con datos personales y cambio seguro de clave.',
+              '📂 Menú Vertical Retráctil con memoria y colapso animado.',
             ].map((text, idx) => (
               <div key={idx} style={{ fontSize: 18, color: '#e2e8f0', display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span>{text}</span>
@@ -178,7 +179,8 @@ export const VerticalPortalsScene: React.FC = () => {
               '💵 Consulta de saldo exacto en USD y Bolívares oficiales según BCV en vivo.',
               '🏦 Cuentas autorizadas oficiales (Pago Móvil, Cuentas Corrientes, Zelle).',
               '📤 Reporte ágil de pagos con capture desde cualquier celular sin app pesada.',
-              '📝 Mesa de averías para reportar filtraciones y ascensores con fotos.',
+              '📂 Menú Lateral Drawer optimizado para pantallas móviles.',
+              '📝 Mesa de averías para reportar incidencias comunitarias con fotos.',
             ].map((text, idx) => (
               <div key={idx} style={{ fontSize: 18, color: '#e2e8f0', display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span>{text}</span>
