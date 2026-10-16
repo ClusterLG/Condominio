@@ -759,8 +759,24 @@ $condoAptos = $stmtAptosList->fetchAll();
                             <input type="number" min="1" max="20" name="habitantes_cant" id="edit-apto-habitantes" class="form-control">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Alícuota (%):</label>
-                            <input type="number" step="0.01" name="alicuota" id="edit-apto-alicuota" class="form-control">
+                            <label class="form-label">
+                                Alícuota (%):
+                                <?php if (!$isSuperAdmin): ?>
+                                    <span style="background: rgba(239, 68, 68, 0.15); color: #f87171; font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: 600;">
+                                        <i class="bi bi-lock-fill"></i> Solo Superadmin
+                                    </span>
+                                <?php else: ?>
+                                    <span style="background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: 600;">
+                                        <i class="bi bi-pencil-fill"></i> Editable por Superadmin
+                                    </span>
+                                <?php endif; ?>
+                            </label>
+                            <input type="number" step="0.01" name="alicuota" id="edit-apto-alicuota" class="form-control" <?= !$isSuperAdmin ? 'readonly style="background: rgba(255,255,255,0.04); cursor: not-allowed; opacity: 0.8;" title="Solo el Superadministrador puede modificar las alícuotas del condominio"' : '' ?>>
+                            <?php if (!$isSuperAdmin): ?>
+                                <small style="color: var(--text-muted); font-size: 0.72rem; display: block; margin-top: 4px;">
+                                    <i class="bi bi-info-circle"></i> Porcentaje legal de copropiedad (inmodificable por el administrador).
+                                </small>
+                            <?php endif; ?>
                         </div>
                     </div>
 
@@ -985,8 +1001,15 @@ $condoAptos = $stmtAptosList->fetchAll();
                 </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
                     <div class="form-group">
-                        <label class="form-label">Alícuota (%):</label>
-                        <input type="number" step="0.01" name="alicuota" class="form-control" value="2.00" required>
+                        <label class="form-label">
+                            Alícuota (%):
+                            <?php if (!$isSuperAdmin): ?>
+                                <span style="background: rgba(239, 68, 68, 0.15); color: #f87171; font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: 600;">
+                                    <i class="bi bi-lock-fill"></i> Solo Superadmin
+                                </span>
+                            <?php endif; ?>
+                        </label>
+                        <input type="number" step="0.01" name="alicuota" class="form-control" value="2.00" required <?= !$isSuperAdmin ? 'readonly style="background: rgba(255,255,255,0.04); cursor: not-allowed; opacity: 0.8;" title="Solo el Superadmin puede asignar alícuotas personalizadas"' : '' ?>>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Contraseña Inicial:</label>

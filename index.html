@@ -2177,6 +2177,18 @@
                     <label class="form-label">Correo Electrónico:</label>
                     <input type="email" id="adjEmail" class="form-control" placeholder="Ej. carlos@empresa.com">
                 </div>
+                <div class="form-group">
+                    <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>Alícuota (%):</span>
+                        <span id="adjAlicuotaLockBadge" style="background: rgba(239, 68, 68, 0.15); color: #f87171; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: 600;">
+                            <i class="bi bi-lock-fill"></i> Solo Superadmin
+                        </span>
+                    </label>
+                    <input type="number" step="0.01" id="adjAlicuota" class="form-control" readonly style="background: rgba(255,255,255,0.04); cursor: not-allowed; opacity: 0.85;" title="Solo el Superadmin puede modificar las alícuotas">
+                    <small id="adjAlicuotaHelp" style="color: var(--text-muted); font-size: 0.72rem; display: block; margin-top: 3px;">
+                        <i class="bi bi-info-circle"></i> Porcentaje legal de copropiedad (inmodificable por el administrador del condominio).
+                    </small>
+                </div>
                 <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem;">
                     <button class="btn-primary-saas" onclick="app.saveAdjudicacion()">
                         <i class="bi bi-check2"></i> Guardar Adjudicación
@@ -4601,9 +4613,14 @@
                         </td>
                         <td>${solvenciaBadge}</td>
                         <td>
-                            <button class="demo-btn" style="padding: 0.35rem 0.65rem; font-size: 0.78rem;" onclick="app.showSuperResidentPayments(${condo.id}, '${u.codigo}')">
-                                <i class="bi bi-receipt"></i> Pagos (${pagosApto.length})
-                            </button>
+                            <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                                <button class="demo-btn" style="padding: 0.35rem 0.65rem; font-size: 0.78rem;" onclick="app.showSuperResidentPayments(${condo.id}, '${u.codigo}')">
+                                    <i class="bi bi-receipt"></i> Pagos (${pagosApto.length})
+                                </button>
+                                <button class="demo-btn" style="padding: 0.35rem 0.65rem; font-size: 0.78rem; color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);" onclick="app.openAdjudicarModal('${u.codigo}')" title="Modificar Ficha y Alícuota (Superadmin)">
+                                    <i class="bi bi-percent"></i> Modificar Alícuota
+                                </button>
+                            </div>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -5272,11 +5289,47 @@
                 if (!u) return;
 
                 document.getElementById('adjAptoCode').value = u.codigo;
-                document.getElementById('adjModalTitle').innerText = `Adjudicar Apartamento ${u.codigo}`;
+                document.getElementById('adjModalTitle').innerText = `Ficha & Adjudicación: Apartamento ${u.codigo}`;
                 document.getElementById('adjNombre').value = u.propietario || '';
                 document.getElementById('adjCedula').value = u.cedula || '';
                 document.getElementById('adjTelefono').value = u.telefono || '';
                 document.getElementById('adjEmail').value = u.email || '';
+
+                const alicuotaInput = document.getElementById('adjAlicuota');
+                const lockBadge = document.getElementById('adjAlicuotaLockBadge');
+                const helpText = document.getElementById('adjAlicuotaHelp');
+
+                if (alicuotaInput) {
+                    alicuotaInput.value = (u.alicuota !== undefined && u.alicuota !== null) ? Number(u.alicuota).toFixed(2) : '2.00';
+                    const isSuper = (this.currentRole === 'superadmin');
+                    if (isSuper) {
+                        alicuotaInput.readOnly = false;
+                        alicuotaInput.style.background = '';
+                        alicuotaInput.style.cursor = 'text';
+                        alicuotaInput.style.opacity = '1';
+                        if (lockBadge) {
+                            lockBadge.style.background = 'rgba(16, 185, 129, 0.15)';
+                            lockBadge.style.color = '#34d399';
+                            lockBadge.innerHTML = '<i class="bi bi-unlock-fill"></i> Modo Superadmin (Editable)';
+                        }
+                        if (helpText) {
+                            helpText.innerHTML = '<i class="bi bi-pencil-fill" style="color: #34d399;"></i> Como Superadmin tienes permiso para recalcular o ajustar la alícuota legal.';
+                        }
+                    } else {
+                        alicuotaInput.readOnly = true;
+                        alicuotaInput.style.background = 'rgba(255,255,255,0.04)';
+                        alicuotaInput.style.cursor = 'not-allowed';
+                        alicuotaInput.style.opacity = '0.85';
+                        if (lockBadge) {
+                            lockBadge.style.background = 'rgba(239, 68, 68, 0.15)';
+                            lockBadge.style.color = '#f87171';
+                            lockBadge.innerHTML = '<i class="bi bi-lock-fill"></i> Solo Superadmin';
+                        }
+                        if (helpText) {
+                            helpText.innerHTML = '<i class="bi bi-info-circle"></i> Porcentaje legal de copropiedad (inmodificable por el administrador del condominio).';
+                        }
+                    }
+                }
 
                 this.openModal('modalAdjudicar');
             },
@@ -5292,20 +5345,39 @@
                 u.telefono = document.getElementById('adjTelefono').value.trim() || null;
                 u.email = document.getElementById('adjEmail').value.trim() || null;
 
+                let alicuotaCambiada = false;
+                if (this.currentRole === 'superadmin') {
+                    const inputAli = document.getElementById('adjAlicuota');
+                    if (inputAli) {
+                        const val = parseFloat(inputAli.value);
+                        if (!isNaN(val) && val > 0 && val !== u.alicuota) {
+                            u.alicuota = Number(val.toFixed(2));
+                            alicuotaCambiada = true;
+                        }
+                    }
+                }
+
                 this.save();
                 this.closeModal('modalAdjudicar');
                 this.renderAdminFloors();
-                this.toast(`Apartamento ${code} adjudicado`);
-                this.logActivity('ADJUDICACION', `Adjudicación de Apto ${code} a ${u.propietario || 'Copropietario'} (C.I. ${u.cedula || 'N/A'})`, this.currentRole || 'Admin', condo.nombre);
+                if (this.currentRole === 'superadmin') {
+                    this.renderSuperResidents();
+                }
+                this.toast(alicuotaCambiada ? `Apartamento ${code} actualizado (Nueva Alícuota: ${u.alicuota}%)` : `Apartamento ${code} adjudicado`);
+                this.logActivity('ADJUDICACION', `Actualización de Apto ${code}: ${u.propietario || 'Sin adjudicar'}${alicuotaCambiada ? ` | Alícuota fijada en ${u.alicuota}% por Superadmin` : ''}`, this.currentRole || 'Admin', condo.nombre);
 
                 if (sbClient) {
                     try {
-                        await sbClient.from('apartamentos').update({
+                        const updateData = {
                             propietario: u.propietario,
                             cedula: u.cedula,
                             telefono: u.telefono,
                             email: u.email
-                        }).match({ condominio_id: condo.id, codigo: code });
+                        };
+                        if (this.currentRole === 'superadmin') {
+                            updateData.alicuota = u.alicuota;
+                        }
+                        await sbClient.from('apartamentos').update(updateData).match({ condominio_id: condo.id, codigo: code });
                     } catch (e) {
                         console.error('Error adjudicando en Supabase:', e);
                     }

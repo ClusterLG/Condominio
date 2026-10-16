@@ -187,28 +187,50 @@ if ($action === 'update') {
     $mascotas = trim($_POST['mascotas_info'] ?? '');
     $contactoEmergencia = trim($_POST['contacto_emergencia'] ?? '');
     $observaciones = trim($_POST['observaciones'] ?? '');
-    $alicuota = (float)($_POST['alicuota'] ?? 2.0);
     $newPassword = trim($_POST['new_password'] ?? '');
 
     if ($id <= 0) {
         jsonResponse(['success' => false, 'message' => 'ID inválido.'], 400);
     }
 
-    if (!empty($newPassword)) {
-        $hash = password_hash($newPassword, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("UPDATE apartamentos SET 
-            propietario_nombre = ?, cedula_identidad = ?, telefono = ?, telefono_secundario = ?, email = ?, 
-            condicion_ocupacion = ?, habitantes_cant = ?, vehiculos_info = ?, mascotas_info = ?, 
-            contacto_emergencia = ?, observaciones = ?, alicuota = ?, password_hash = ? 
-            WHERE id = ?");
-        $stmt->execute([$nombre, $cedula, $telefono, $telefonoSecundario, $email, $condicion, $habitantes, $vehiculos, $mascotas, $contactoEmergencia, $observaciones, $alicuota, $hash, $id]);
+    $isSuper = isSuperAdmin();
+
+    if ($isSuper && isset($_POST['alicuota'])) {
+        $alicuota = (float)$_POST['alicuota'];
+        if (!empty($newPassword)) {
+            $hash = password_hash($newPassword, PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("UPDATE apartamentos SET 
+                propietario_nombre = ?, cedula_identidad = ?, telefono = ?, telefono_secundario = ?, email = ?, 
+                condicion_ocupacion = ?, habitantes_cant = ?, vehiculos_info = ?, mascotas_info = ?, 
+                contacto_emergencia = ?, observaciones = ?, alicuota = ?, password_hash = ? 
+                WHERE id = ?");
+            $stmt->execute([$nombre, $cedula, $telefono, $telefonoSecundario, $email, $condicion, $habitantes, $vehiculos, $mascotas, $contactoEmergencia, $observaciones, $alicuota, $hash, $id]);
+        } else {
+            $stmt = $pdo->prepare("UPDATE apartamentos SET 
+                propietario_nombre = ?, cedula_identidad = ?, telefono = ?, telefono_secundario = ?, email = ?, 
+                condicion_ocupacion = ?, habitantes_cant = ?, vehiculos_info = ?, mascotas_info = ?, 
+                contacto_emergencia = ?, observaciones = ?, alicuota = ? 
+                WHERE id = ?");
+            $stmt->execute([$nombre, $cedula, $telefono, $telefonoSecundario, $email, $condicion, $habitantes, $vehiculos, $mascotas, $contactoEmergencia, $observaciones, $alicuota, $id]);
+        }
     } else {
-        $stmt = $pdo->prepare("UPDATE apartamentos SET 
-            propietario_nombre = ?, cedula_identidad = ?, telefono = ?, telefono_secundario = ?, email = ?, 
-            condicion_ocupacion = ?, habitantes_cant = ?, vehiculos_info = ?, mascotas_info = ?, 
-            contacto_emergencia = ?, observaciones = ?, alicuota = ? 
-            WHERE id = ?");
-        $stmt->execute([$nombre, $cedula, $telefono, $telefonoSecundario, $email, $condicion, $habitantes, $vehiculos, $mascotas, $contactoEmergencia, $observaciones, $alicuota, $id]);
+        // Solo Superadmin puede modificar alícuotas; el Admin ordinario preserva el porcentaje actual
+        if (!empty($newPassword)) {
+            $hash = password_hash($newPassword, PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("UPDATE apartamentos SET 
+                propietario_nombre = ?, cedula_identidad = ?, telefono = ?, telefono_secundario = ?, email = ?, 
+                condicion_ocupacion = ?, habitantes_cant = ?, vehiculos_info = ?, mascotas_info = ?, 
+                contacto_emergencia = ?, observaciones = ?, password_hash = ? 
+                WHERE id = ?");
+            $stmt->execute([$nombre, $cedula, $telefono, $telefonoSecundario, $email, $condicion, $habitantes, $vehiculos, $mascotas, $contactoEmergencia, $observaciones, $hash, $id]);
+        } else {
+            $stmt = $pdo->prepare("UPDATE apartamentos SET 
+                propietario_nombre = ?, cedula_identidad = ?, telefono = ?, telefono_secundario = ?, email = ?, 
+                condicion_ocupacion = ?, habitantes_cant = ?, vehiculos_info = ?, mascotas_info = ?, 
+                contacto_emergencia = ?, observaciones = ? 
+                WHERE id = ?");
+            $stmt->execute([$nombre, $cedula, $telefono, $telefonoSecundario, $email, $condicion, $habitantes, $vehiculos, $mascotas, $contactoEmergencia, $observaciones, $id]);
+        }
     }
 
     jsonResponse(['success' => true, 'message' => 'Ficha del apartamento y titular actualizada con éxito.']);
@@ -221,11 +243,20 @@ if ($action === 'create_unit') {
     $piso = (int)($_POST['piso'] ?? 0);
     $codigo = strtoupper(trim($_POST['codigo'] ?? ''));
     $nombre = trim($_POST['propietario_nombre'] ?? 'Propietario ' . $codigo);
-    $alicuota = (float)($_POST['alicuota'] ?? 2.0);
     $password = trim($_POST['password'] ?? '123456');
 
     if (empty($codigo)) {
         jsonResponse(['success' => false, 'message' => 'El código del apartamento es obligatorio (ej. 13A, PH-1, Local-1).'], 400);
+    }
+
+    // Alícuota: solo Superadmin puede definir un valor personalizado
+    if (isSuperAdmin() && isset($_POST['alicuota'])) {
+        $alicuota = (float)$_POST['alicuota'];
+    } else {
+        $stmtCount = $pdo->prepare("SELECT COUNT(*) FROM apartamentos WHERE condominio_id = ?");
+        $stmtCount->execute([$cId]);
+        $totalAptos = (int)$stmtCount->fetchColumn();
+        $alicuota = ($totalAptos + 1 > 0) ? round(100.0 / ($totalAptos + 1), 2) : 2.0;
     }
 
     // Verificar si ya existe en este condominio
