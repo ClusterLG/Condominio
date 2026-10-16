@@ -249,6 +249,380 @@
             display: block;
         }
 
+        /* ========================================================
+           MENÚ VERTICAL RETRÁCTIL EXCLUSIVO PARA ADMINISTRADORES
+           ======================================================== */
+        .admin-shell-view {
+            display: none;
+            max-width: 100% !important;
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            min-height: calc(100vh - 65px);
+            box-sizing: border-box;
+        }
+        .admin-shell-view.active {
+            display: flex !important;
+            flex-direction: row;
+        }
+
+        .admin-vertical-sidebar {
+            width: 260px;
+            background: #111827;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+            position: sticky;
+            top: 60px;
+            height: calc(100vh - 60px);
+            z-index: 90;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+
+        .admin-vertical-sidebar.collapsed {
+            width: 74px;
+        }
+
+        .admin-sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.15rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            gap: 0.5rem;
+            min-height: 72px;
+            box-sizing: border-box;
+        }
+
+        .admin-sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .admin-brand-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: #fff;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+        }
+
+        .admin-brand-text {
+            overflow: hidden;
+        }
+
+        .admin-brand-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.01em;
+            line-height: 1.2;
+        }
+
+        .admin-brand-subtitle {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 130px;
+        }
+
+        .btn-admin-sidebar-toggle {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .btn-admin-sidebar-toggle:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .admin-sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            padding: 1rem 0.75rem;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .admin-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 0.75rem 0.9rem;
+            border-radius: 10px;
+            background: transparent;
+            border: 1px solid transparent;
+            color: #94a3b8;
+            font-size: 0.88rem;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            white-space: nowrap;
+            position: relative;
+            user-select: none;
+            box-sizing: border-box;
+        }
+
+        .admin-nav-link i {
+            font-size: 1.15rem;
+            width: 22px;
+            text-align: center;
+            flex-shrink: 0;
+            transition: transform 0.2s, color 0.2s;
+        }
+
+        .admin-nav-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #f8fafc;
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+
+        .admin-nav-link:hover i {
+            color: #60a5fa;
+            transform: scale(1.1);
+        }
+
+        .admin-nav-link.active {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.15));
+            border-color: rgba(59, 130, 246, 0.4);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+        }
+
+        .admin-nav-link.active i {
+            color: #60a5fa;
+        }
+
+        .admin-nav-badge {
+            background: #ef4444;
+            color: #fff;
+            font-size: 0.68rem;
+            padding: 1px 6px;
+            border-radius: 10px;
+            margin-left: auto;
+            font-weight: 700;
+        }
+
+        .admin-sidebar-footer {
+            padding: 0.85rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            background: rgba(11, 15, 25, 0.4);
+        }
+
+        .admin-sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            cursor: pointer;
+            padding: 0.35rem 0.45rem;
+            border-radius: 8px;
+            transition: background 0.2s;
+            overflow: hidden;
+            flex: 1;
+        }
+        .admin-sidebar-user:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .admin-user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #6366f1, #3b82f6);
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.82rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .admin-user-info {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .admin-user-name {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #fff;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.2;
+        }
+
+        .admin-user-role {
+            font-size: 0.68rem;
+            color: #94a3b8;
+        }
+
+        .btn-admin-logout-mini {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #94a3b8;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .btn-admin-logout-mini:hover {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        /* Ocultar elementos cuando el sidebar está retraído */
+        .admin-vertical-sidebar.collapsed .admin-brand-text,
+        .admin-vertical-sidebar.collapsed .nav-label,
+        .admin-vertical-sidebar.collapsed .admin-nav-badge,
+        .admin-vertical-sidebar.collapsed .admin-user-info {
+            display: none !important;
+        }
+
+        .admin-vertical-sidebar.collapsed .admin-nav-link {
+            justify-content: center;
+            padding: 0.75rem 0;
+        }
+
+        .admin-vertical-sidebar.collapsed .admin-sidebar-header {
+            justify-content: center;
+            padding: 1.15rem 0.5rem;
+        }
+
+        .admin-vertical-sidebar.collapsed .admin-sidebar-brand {
+            display: none;
+        }
+
+        .admin-vertical-sidebar.collapsed .admin-sidebar-user {
+            justify-content: center;
+            padding: 0;
+        }
+
+        /* Lienzo Principal del Administrador */
+        .admin-main-canvas {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            background: #0b0f19;
+            overflow-x: hidden;
+        }
+
+        .admin-topbar-header {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 1rem 1.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            position: sticky;
+            top: 60px;
+            z-index: 80;
+        }
+
+        .btn-admin-topbar-toggle {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-admin-topbar-toggle:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .admin-content-inner {
+            padding: 1.5rem 1.75rem 3rem;
+            flex: 1;
+        }
+
+        @media (max-width: 900px) {
+            .admin-vertical-sidebar {
+                position: fixed;
+                left: -270px;
+                top: 60px;
+                bottom: 0;
+                z-index: 1000;
+                width: 260px !important;
+                transition: left 0.28s ease;
+            }
+            .admin-vertical-sidebar.mobile-open {
+                left: 0;
+            }
+            .admin-vertical-sidebar.collapsed {
+                left: -270px;
+            }
+            .admin-vertical-sidebar.mobile-open.collapsed {
+                left: 0;
+                width: 260px !important;
+            }
+            .admin-vertical-sidebar.mobile-open.collapsed .admin-brand-text,
+            .admin-vertical-sidebar.mobile-open.collapsed .nav-label,
+            .admin-vertical-sidebar.mobile-open.collapsed .admin-nav-badge,
+            .admin-vertical-sidebar.mobile-open.collapsed .admin-user-info {
+                display: block !important;
+            }
+            .admin-vertical-sidebar.mobile-open.collapsed .admin-sidebar-brand {
+                display: flex !important;
+            }
+            .admin-topbar-header {
+                padding: 0.85rem 1rem;
+            }
+            .admin-content-inner {
+                padding: 1rem 0.85rem 2rem;
+            }
+        }
+
         /* PIE DE PÁGINA GLOBAL DE LA PLATAFORMA (CLUSTER LG) */
         .app-global-footer {
             background: rgba(17, 24, 39, 0.95);
@@ -1166,82 +1540,102 @@
         </div>
     </section>
 
-    <!-- VISTA: DASHBOARD ADMINISTRADOR LOCAL -->
-    <section id="viewAdmin" class="dashboard-view">
-        <div class="dashboard-header">
-            <div>
-                <span class="stat-badge" style="margin-bottom: 0.4rem; display: inline-flex;"><i class="bi bi-building"></i> <span id="adminViewCondoTitle">Residencias Los Samanes</span></span>
-                <h2 style="font-size: 1.6rem; font-weight: 800; color: #fff; margin: 0;">Panel de Administración del Edificio</h2>
-            </div>
-            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                <button class="btn-primary-saas" style="width: auto;" onclick="app.showEmitirCuotaModal()">
-                    <i class="bi bi-file-earmark-plus"></i> Emitir Cuota
+    <!-- VISTA: DASHBOARD ADMINISTRADOR LOCAL (CON MENÚ VERTICAL RETRÁCTIL) -->
+    <section id="viewAdmin" class="dashboard-view admin-shell-view">
+        <!-- BARRA LATERAL VERTICAL RETRÁCTIL EXCLUSIVA DEL ADMINISTRADOR -->
+        <aside class="admin-vertical-sidebar" id="adminVerticalSidebar">
+            <!-- Encabezado del Menú Lateral -->
+            <div class="admin-sidebar-header">
+                <div class="admin-sidebar-brand">
+                    <div class="admin-brand-icon">
+                        <i class="bi bi-buildings"></i>
+                    </div>
+                    <div class="admin-brand-text">
+                        <div class="admin-brand-title">CondoAdmin</div>
+                        <div class="admin-brand-subtitle" id="adminSidebarCondoName">Panel Principal</div>
+                    </div>
+                </div>
+                <!-- Botón de Colapsar / Desplegar Menú -->
+                <button type="button" class="btn-admin-sidebar-toggle" id="btnAdminSidebarToggle" onclick="app.toggleAdminSidebar()" title="Plegar / Desplegar Menú Lateral">
+                    <i class="bi bi-chevron-left" id="adminSidebarToggleIcon"></i>
                 </button>
-                <button class="demo-btn" style="padding: 0.6rem 1rem; font-size: 0.88rem;" onclick="app.showHome()">
-                    <i class="bi bi-box-arrow-left"></i> Cambiar Edificio / Salir
+            </div>
+
+            <!-- Navegación Vertical -->
+            <nav class="admin-sidebar-nav" id="adminSidebarNav">
+                <button type="button" class="admin-nav-link active" data-tab="mapa" onclick="app.switchAdminTab('mapa', this)" title="Mapa de Pisos & Adjudicación">
+                    <i class="bi bi-grid-fill"></i>
+                    <span class="nav-label">Mapa & Adjudicación</span>
+                </button>
+                <button type="button" class="admin-nav-link" data-tab="cuotas" onclick="app.switchAdminTab('cuotas', this)" title="Historial de Cuotas">
+                    <i class="bi bi-journal-text"></i>
+                    <span class="nav-label">Historial de Cuotas</span>
+                </button>
+                <button type="button" class="admin-nav-link" data-tab="pagos" onclick="app.switchAdminTab('pagos', this)" title="Auditoría de Pagos">
+                    <i class="bi bi-cash-coin"></i>
+                    <span class="nav-label">Auditoría de Pagos</span>
+                </button>
+                <button type="button" class="admin-nav-link" data-tab="tickets" onclick="app.switchAdminTab('tickets', this)" title="Solicitudes & Quejas">
+                    <i class="bi bi-chat-square-dots"></i>
+                    <span class="nav-label">Solicitudes & Quejas</span>
+                    <span id="adminTicketsBadge" class="admin-nav-badge" style="display:none;">0</span>
+                </button>
+                <button type="button" class="admin-nav-link" data-tab="comunicados" onclick="app.switchAdminTab('comunicados', this)" title="Cartelera Informativa">
+                    <i class="bi bi-megaphone"></i>
+                    <span class="nav-label">Cartelera Informativa</span>
+                </button>
+                <button type="button" class="admin-nav-link" data-tab="config" onclick="app.switchAdminTab('config', this)" title="Cuentas Bancarias Receptoras">
+                    <i class="bi bi-wallet2"></i>
+                    <span class="nav-label">Cuentas Bancarias</span>
+                </button>
+                <button type="button" class="admin-nav-link" data-tab="perfil" onclick="app.switchAdminTab('perfil', this)" title="Mi Perfil de Administrador">
+                    <i class="bi bi-person-gear"></i>
+                    <span class="nav-label">Mi Perfil Admin</span>
+                </button>
+            </nav>
+
+            <!-- Pie del Menú Lateral -->
+            <div class="admin-sidebar-footer">
+                <div class="admin-sidebar-user" onclick="app.switchAdminTab('perfil')" title="Ver / Editar Mi Perfil">
+                    <div class="admin-user-avatar" id="adminSidebarAvatar">AD</div>
+                    <div class="admin-user-info">
+                        <div class="admin-user-name" id="adminSidebarUserName">Administrador</div>
+                        <div class="admin-user-role">Panel Oficial</div>
+                    </div>
+                </div>
+                <button type="button" class="btn-admin-logout-mini" onclick="app.showHome()" title="Salir del Administrador">
+                    <i class="bi bi-box-arrow-left"></i>
                 </button>
             </div>
-        </div>
+        </aside>
 
-        <!-- DASHBOARD GENERAL SINTETIZADO (MÉTRICAS Y AUDITORÍA GENERAL DEL CONDOMINIO) -->
-        <div id="adminSummaryDashboard" style="margin-bottom: 1.5rem;">
-            <!-- Tarjetas de Métricas Globales del Inmueble -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
-                <div class="stat-card-saas">
-                    <div class="stat-icon-saas" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;"><i class="bi bi-door-open"></i></div>
+        <!-- LIENZO PRINCIPAL DEL ADMINISTRADOR -->
+        <main class="admin-main-canvas" id="adminMainCanvas">
+            <!-- Header Compacto Superior del Canvas -->
+            <div class="admin-topbar-header">
+                <div style="display: flex; align-items: center; gap: 0.85rem;">
+                    <button type="button" class="btn-admin-topbar-toggle" onclick="app.toggleAdminSidebar()" title="Plegar / Desplegar Menú">
+                        <i class="bi bi-list"></i>
+                    </button>
                     <div>
-                        <div style="font-size: 1.45rem; font-weight: 800; color: #fff;" id="adminStatUnits">0</div>
-                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Total Apartamentos</div>
+                        <span class="stat-badge" style="margin-bottom: 0.2rem; display: inline-flex;"><i class="bi bi-building"></i> <span id="adminViewCondoTitle">Residencias Los Samanes</span></span>
+                        <h2 style="font-size: 1.4rem; font-weight: 800; color: #fff; margin: 0;" id="adminCurrentTabHeading">Mapa de Pisos & Adjudicación</h2>
                     </div>
                 </div>
-                <div class="stat-card-saas">
-                    <div class="stat-icon-saas" style="background: rgba(139, 92, 246, 0.15); color: #c084fc;"><i class="bi bi-people-fill"></i></div>
-                    <div>
-                        <div style="font-size: 1.45rem; font-weight: 800; color: #fff;" id="adminStatOcupacion">0%</div>
-                        <div style="font-size: 0.8rem; color: var(--text-secondary);" id="adminStatOcupacionLabel">Ocupación Adjudicada</div>
-                    </div>
-                </div>
-                <div class="stat-card-saas">
-                    <div class="stat-icon-saas" style="background: rgba(16, 185, 129, 0.15); color: #34d399;"><i class="bi bi-shield-check"></i></div>
-                    <div>
-                        <div style="font-size: 1.45rem; font-weight: 800; color: #34d399;" id="adminStatOcupacionEfectiva">0%</div>
-                        <div style="font-size: 0.8rem; color: var(--text-secondary);" id="adminStatOcupacionEfectivaLabel">Ocupación Efectiva</div>
-                    </div>
-                </div>
-                <div class="stat-card-saas">
-                    <div class="stat-icon-saas" style="background: rgba(16, 185, 129, 0.15); color: #34d399;"><i class="bi bi-check2-circle"></i></div>
-                    <div>
-                        <div style="font-size: 1.45rem; font-weight: 800; color: #34d399;" id="adminStatSolventes">0</div>
-                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Residentes Solventes (Al Día)</div>
-                    </div>
-                </div>
-                <div class="stat-card-saas">
-                    <div class="stat-icon-saas" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;"><i class="bi bi-exclamation-octagon"></i></div>
-                    <div>
-                        <div style="font-size: 1.45rem; font-weight: 800; color: #ef4444;" id="adminStatMorosos">0</div>
-                        <div style="font-size: 0.8rem; color: var(--text-secondary);">Residentes Morosos</div>
-                    </div>
-                </div>
-                <div class="stat-card-saas">
-                    <div class="stat-icon-saas" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;"><i class="bi bi-cash-stack"></i></div>
-                    <div>
-                        <div style="font-size: 1.35rem; font-weight: 800; color: #fbbf24;" id="adminStatDeudaTotal">$0.00 USD</div>
-                        <div style="font-size: 0.8rem; color: var(--text-secondary);" id="adminStatDeudaTotalBs">Total Deuda Acumulada</div>
-                    </div>
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+                    <button class="btn-primary-saas" style="width: auto; padding: 0.55rem 1rem; font-size: 0.85rem;" onclick="app.showEmitirCuotaModal()">
+                        <i class="bi bi-file-earmark-plus"></i> Emitir Cuota
+                    </button>
+                    <button class="demo-btn" style="padding: 0.55rem 0.95rem; font-size: 0.85rem;" onclick="app.showHome()">
+                        <i class="bi bi-box-arrow-left"></i> Cambiar Edificio / Salir
+                    </button>
                 </div>
             </div>
-        </div>
 
-        <!-- TABS DE GESTIÓN -->
-        <div class="nav-tabs-saas">
-            <button class="tab-item-saas active" onclick="app.switchAdminTab('mapa', this)"><i class="bi bi-grid-fill"></i> Mapa de Pisos & Adjudicación</button>
-            <button class="tab-item-saas" onclick="app.switchAdminTab('cuotas', this)"><i class="bi bi-journal-text"></i> Historial de Cuotas</button>
-            <button class="tab-item-saas" onclick="app.switchAdminTab('pagos', this)"><i class="bi bi-cash-coin"></i> Auditoría de Pagos</button>
-            <button class="tab-item-saas" onclick="app.switchAdminTab('tickets', this)"><i class="bi bi-chat-square-dots"></i> Solicitudes & Quejas <span id="adminTicketsBadge" style="background:#ef4444; color:#fff; font-size:0.68rem; padding: 1px 6px; border-radius:10px; margin-left:3px; display:none;">0</span></button>
-            <button class="tab-item-saas" onclick="app.switchAdminTab('comunicados', this)"><i class="bi bi-megaphone"></i> Cartelera Informativa</button>
-            <button class="tab-item-saas" onclick="app.switchAdminTab('config', this)"><i class="bi bi-wallet2"></i> Cuentas</button>
-            <button class="tab-item-saas" onclick="app.switchAdminTab('perfil', this)"><i class="bi bi-person-gear"></i> Mi Perfil</button>
-        </div>
+            <!-- Contenido Interior Dinámico -->
+            <div class="admin-content-inner">
+                <!-- DASHBOARD GENERAL SINTETIZADO (MÉTRICAS Y AUDITORÍA GENERAL DEL CONDOMINIO) -->
+                <div id="adminSummaryDashboard" style="margin-bottom: 1.5rem;">
 
         <!-- TAB: MAPA DE PISOS -->
         <div id="adminTabMapa">
@@ -1479,6 +1873,9 @@
                 </button>
             </div>
         </div>
+
+            </div><!-- /.admin-content-inner -->
+        </main><!-- /.admin-main-canvas -->
     </section>
 
     <!-- VISTA: PORTAL RESIDENTE -->
@@ -4561,11 +4958,31 @@
                 const condo = this.getActiveCondo();
                 this.ensureCondoCuentas(condo);
                 document.getElementById('adminViewCondoTitle').innerText = `${condo.nombre} (${role})`;
+
+                // Sincronizar datos en el menú lateral retraíble
+                const condoSideName = document.getElementById('adminSidebarCondoName');
+                if (condoSideName) condoSideName.innerText = condo.nombre;
+                const prof = condo.adminProfile || {};
+                const adminName = prof.nombre || `Admin ${condo.nombre}`;
+                const sideUserName = document.getElementById('adminSidebarUserName');
+                if (sideUserName) sideUserName.innerText = adminName;
+                const initials = adminName.split(' ').filter(Boolean).map(w => w[0]).slice(0, 2).join('').toUpperCase() || 'AD';
+                const sideAvatar = document.getElementById('adminSidebarAvatar');
+                if (sideAvatar) sideAvatar.innerText = initials;
+
+                // Restaurar preferencia colapsada guardada
+                try {
+                    const savedCollapsed = localStorage.getItem('condo_admin_sidebar_collapsed') === '1';
+                    const sb = document.getElementById('adminVerticalSidebar');
+                    const icon = document.getElementById('adminSidebarToggleIcon');
+                    if (sb && savedCollapsed && window.innerWidth > 900) {
+                        sb.classList.add('collapsed');
+                        if (icon) icon.className = 'bi bi-chevron-right';
+                    }
+                } catch (e) {}
+
                 this.renderAdminMetrics();
-                this.renderAdminFloors();
-                this.renderCuotasTable();
-                this.renderPagosTable();
-                this.renderAdminCuentas();
+                this.switchAdminTab(this.currentAdminTab || 'mapa');
             },
 
             // 4. FILTROS DEL MAPA DE PISOS (TODOS, DISPONIBLES, ADJUDICADOS, AL DÍA, MOROSOS)
@@ -4703,8 +5120,25 @@
 
             switchAdminTab(tabName, btnEl) {
                 this.currentAdminTab = tabName;
-                document.querySelectorAll('#viewAdmin .tab-item-saas').forEach(b => b.classList.remove('active'));
-                if (btnEl) btnEl.classList.add('active');
+                document.querySelectorAll('#adminVerticalSidebar .admin-nav-link').forEach(b => b.classList.remove('active'));
+                
+                const targetBtn = btnEl || document.querySelector(`#adminVerticalSidebar .admin-nav-link[data-tab="${tabName}"]`);
+                if (targetBtn) targetBtn.classList.add('active');
+
+                // Títulos dinámicos de cabecera
+                const tabTitles = {
+                    'mapa': 'Mapa de Pisos & Adjudicación',
+                    'cuotas': 'Historial y Emisión de Cuotas',
+                    'pagos': 'Bandeja de Auditoría de Pagos',
+                    'tickets': 'Solicitudes, Quejas y Averías',
+                    'comunicados': 'Cartelera Informativa Digital',
+                    'config': 'Cuentas Bancarias Receptoras',
+                    'perfil': 'Mi Perfil de Administrador'
+                };
+                const headingEl = document.getElementById('adminCurrentTabHeading');
+                if (headingEl && tabTitles[tabName]) {
+                    headingEl.innerText = tabTitles[tabName];
+                }
 
                 document.getElementById('adminTabMapa').style.display = tabName === 'mapa' ? 'block' : 'none';
                 document.getElementById('adminTabCuotas').style.display = tabName === 'cuotas' ? 'block' : 'none';
@@ -4721,6 +5155,30 @@
                 if (tabName === 'comunicados') this.renderComunicados();
                 if (tabName === 'config') this.renderAdminCuentas();
                 if (tabName === 'perfil') this.renderAdminProfile();
+
+                // Cerrar menú en móviles al hacer clic en una opción
+                if (window.innerWidth <= 900) {
+                    const sb = document.getElementById('adminVerticalSidebar');
+                    if (sb) sb.classList.remove('mobile-open');
+                }
+            },
+
+            toggleAdminSidebar() {
+                const sb = document.getElementById('adminVerticalSidebar');
+                if (!sb) return;
+                const icon = document.getElementById('adminSidebarToggleIcon');
+
+                if (window.innerWidth <= 900) {
+                    sb.classList.toggle('mobile-open');
+                } else {
+                    const isCollapsed = sb.classList.toggle('collapsed');
+                    if (icon) {
+                        icon.className = isCollapsed ? 'bi bi-chevron-right' : 'bi bi-chevron-left';
+                    }
+                    try {
+                        localStorage.setItem('condo_admin_sidebar_collapsed', isCollapsed ? '1' : '0');
+                    } catch (e) {}
+                }
             },
 
             // MI PERFIL DE ADMINISTRADOR
@@ -4963,8 +5421,7 @@
                 // CARGA INMEDIATA: Actualizar tabla y cambiar a la pestaña 'cuotas' al instante
                 this.renderCuotasTable();
                 this.renderAdminMetrics();
-                const tabCuotasBtn = document.querySelectorAll('.tab-item-saas')[1];
-                this.switchAdminTab('cuotas', tabCuotasBtn);
+                this.switchAdminTab('cuotas');
 
                 let mensajeToast = '';
                 if (tipo === 'ordinaria') {
