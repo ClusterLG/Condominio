@@ -201,11 +201,42 @@ if ($action === 'create') {
 
         $pdo->commit();
 
+        // Obtener las unidades generadas para sincronización
+        $stmtUnits = $pdo->prepare("SELECT id, piso, codigo, alicuota, propietario_nombre, cedula_identidad, telefono, email FROM apartamentos WHERE condominio_id = ? ORDER BY piso ASC, codigo ASC");
+        $stmtUnits->execute([$condominioId]);
+        $unitsGeneradas = $stmtUnits->fetchAll();
+
+        // Sincronizar hacia Supabase: Condominio, Apartamentos y N apartamentos + 1 admin con claves por defecto
+        $condoData = [
+            'id' => $condominioId,
+            'slug' => $slug,
+            'nombre' => $nombre,
+            'rif' => $rif,
+            'direccion' => $direccion,
+            'pisos_cant' => $pisosCant,
+            'tiene_pb' => $tienePB,
+            'aptos_pb_cant' => $aptosPBCant,
+            'aptos_por_piso' => $aptosPorPiso,
+            'tasa_dolar' => $tasaDolar,
+            'banco_pago_movil' => $bancoPagoMovil,
+            'banco_transferencia' => $bancoTransferencia,
+            'cuenta_zelle' => $cuentaZelle
+        ];
+        $adminInfo = [
+            'username' => $adminUsername,
+            'nombre' => $adminNombre
+        ];
+        $syncSupabase = syncNewCondominioAndUsersToSupabase($condoData, $unitsGeneradas, $adminInfo);
+
+        $totalUsuarios = count($unitsGeneradas) + 1;
+
         jsonResponse([
             'success' => true,
-            'message' => "Condominio '{$nombre}' creado con éxito. Se generaron {$resultadoGen['total_generados']} apartamentos residenciales.",
+            'message' => "Condominio '{$nombre}' creado con éxito. Se generaron {$resultadoGen['total_generados']} apartamentos residenciales y {$totalUsuarios} usuarios ({$resultadoGen['total_generados']} residentes con clave 123456 + 1 admin con clave admin123) listos en Supabase.",
             'condominio_id' => $condominioId,
             'total_unidades' => $resultadoGen['total_generados'],
+            'total_usuarios' => $totalUsuarios,
+            'supabase_sync' => $syncSupabase,
             'codigos' => $resultadoGen['codigos']
         ]);
 

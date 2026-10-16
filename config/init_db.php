@@ -70,6 +70,10 @@ function initializeDatabase() {
             `rol` ENUM('super_admin', 'admin') NOT NULL DEFAULT 'admin',
             `nombre` VARCHAR(100) NOT NULL,
             `email` VARCHAR(100) NULL,
+            `cedula` VARCHAR(30) NULL,
+            `telefono` VARCHAR(50) NULL,
+            `telefono_secundario` VARCHAR(50) NULL,
+            `cargo` VARCHAR(100) NULL DEFAULT 'Administrador de Condominio',
             `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (`condominio_id`) REFERENCES `condominios`(`id`) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");

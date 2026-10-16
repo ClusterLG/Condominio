@@ -158,6 +158,7 @@ const AdminApp = {
         if (viewId === 'tickets') this.loadTickets();
         if (viewId === 'comunicados') this.loadComunicados();
         if (viewId === 'config') this.loadConfig();
+        if (viewId === 'perfil') this.loadAdminProfile();
     },
 
     async syncBCV() {
@@ -842,6 +843,45 @@ const AdminApp = {
         if (document.getElementById('cfg-pago-movil')) document.getElementById('cfg-pago-movil').value = c.banco_pago_movil || '';
         if (document.getElementById('cfg-transferencia')) document.getElementById('cfg-transferencia').value = c.banco_transferencia || '';
         if (document.getElementById('cfg-zelle')) document.getElementById('cfg-zelle').value = c.cuenta_zelle || '';
+    },
+
+    // 8. Mi Perfil de Administrador
+    async loadAdminProfile() {
+        const res = await apiRequest('api/auth.php?action=get_admin_profile');
+        if (!res.success || !res.user) return;
+        const u = res.user;
+
+        // Inputs del Formulario
+        if (document.getElementById('admin-profile-nombre')) document.getElementById('admin-profile-nombre').value = u.nombre || '';
+        if (document.getElementById('admin-profile-username')) document.getElementById('admin-profile-username').value = u.username || '';
+        if (document.getElementById('admin-profile-email')) document.getElementById('admin-profile-email').value = u.email || '';
+        if (document.getElementById('admin-profile-cedula')) document.getElementById('admin-profile-cedula').value = u.cedula || '';
+        if (document.getElementById('admin-profile-telefono')) document.getElementById('admin-profile-telefono').value = u.telefono || '';
+        if (document.getElementById('admin-profile-telefono-sec')) document.getElementById('admin-profile-telefono-sec').value = u.telefono_secundario || '';
+        if (document.getElementById('admin-profile-cargo')) document.getElementById('admin-profile-cargo').value = u.cargo || '';
+
+        // Reset inputs de clave
+        if (document.getElementById('admin-profile-curr-pass')) document.getElementById('admin-profile-curr-pass').value = '';
+        if (document.getElementById('admin-profile-new-pass')) document.getElementById('admin-profile-new-pass').value = '';
+        if (document.getElementById('admin-profile-confirm-pass')) document.getElementById('admin-profile-confirm-pass').value = '';
+
+        // Actualizar Banner
+        if (document.getElementById('admin-banner-name')) document.getElementById('admin-banner-name').textContent = u.nombre || 'Administrador';
+        if (document.getElementById('admin-banner-cargo')) {
+            document.getElementById('admin-banner-cargo').innerHTML = '<i class="bi bi-briefcase text-primary"></i> ' + (u.cargo || (u.rol === 'super_admin' ? 'Super Administrador Global' : 'Administrador de Condominio'));
+        }
+        if (document.getElementById('admin-banner-username')) document.getElementById('admin-banner-username').textContent = '@' + (u.username || 'admin');
+        if (document.getElementById('admin-banner-condo')) document.getElementById('admin-banner-condo').textContent = u.condominio_nombre || 'Condominio Central';
+        if (document.getElementById('admin-banner-created') && u.created_at) {
+            const dateStr = new Date(u.created_at).toLocaleDateString('es-VE', { year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('admin-banner-created').textContent = 'Miembro desde: ' + dateStr;
+        }
+
+        const initials = (u.nombre || 'AD').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase() || 'AD';
+        if (document.getElementById('admin-banner-avatar')) document.getElementById('admin-banner-avatar').textContent = initials;
+        if (document.getElementById('sidebar-user-avatar')) document.getElementById('sidebar-user-avatar').textContent = initials;
+        if (document.getElementById('sidebar-user-name')) document.getElementById('sidebar-user-name').textContent = u.nombre || 'Administrador';
+        if (document.getElementById('sidebar-user-role')) document.getElementById('sidebar-user-role').textContent = u.cargo || (u.rol === 'super_admin' ? 'Super Administrador' : 'Administrador Local');
     },
 
     // 8. Métodos de Gestión Multi-Condominio y Estructura

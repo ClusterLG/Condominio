@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS public.usuarios (
     nombre_completo VARCHAR(150),
     cedula VARCHAR(50),
     telefono VARCHAR(50),
+    telefono_secundario VARCHAR(50),
+    cargo VARCHAR(100) DEFAULT 'Administrador de Condominio',
     rol VARCHAR(50) NOT NULL DEFAULT 'residente', -- 'superadmin', 'admin', 'junta', 'residente'
     apto_codigo VARCHAR(20),
     activo BOOLEAN DEFAULT true,
@@ -34,26 +36,43 @@ GRANT ALL ON TABLE public.usuarios TO anon, authenticated;
 GRANT ALL ON SEQUENCE public.usuarios_id_seq TO anon, authenticated;
 
 -- 3. INSERTAR USUARIOS ADMINISTRATIVOS
-DELETE FROM public.usuarios WHERE username IN (
-    'clusterlg', 
-    'admin@resdlossamanes.com', 
-    'admin@resdchichisuggar.com', 
-    'admin', 
-    'admin_chichi'
-);
-
+-- 3.1 Superadministrador Global
 INSERT INTO public.usuarios (condominio_id, username, email, password, nombre_completo, cedula, telefono, rol, apto_codigo, activo)
-VALUES
--- Superadministrador Global
-(NULL, 'clusterlg', 'superadmin@condohub.com', 'glretsulc', 'Superadministrador Global ClusterLG', 'V-00.000.000', '0414-1234567', 'superadmin', NULL, true),
+VALUES (NULL, 'clusterlg', 'superadmin@condohub.com', 'glretsulc', 'Superadministrador Global ClusterLG', 'V-00.000.000', '0414-1234567', 'superadmin', NULL, true)
+ON CONFLICT (username) DO UPDATE 
+SET password = EXCLUDED.password, nombre_completo = EXCLUDED.nombre_completo, activo = true;
 
--- Administrador Los Samanes (Email Oficial)
-(1, 'admin@resdlossamanes.com', 'admin@resdlossamanes.com', 'admin123', 'Administrador Residencias Los Samanes', 'J-12345678-0', '0414-1234567', 'admin', NULL, true),
+-- 3.2 Administradores Oficiales de CADA Condominio Registrado (1 Admin por cada Condominio)
+INSERT INTO public.usuarios (condominio_id, username, email, password, nombre_completo, cedula, telefono, rol, apto_codigo, activo)
+SELECT 
+    c.id AS condominio_id,
+    LOWER(CONCAT('admin@', CASE 
+        WHEN c.id = 1 THEN 'resdlossamanes.com'
+        WHEN c.id = 2 THEN 'resdchichisuggar.com'
+        ELSE CONCAT('resd', LOWER(REPLACE(REPLACE(c.slug, '-', ''), ' ', '')), '.com')
+    END)) AS username,
+    LOWER(CONCAT('admin@', CASE 
+        WHEN c.id = 1 THEN 'resdlossamanes.com'
+        WHEN c.id = 2 THEN 'resdchichisuggar.com'
+        ELSE CONCAT('resd', LOWER(REPLACE(REPLACE(c.slug, '-', ''), ' ', '')), '.com')
+    END)) AS email,
+    'admin123' AS password, -- Clave por defecto para el administrador: admin123
+    CONCAT('Administrador ', c.nombre) AS nombre_completo,
+    COALESCE(c.rif, 'J-00000000-0') AS cedula,
+    '0414-1234567' AS telefono,
+    'admin' AS rol,
+    NULL AS apto_codigo,
+    true AS activo
+FROM public.condominios c
+ON CONFLICT (username) DO UPDATE 
+SET 
+    password = EXCLUDED.password,
+    nombre_completo = EXCLUDED.nombre_completo,
+    cedula = EXCLUDED.cedula,
+    condominio_id = EXCLUDED.condominio_id,
+    activo = true;
 
--- Administrador Chichi Suggar (Email Oficial)
-(2, 'admin@resdchichisuggar.com', 'admin@resdchichisuggar.com', 'admin123', 'Administrador Residencia Chichi Suggar', 'J-4658975-1', '0414-9988776', 'admin', NULL, true);
-
--- 4. POBLAR AUTOMÁTICAMENTE TODOS LOS APARTAMENTOS CON EL FORMATO INSTITUCIONAL EXACTO:
+-- 4. POBLAR AUTOMÁTICAMENTE TODOS LOS APARTAMENTOS (1 Usuario por cada Apartamento):
 -- Ejemplos generados:
 --   Samanes PB-A -> aptopba@resdlossamanes.com
 --   Samanes 1B   -> apto1b@resdlossamanes.com
@@ -70,7 +89,7 @@ SELECT
         CASE 
             WHEN a.condominio_id = 1 THEN 'resdlossamanes.com'
             WHEN a.condominio_id = 2 THEN 'resdchichisuggar.com'
-            ELSE CONCAT('resd', LOWER(REPLACE(c.slug, '-', '')), '.com')
+            ELSE CONCAT('resd', LOWER(REPLACE(REPLACE(c.slug, '-', ''), ' ', '')), '.com')
         END
     )) AS username,
     -- Email institucional
@@ -81,10 +100,10 @@ SELECT
         CASE 
             WHEN a.condominio_id = 1 THEN 'resdlossamanes.com'
             WHEN a.condominio_id = 2 THEN 'resdchichisuggar.com'
-            ELSE CONCAT('resd', LOWER(REPLACE(c.slug, '-', '')), '.com')
+            ELSE CONCAT('resd', LOWER(REPLACE(REPLACE(c.slug, '-', ''), ' ', '')), '.com')
         END
     )) AS email,
-    '123456' AS password, -- Clave por defecto inicial unificada: 123456
+    '123456' AS password, -- Clave por defecto inicial para residentes: 123456
     COALESCE(a.propietario, CONCAT('Copropietario Apto ', a.codigo)),
     a.cedula,
     a.telefono,
@@ -99,8 +118,12 @@ SET
     nombre_completo = EXCLUDED.nombre_completo,
     cedula = EXCLUDED.cedula,
     telefono = EXCLUDED.telefono,
-    email = EXCLUDED.email;
+    email = EXCLUDED.email,
+    condominio_id = EXCLUDED.condominio_id,
+    apto_codigo = EXCLUDED.apto_codigo,
+    activo = true;
 
 -- 5. ASEGURAR QUE TODOS LOS USUARIOS RESIDENCIALES TENGAN LA CLAVE 123456 Y LOS ADMINS admin123
 UPDATE public.usuarios SET password = '123456' WHERE rol = 'residente';
 UPDATE public.usuarios SET password = 'admin123' WHERE rol = 'admin';
+UPDATE public.usuarios SET password = 'glretsulc' WHERE rol = 'superadmin';

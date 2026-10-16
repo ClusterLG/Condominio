@@ -133,6 +133,9 @@ $fechaValorBCV = getConfig('tasa_bcv_fecha_valor', 'Oficial');
             <span style="font-size: 0.85rem; color: var(--text-secondary);">
                 <i class="bi bi-person-circle"></i> <?= htmlspecialchars($_SESSION['user_name'] ?? 'Super Admin') ?>
             </span>
+            <a href="admin_dashboard.php" class="btn btn-secondary btn-sm" title="Ir al panel y editar mi perfil">
+                <i class="bi bi-person-gear"></i> Mi Perfil
+            </a>
             <a href="api/auth.php?action=logout" class="btn btn-secondary btn-sm" title="Cerrar Sesión">
                 <i class="bi bi-box-arrow-right"></i> Salir
             </a>
@@ -578,9 +581,11 @@ const SuperApp = {
         let pbStr = tienePB ? `PB (${pbCant} aptos) + ` : '';
         let phStr = tienePH ? ` + PH (${phCant} aptos)` : '';
 
+        const totalUsuarios = total + 1;
         document.getElementById('preview-text').innerHTML = `
             <strong>Resumen de Arquitectura:</strong> Se generarán <strong>${total} apartamentos residenciales</strong> (${pbStr}${ejEjemplo}${phStr}).<br>
-            <span style="color: var(--success); font-weight: 600;">Alícuota calculada automáticamente: ~${alicuota}% por apartamento.</span>
+            <span style="color: var(--success); font-weight: 600;">Alícuota calculada automáticamente: ~${alicuota}% por apartamento.</span><br>
+            <span style="color: var(--primary); font-weight: 600;"><i class="bi bi-people-fill"></i> Usuarios en Supabase: <strong>${totalUsuarios} usuarios listos</strong> (${total} residentes con clave <code>123456</code> + 1 admin con clave <code>admin123</code>).</span>
         `;
     },
 

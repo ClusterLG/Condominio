@@ -1240,6 +1240,7 @@
             <button class="tab-item-saas" onclick="app.switchAdminTab('tickets', this)"><i class="bi bi-chat-square-dots"></i> Solicitudes & Quejas <span id="adminTicketsBadge" style="background:#ef4444; color:#fff; font-size:0.68rem; padding: 1px 6px; border-radius:10px; margin-left:3px; display:none;">0</span></button>
             <button class="tab-item-saas" onclick="app.switchAdminTab('comunicados', this)"><i class="bi bi-megaphone"></i> Cartelera Informativa</button>
             <button class="tab-item-saas" onclick="app.switchAdminTab('config', this)"><i class="bi bi-wallet2"></i> Cuentas</button>
+            <button class="tab-item-saas" onclick="app.switchAdminTab('perfil', this)"><i class="bi bi-person-gear"></i> Mi Perfil</button>
         </div>
 
         <!-- TAB: MAPA DE PISOS -->
@@ -1407,6 +1408,76 @@
             <input type="hidden" id="cfgPagoMovil">
             <input type="hidden" id="cfgTransferencia">
             <input type="hidden" id="cfgZelle">
+        </div>
+
+        <!-- TAB: MI PERFIL DE ADMINISTRADOR -->
+        <div id="adminTabPerfil" style="display: none;">
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; max-width: 950px; margin-bottom: 1.5rem;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, #6366f1, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 800; color: #fff;" id="adminSpaAvatar">
+                            AD
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1.2rem; color: #fff; margin: 0;" id="adminSpaBannerName">Perfil del Administrador</h3>
+                            <span style="font-size: 0.82rem; color: var(--text-secondary);" id="adminSpaBannerRole">Administrador Oficial de Condominio</span>
+                        </div>
+                    </div>
+                    <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.75rem;">
+                        <i class="bi bi-shield-check"></i> Sesión Autenticada
+                    </span>
+                </div>
+
+                <h4 style="font-size: 1rem; color: #fff; margin-bottom: 0.75rem;"><i class="bi bi-person-vcard text-primary"></i> Datos Personales y Profesionales</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">Nombre Completo: <span style="color: var(--danger);">*</span></label>
+                        <input type="text" id="adminProfileName" class="form-control" placeholder="Ej. Lic. Carlos Mendoza">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Cédula de Identidad / RIF:</label>
+                        <input type="text" id="adminProfileCedula" class="form-control" placeholder="Ej. V-15.678.901">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Cargo / Responsabilidad:</label>
+                        <input type="text" id="adminProfileCargo" class="form-control" placeholder="Ej. Administrador Principal">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Teléfono Móvil / WhatsApp:</label>
+                        <input type="text" id="adminProfilePhone" class="form-control" placeholder="Ej. 0414-1234567">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Correo Electrónico:</label>
+                        <input type="email" id="adminProfileEmail" class="form-control" placeholder="Ej. admin@resdlossamanes.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nombre de Usuario de Ingreso:</label>
+                        <input type="text" id="adminProfileUsername" class="form-control" placeholder="Ej. admin" style="font-family: 'JetBrains Mono', monospace;">
+                    </div>
+                </div>
+                <button class="btn-primary-saas" style="width: auto; padding: 0.65rem 1.25rem; margin-top: 0.5rem;" onclick="app.saveAdminProfile()">
+                    <i class="bi bi-save"></i> Guardar Mis Datos de Perfil
+                </button>
+            </div>
+
+            <!-- APARTADO DE SEGURIDAD: CAMBIO DE CONTRASEÑA ADMIN -->
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; max-width: 950px;">
+                <h3 style="font-size: 1.15rem; color: #fff; margin-bottom: 0.35rem;"><i class="bi bi-shield-lock text-warning"></i> Seguridad de Acceso: Actualizar Contraseña de Ingreso</h3>
+                <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.25rem;">Establezca una nueva clave de acceso para el ingreso administrativo al portal.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">Nueva Contraseña:</label>
+                        <input type="password" id="adminNewPassword" class="form-control" placeholder="Mínimo 6 caracteres">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirmar Nueva Contraseña:</label>
+                        <input type="password" id="adminConfirmPassword" class="form-control" placeholder="Repita la nueva contraseña">
+                    </div>
+                </div>
+                <button class="btn-primary-saas" style="width: auto; padding: 0.65rem 1.25rem; background: linear-gradient(135deg, #f59e0b, #d97706); border: none; margin-top: 0.5rem;" onclick="app.updateAdminPassword()">
+                    <i class="bi bi-key-fill"></i> Actualizar Contraseña de Ingreso
+                </button>
+            </div>
         </div>
     </section>
 
@@ -1673,11 +1744,11 @@
                     </div>
                 </div>
 
-                <div style="background: var(--bg-card); padding: 0.85rem; border-radius: 8px; margin-bottom: 1.25rem; font-size: 0.85rem; color: #10b981;">
-                    <i class="bi bi-magic"></i> Se generarán los apartamentos limpios con alícuotas calculadas automáticamente.
+                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.85rem; border-radius: 8px; margin-bottom: 1.25rem; font-size: 0.85rem; color: #34d399;">
+                    <i class="bi bi-shield-check"></i> <strong>Carga Automática de Accesos Supabase:</strong> Se crearán exactamente los usuarios correspondientes a cada apartamento (clave por defecto: <code>123456</code>) más el usuario Administrador del edificio (clave por defecto: <code>admin123</code>). Total usuarios = <strong>N apartamentos + 1 admin</strong>.
                 </div>
 
-                <button class="btn-primary-saas" style="background: #8b5cf6;" onclick="app.createNewCondominio()">
+                <button class="btn-primary-saas" id="btnSubmitNewCondo" style="background: #8b5cf6;" onclick="app.createNewCondominio()">
                     <i class="bi bi-check-lg"></i> Crear y Guardar Edificio
                 </button>
             </div>
@@ -3178,15 +3249,21 @@
                     let updated = false;
 
                     if (resCondos.data && resCondos.data.length > 0) {
-                        this.state.condominios = resCondos.data.map(nc => {
+                        const cloudIds = new Set(resCondos.data.map(c => String(c.id)));
+                        const cloudCondos = resCondos.data.map(nc => {
                             const prev = (this.state.condominios || []).find(c => String(c.id) === String(nc.id));
                             return {
                                 ...nc,
+                                _cloud_synced: true,
                                 cuentas_bancarias: (prev && Array.isArray(prev.cuentas_bancarias) && prev.cuentas_bancarias.length > 0)
                                     ? prev.cuentas_bancarias
                                     : []
                             };
                         });
+                        // Preservar condominios creados localmente que aún no están en la nube
+                        const localPending = (this.state.condominios || []).filter(c => !cloudIds.has(String(c.id)));
+                        localPending.forEach(c => { c._cloud_synced = false; });
+                        this.state.condominios = [...cloudCondos, ...localPending];
                         updated = true;
                     }
 
@@ -3219,7 +3296,8 @@
                     }
 
                     if (resAptos.data && resAptos.data.length > 0) {
-                        this.state.apartamentos = resAptos.data.map(u => {
+                        const cloudCondoIds = new Set((resCondos.data || []).map(c => String(c.id)));
+                        const cloudAptos = resAptos.data.map(u => {
                             const prev = (this.state.apartamentos || []).find(a => 
                                 String(a.condoId) === String(u.condominio_id) && 
                                 this.normCode(a.codigo) === this.normCode(u.codigo)
@@ -3238,6 +3316,8 @@
                                 password: u.password || (prev ? prev.password : null) || '123456'
                             };
                         });
+                        const localPendingAptos = (this.state.apartamentos || []).filter(a => !cloudCondoIds.has(String(a.condoId)));
+                        this.state.apartamentos = [...cloudAptos, ...localPendingAptos];
                         updated = true;
                     }
 
@@ -3321,7 +3401,10 @@
                     }
 
                     if (resUsuarios && resUsuarios.data && resUsuarios.data.length > 0) {
-                        this.state.usuarios = resUsuarios.data;
+                        const cloudCondoIds = new Set((resCondos.data || []).map(c => String(c.id)));
+                        const cloudUsers = resUsuarios.data;
+                        const localPendingUsers = (this.state.usuarios || []).filter(u => !cloudCondoIds.has(String(u.condominio_id)));
+                        this.state.usuarios = [...cloudUsers, ...localPendingUsers];
                         this.state.usuarios.forEach(u => {
                             if (u.condominio_id && u.apto_codigo && u.password) {
                                 const unit = (this.state.apartamentos || []).find(a => 
@@ -3564,18 +3647,27 @@
                     }
                 }
                 if (!matchedAdminCondo) {
+                    for (const c of this.state.condominios) {
+                        if (c.adminProfile && c.adminProfile.username && c.adminProfile.username.toLowerCase() === lowerUser) {
+                            matchedAdminCondo = c;
+                            break;
+                        }
+                    }
+                }
+                if (!matchedAdminCondo) {
                     if (lowerUser === 'admin@resdlossamanes.com') matchedAdminCondo = this.state.condominios.find(c => c.id === 1) || this.getActiveCondo();
                     else if (lowerUser === 'admin@resdchichisuggar.com') matchedAdminCondo = this.state.condominios.find(c => c.id === 2) || this.getActiveCondo();
                     else if (lowerUser === 'admin' || lowerUser === 'administrador') matchedAdminCondo = this.getActiveCondo();
                 }
 
                 if (matchedAdminCondo) {
-                    if (pass !== 'admin123') {
-                        alert('Contraseña incorrecta para el usuario administrador. La clave por defecto es admin123.');
+                    const expectedPass = matchedAdminCondo.adminPassword || 'admin123';
+                    if (pass !== expectedPass) {
+                        alert('Contraseña incorrecta para el usuario administrador.');
                         return;
                     }
                     this.switchCondominio(matchedAdminCondo.id);
-                    const adminEmail = this.getAdminEmail(matchedAdminCondo);
+                    const adminEmail = (matchedAdminCondo.adminProfile && matchedAdminCondo.adminProfile.email) || this.getAdminEmail(matchedAdminCondo);
                     this.logActivity('LOGIN', `Inicio de sesión de Administrador (${adminEmail}) en ${matchedAdminCondo.nombre}`, 'admin (Admin)', matchedAdminCondo.nombre);
                     this.openAdminDashboard('Admin');
                     return;
@@ -3875,11 +3967,24 @@
                     // Porcentaje de ocupación efectiva (apartamentos ocupados con saldo positivo o nulo)
                     const efPct = units.length > 0 ? ((solventes / units.length) * 100).toFixed(1) : 0;
 
+                    const isCloud = c._cloud_synced !== false;
+
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td>
                             <strong style="font-size: 0.95rem; color: #fff;">${c.nombre}</strong><br>
                             <span style="font-size: 0.75rem; color: var(--text-muted);"><i class="bi bi-geo-alt"></i> ${c.direccion || 'Caracas, Venezuela'}</span>
+                            <div style="margin-top: 4px;">
+                                ${isCloud ? `
+                                    <span class="stat-badge" style="background: rgba(16, 185, 129, 0.12); color: #34d399; border-color: rgba(16, 185, 129, 0.3); font-size: 0.7rem; padding: 2px 6px;">
+                                        <i class="bi bi-cloud-check-fill"></i> Supabase Online
+                                    </span>
+                                ` : `
+                                    <span class="stat-badge" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-color: rgba(245, 158, 11, 0.3); font-size: 0.7rem; padding: 2px 6px;">
+                                        <i class="bi bi-cloud-slash"></i> Pendiente en Supabase
+                                    </span>
+                                `}
+                            </div>
                         </td>
                         <td><code>${c.rif || 'N/A'}</code></td>
                         <td>${c.tiene_pb ? 'PB + ' : ''}${c.pisos_cant} Pisos</td>
@@ -3897,9 +4002,16 @@
                             </span>
                         </td>
                         <td>
-                            <button class="btn-primary-saas" style="width: auto; padding: 0.4rem 0.85rem; font-size: 0.82rem; background: #8b5cf6;" onclick="app.openSuperCondoAudit(${c.id})">
-                                <i class="bi bi-search"></i> Inspeccionar Residencia
-                            </button>
+                            <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                                <button class="btn-primary-saas" style="width: auto; padding: 0.4rem 0.85rem; font-size: 0.82rem; background: #8b5cf6;" onclick="app.openSuperCondoAudit(${c.id})">
+                                    <i class="bi bi-search"></i> Inspeccionar Residencia
+                                </button>
+                                ${!isCloud ? `
+                                    <button class="btn-primary-saas" id="btnSyncCloud_${c.id}" style="width: auto; padding: 0.4rem 0.85rem; font-size: 0.82rem; background: #f59e0b;" onclick="app.sincronizarCondominioASupabase(${c.id})" title="Cargar este condominio y sus usuarios a Supabase">
+                                        <i class="bi bi-cloud-arrow-up-fill"></i> Subir a Supabase
+                                    </button>
+                                ` : ''}
+                            </div>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -3929,7 +4041,17 @@
                 const infoText = document.getElementById('auditCondoInfoText');
                 if (infoText) {
                     const pb = condo.tiene_pb ? 'PB + ' : '';
-                    infoText.innerText = `${condo.nombre} | RIF: ${condo.rif || 'N/A'} | ${pb}${condo.pisos_cant} Pisos | Dir: ${condo.direccion || 'Caracas'}`;
+                    const isCloud = condo._cloud_synced !== false;
+                    const syncBtnHtml = !isCloud ? `
+                        <button class="btn-primary-saas" id="btnSyncDetail_${condo.id}" style="display: inline-block; width: auto; padding: 0.25rem 0.65rem; font-size: 0.75rem; background: #f59e0b; margin-left: 0.5rem;" onclick="app.sincronizarCondominioASupabase(${condo.id})">
+                            <i class="bi bi-cloud-arrow-up-fill"></i> Subir este Edificio y Usuarios a Supabase
+                        </button>
+                    ` : `
+                        <span class="stat-badge" style="background: rgba(16, 185, 129, 0.12); color: #34d399; border-color: rgba(16, 185, 129, 0.3); font-size: 0.72rem; padding: 2px 6px; margin-left: 0.5rem;">
+                            <i class="bi bi-cloud-check-fill"></i> Sincronizado en Supabase
+                        </span>
+                    `;
+                    infoText.innerHTML = `${condo.nombre} | RIF: ${condo.rif || 'N/A'} | ${pb}${condo.pisos_cant} Pisos | Dir: ${condo.direccion || 'Caracas'} ${syncBtnHtml}`;
                 }
                 const rateText = document.getElementById('auditCondoRateText');
                 if (rateText) {
@@ -4590,6 +4712,7 @@
                 document.getElementById('adminTabTickets').style.display = tabName === 'tickets' ? 'block' : 'none';
                 document.getElementById('adminTabComunicados').style.display = tabName === 'comunicados' ? 'block' : 'none';
                 document.getElementById('adminTabConfig').style.display = tabName === 'config' ? 'block' : 'none';
+                document.getElementById('adminTabPerfil').style.display = tabName === 'perfil' ? 'block' : 'none';
 
                 if (tabName === 'mapa') this.renderAdminFloors();
                 if (tabName === 'cuotas') this.renderCuotasTable();
@@ -4597,6 +4720,91 @@
                 if (tabName === 'tickets') this.renderAdminTickets();
                 if (tabName === 'comunicados') this.renderComunicados();
                 if (tabName === 'config') this.renderAdminCuentas();
+                if (tabName === 'perfil') this.renderAdminProfile();
+            },
+
+            // MI PERFIL DE ADMINISTRADOR
+            renderAdminProfile() {
+                const condo = this.getActiveCondo();
+                if (!condo) return;
+                const prof = condo.adminProfile || {};
+                const adminEmail = prof.email || this.getAdminEmail(condo);
+                const adminName = prof.nombre || `Administrador ${condo.nombre}`;
+                const adminUsername = prof.username || 'admin';
+                const adminCargo = prof.cargo || 'Administrador de Condominio';
+
+                document.getElementById('adminProfileName').value = prof.nombre || '';
+                document.getElementById('adminProfileCedula').value = prof.cedula || '';
+                document.getElementById('adminProfileCargo').value = prof.cargo || '';
+                document.getElementById('adminProfilePhone').value = prof.telefono || '';
+                document.getElementById('adminProfileEmail').value = adminEmail;
+                document.getElementById('adminProfileUsername').value = adminUsername;
+
+                document.getElementById('adminSpaBannerName').innerText = adminName;
+                document.getElementById('adminSpaBannerRole').innerText = `${adminCargo} - ${condo.nombre}`;
+                const initials = adminName.split(' ').filter(Boolean).map(w => w[0]).slice(0, 2).join('').toUpperCase() || 'AD';
+                document.getElementById('adminSpaAvatar').innerText = initials;
+
+                document.getElementById('adminNewPassword').value = '';
+                document.getElementById('adminConfirmPassword').value = '';
+            },
+
+            saveAdminProfile() {
+                const condo = this.getActiveCondo();
+                if (!condo) return;
+                const nombre = document.getElementById('adminProfileName').value.trim();
+                const cedula = document.getElementById('adminProfileCedula').value.trim();
+                const cargo = document.getElementById('adminProfileCargo').value.trim();
+                const telefono = document.getElementById('adminProfilePhone').value.trim();
+                const email = document.getElementById('adminProfileEmail').value.trim();
+                const username = document.getElementById('adminProfileUsername').value.trim();
+
+                if (!nombre) {
+                    alert('Por favor ingrese el nombre del administrador.');
+                    return;
+                }
+
+                condo.adminProfile = {
+                    nombre,
+                    cedula,
+                    cargo: cargo || 'Administrador de Condominio',
+                    telefono,
+                    email,
+                    username: username || 'admin'
+                };
+
+                this.save();
+                this.toast('Perfil de administrador guardado con éxito');
+                this.renderAdminProfile();
+                this.logActivity('PERFIL_ADMIN', `Administrador actualizó sus datos de contacto (${nombre})`, 'admin', condo.nombre);
+            },
+
+            updateAdminPassword() {
+                const newPass = document.getElementById('adminNewPassword').value.trim();
+                const confirmPass = document.getElementById('adminConfirmPassword').value.trim();
+
+                if (!newPass) {
+                    alert('Por favor ingrese la nueva contraseña de ingreso.');
+                    return;
+                }
+                if (newPass.length < 6) {
+                    alert('La contraseña debe tener un mínimo de 6 caracteres.');
+                    return;
+                }
+                if (newPass !== confirmPass) {
+                    alert('Las contraseñas no coinciden. Verifique ambas casillas.');
+                    return;
+                }
+
+                const condo = this.getActiveCondo();
+                if (!condo) return;
+
+                condo.adminPassword = newPass;
+                this.save();
+                this.toast('Contraseña de ingreso de administrador actualizada con éxito');
+                document.getElementById('adminNewPassword').value = '';
+                document.getElementById('adminConfirmPassword').value = '';
+                this.logActivity('SEGURIDAD', `Contraseña de acceso del Administrador actualizada exitosamente`, 'admin', condo.nombre);
             },
 
             // ADJUDICAR
@@ -6450,55 +6658,364 @@
                     return;
                 }
 
-                const newId = this.state.condominios.length + 1;
-                const newCondo = {
-                    id: newId,
-                    slug: nombre.toLowerCase().replace(/[^a-z0-9]/g, '-'),
-                    nombre: nombre,
-                    rif: rif,
-                    direccion: dir,
-                    pisos_cant: pisos,
-                    tiene_pb: tienePB ? 1 : 0,
-                    aptos_pb_cant: aptosPB,
-                    aptos_por_piso: aptosPiso,
-                    tasa_dolar: 877.90,
-                    banco_pago_movil: 'No configurado',
-                    banco_transferencia: 'No configurado',
-                    cuenta_zelle: 'No configurado',
-                    cuentas_bancarias: []
-                };
+                const btn = document.getElementById('btnSubmitNewCondo');
+                const origBtnHtml = btn ? btn.innerHTML : '';
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Registrando en Supabase y generando usuarios...';
+                }
 
-                const newUnits = generateCleanUnits(newId, pisos, aptosPiso, tienePB, aptosPB);
-                const alicuota = +(100.0 / newUnits.length).toFixed(2);
-                newUnits.forEach(u => u.alicuota = alicuota);
+                try {
+                    // Obtener ID numérico consecutivo seguro (consultando local y Supabase)
+                    let maxId = 0;
+                    (this.state.condominios || []).forEach(c => {
+                        const idNum = parseInt(c.id, 10);
+                        if (!isNaN(idNum) && idNum > maxId) maxId = idNum;
+                    });
 
-                this.state.condominios.push(newCondo);
-                this.state.apartamentos = this.state.apartamentos.concat(newUnits);
+                    if (sbClient) {
+                        try {
+                            const { data: dbCondos } = await sbClient.from('condominios').select('id');
+                            if (dbCondos && dbCondos.length > 0) {
+                                dbCondos.forEach(c => {
+                                    const idNum = parseInt(c.id, 10);
+                                    if (!isNaN(idNum) && idNum > maxId) maxId = idNum;
+                                });
+                            }
+                        } catch (e) {
+                            console.warn('Advertencia consultando IDs en Supabase:', e);
+                        }
+                    }
+                    const newId = maxId + 1;
 
-                this.save();
-                this.closeModal('modalNewCondo');
-                this.renderSuperAdmin();
-                this.toast(`¡Condominio "${nombre}" creado con éxito con ${newUnits.length} apartamentos!`);
-                this.logActivity('CONDOMINIO', `Creación de nuevo condominio: "${nombre}" (${pisos} pisos, ${newUnits.length} apartamentos)`, 'clusterlg (Superadmin)', nombre);
+                    // Generar slug y comprobar unicidad
+                    let slug = nombre.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || `condo-${newId}`;
+                    if (sbClient) {
+                        try {
+                            const { data: slugCheck } = await sbClient.from('condominios').select('id').eq('slug', slug);
+                            if (slugCheck && slugCheck.length > 0) {
+                                slug = `${slug}-${Math.floor(100 + Math.random() * 900)}`;
+                            }
+                        } catch (e) {
+                            console.warn('Advertencia verificando slug:', e);
+                        }
+                    }
 
-                if (sbClient) {
-                    try {
-                        await sbClient.from('condominios').insert([newCondo]);
+                    const slugClean = slug.replace(/-/g, '');
+                    const domain = (newId === 1) ? 'resdlossamanes.com' : (newId === 2 ? 'resdchichisuggar.com' : `resd${slugClean}.com`);
+
+                    // Payload EXCLUSIVO para la tabla condominios de Supabase (SIN cuentas_bancarias)
+                    const condoPayload = {
+                        id: newId,
+                        slug: slug,
+                        nombre: nombre,
+                        rif: rif,
+                        direccion: dir,
+                        pisos_cant: pisos,
+                        tiene_pb: tienePB ? 1 : 0,
+                        aptos_pb_cant: aptosPB,
+                        aptos_por_piso: aptosPiso,
+                        tasa_dolar: 877.90,
+                        banco_pago_movil: 'No configurado',
+                        banco_transferencia: 'No configurado',
+                        cuenta_zelle: 'No configurado'
+                    };
+
+                    // Objeto para el estado local
+                    const newCondo = {
+                        ...condoPayload,
+                        _cloud_synced: false,
+                        cuentas_bancarias: []
+                    };
+
+                    const newUnits = generateCleanUnits(newId, pisos, aptosPiso, tienePB, aptosPB);
+                    const totalUnits = newUnits.length;
+                    const alicuota = +(100.0 / totalUnits).toFixed(2);
+                    newUnits.forEach(u => u.alicuota = alicuota);
+
+                    // REGLA: Cantidad de usuarios = Total Apartamentos + 1 (Admin)
+                    const newUsers = [];
+
+                    // 1. Usuario Administrador del Condominio (Clave por defecto: admin123)
+                    const adminUser = {
+                        condominio_id: newId,
+                        username: `admin@${domain}`,
+                        email: `admin@${domain}`,
+                        password: 'admin123',
+                        nombre_completo: `Administrador ${nombre}`,
+                        cedula: rif || null,
+                        telefono: '0414-1234567',
+                        rol: 'admin',
+                        apto_codigo: null,
+                        activo: true
+                    };
+                    newUsers.push(adminUser);
+
+                    // 2. Usuarios Residentes (Uno por cada apartamento generado, Clave por defecto: 123456)
+                    newUnits.forEach(u => {
+                        const codeClean = u.codigo.replace(/[^a-z0-9]/gi, '').toLowerCase();
+                        const residentEmail = `apto${codeClean}@${domain}`;
+                        newUsers.push({
+                            condominio_id: newId,
+                            username: residentEmail,
+                            email: residentEmail,
+                            password: '123456',
+                            nombre_completo: u.propietario || `Copropietario Apto ${u.codigo}`,
+                            cedula: u.cedula || null,
+                            telefono: u.telefono || null,
+                            rol: 'residente',
+                            apto_codigo: u.codigo,
+                            activo: true
+                        });
+                    });
+
+                    // INSERCIÓN AWAIT EN SUPABASE ANTES DE CERRAR MODAL
+                    let assignedId = newId;
+                    if (sbClient) {
+                        // 1. Insertar Condominio
+                        const { data: cData, error: cErr } = await sbClient.from('condominios').insert([condoPayload]).select();
+                        if (cErr) {
+                            throw new Error('Error al registrar condominio en Supabase: ' + (cErr.message || JSON.stringify(cErr)));
+                        }
+
+                        if (cData && cData[0] && cData[0].id) {
+                            assignedId = cData[0].id;
+                        }
+
+                        newCondo.id = assignedId;
+                        newCondo._cloud_synced = true;
+                        newUnits.forEach(u => { u.condoId = assignedId; });
+                        newUsers.forEach(u => { u.condominio_id = assignedId; });
+
+                        // 2. Insertar Apartamentos en lotes de 100
                         const rows = newUnits.map(u => ({
-                            condominio_id: newCondo.id,
+                            condominio_id: assignedId,
                             piso: u.piso,
                             codigo: u.codigo,
                             alicuota: u.alicuota,
-                            propietario: null,
-                            cedula: null,
-                            telefono: null,
-                            email: null,
+                            propietario: u.propietario || null,
+                            cedula: u.cedula || null,
+                            telefono: u.telefono || null,
+                            email: u.email || null,
                             vehiculo: null
                         }));
-                        await sbClient.from('apartamentos').insert(rows);
-                    } catch (e) {
-                        console.error('Error insertando nuevo condominio en Supabase:', e);
+
+                        for (let i = 0; i < rows.length; i += 100) {
+                            const chunk = rows.slice(i, i + 100);
+                            const { error: aErr } = await sbClient.from('apartamentos').insert(chunk);
+                            if (aErr) {
+                                throw new Error(`Error insertando apartamentos en Supabase (lote ${Math.floor(i/100)+1}): ` + aErr.message);
+                            }
+                        }
+
+                        // 3. Insertar Usuarios en lotes de 100
+                        for (let i = 0; i < newUsers.length; i += 100) {
+                            const chunk = newUsers.slice(i, i + 100);
+                            const { error: uErr } = await sbClient.from('usuarios').insert(chunk);
+                            if (uErr) {
+                                throw new Error(`Error insertando usuarios en Supabase (lote ${Math.floor(i/100)+1}): ` + uErr.message);
+                            }
+                        }
+
+                        console.log(`✅ Supabase sincronizado: ${newUsers.length} usuarios creados (${totalUnits} residentes + 1 admin) para Condominio ${assignedId}`);
                     }
+
+                    // Carga en estado local una vez confirmado
+                    this.state.condominios.push(newCondo);
+                    this.state.apartamentos = this.state.apartamentos.concat(newUnits);
+                    if (!Array.isArray(this.state.usuarios)) {
+                        this.state.usuarios = [];
+                    }
+                    this.state.usuarios = this.state.usuarios.concat(newUsers);
+
+                    this.save();
+                    this.closeModal('modalNewCondo');
+                    this.renderSuperAdmin();
+                    this.toast(`¡Condominio "${nombre}" creado con éxito en Supabase! (${totalUnits} apartamentos y ${newUsers.length} usuarios listos en la nube).`);
+                    this.logActivity('CONDOMINIO', `Creación de nuevo condominio: "${nombre}" (${totalUnits} aptos, ${newUsers.length} usuarios creados en Supabase)`, 'clusterlg (Superadmin)', nombre);
+
+                } catch (err) {
+                    console.error('Error creando nuevo condominio:', err);
+                    alert(`⚠️ ${err.message}`);
+                } finally {
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = origBtnHtml || '<i class="bi bi-check-lg"></i> Crear y Guardar Edificio';
+                    }
+                }
+            },
+
+            // SINCRONIZACIÓN MANUAL DE UN CONDOMINIO ESPECÍFICO A SUPABASE
+            async sincronizarCondominioASupabase(condoId) {
+                if (!sbClient) {
+                    alert('El cliente de Supabase no está conectado.');
+                    return;
+                }
+                const condo = (this.state.condominios || []).find(c => String(c.id) === String(condoId));
+                if (!condo) {
+                    alert('Condominio no encontrado en el sistema local.');
+                    return;
+                }
+
+                const btn1 = document.getElementById(`btnSyncCloud_${condo.id}`);
+                const btn2 = document.getElementById(`btnSyncDetail_${condo.id}`);
+                const setBtns = (loading, txt) => {
+                    [btn1, btn2].forEach(b => {
+                        if (b) {
+                            b.disabled = loading;
+                            b.innerHTML = loading ? `<i class="bi bi-arrow-repeat spin"></i> ${txt}` : '<i class="bi bi-cloud-arrow-up-fill"></i> Subir a Supabase';
+                        }
+                    });
+                };
+
+                setBtns(true, 'Sincronizando...');
+                this.toast(`Iniciando sincronización de "${condo.nombre}" hacia Supabase...`);
+
+                try {
+                    // 1. Verificar si el condominio existe en Supabase
+                    const { data: existingCondo, error: checkErr } = await sbClient
+                        .from('condominios')
+                        .select('id, slug')
+                        .eq('id', condo.id)
+                        .maybeSingle();
+
+                    let assignedId = condo.id;
+
+                    const condoPayload = {
+                        id: condo.id,
+                        slug: condo.slug,
+                        nombre: condo.nombre,
+                        rif: condo.rif || 'J-99999999-0',
+                        direccion: condo.direccion || 'Caracas, Venezuela',
+                        pisos_cant: condo.pisos_cant || 10,
+                        tiene_pb: condo.tiene_pb ? 1 : 0,
+                        aptos_pb_cant: condo.aptos_pb_cant || 0,
+                        aptos_por_piso: condo.aptos_por_piso || 4,
+                        tasa_dolar: condo.tasa_dolar || 877.90,
+                        banco_pago_movil: condo.banco_pago_movil || 'No configurado',
+                        banco_transferencia: condo.banco_transferencia || 'No configurado',
+                        cuenta_zelle: condo.cuenta_zelle || 'No configurado'
+                    };
+
+                    if (!existingCondo) {
+                        // Verificar si el slug colisiona
+                        const { data: slugCheck } = await sbClient.from('condominios').select('id').eq('slug', condoPayload.slug);
+                        if (slugCheck && slugCheck.length > 0) {
+                            condoPayload.slug = `${condoPayload.slug}-${Math.floor(100 + Math.random() * 900)}`;
+                            condo.slug = condoPayload.slug;
+                        }
+
+                        const { data: cData, error: cErr } = await sbClient.from('condominios').insert([condoPayload]).select();
+                        if (cErr) {
+                            throw new Error('Error al insertar condominio en Supabase: ' + cErr.message);
+                        }
+                        if (cData && cData[0] && cData[0].id) {
+                            assignedId = cData[0].id;
+                            condo.id = assignedId;
+                        }
+                    }
+
+                    condo._cloud_synced = true;
+
+                    // 2. Sincronizar Unidades / Apartamentos
+                    const units = this.getCondoUnits(condo.id);
+                    if (units.length > 0) {
+                        const { data: existingAptos } = await sbClient
+                            .from('apartamentos')
+                            .select('codigo')
+                            .eq('condominio_id', assignedId);
+                        
+                        const existingCodes = new Set((existingAptos || []).map(a => this.normCode(a.codigo)));
+                        const missingUnits = units.filter(u => !existingCodes.has(this.normCode(u.codigo)));
+
+                        if (missingUnits.length > 0) {
+                            const aptoRows = missingUnits.map(u => ({
+                                condominio_id: assignedId,
+                                piso: u.piso,
+                                codigo: u.codigo,
+                                alicuota: u.alicuota || +(100.0 / units.length).toFixed(2),
+                                propietario: u.propietario || null,
+                                cedula: u.cedula || null,
+                                telefono: u.telefono || null,
+                                email: u.email || null,
+                                vehiculo: u.vehiculo || null
+                            }));
+
+                            for (let i = 0; i < aptoRows.length; i += 100) {
+                                const chunk = aptoRows.slice(i, i + 100);
+                                const { error: aErr } = await sbClient.from('apartamentos').insert(chunk);
+                                if (aErr) throw new Error('Error insertando apartamentos en Supabase: ' + aErr.message);
+                            }
+                        }
+                    }
+
+                    // 3. Sincronizar Usuarios (Admin + Residentes)
+                    const slugClean = (condo.slug || '').replace(/[^a-z0-9]/gi, '').toLowerCase();
+                    const domain = (assignedId === 1) ? 'resdlossamanes.com' : (assignedId === 2 ? 'resdchichisuggar.com' : `resd${slugClean}.com`);
+                    
+                    const { data: existingUsersDb } = await sbClient
+                        .from('usuarios')
+                        .select('username')
+                        .eq('condominio_id', assignedId);
+                    
+                    const existingUsernames = new Set((existingUsersDb || []).map(u => (u.username || '').toLowerCase()));
+                    const usersToInsert = [];
+
+                    // Admin del edificio
+                    const adminEmail = `admin@${domain}`;
+                    if (!existingUsernames.has(adminEmail.toLowerCase())) {
+                        usersToInsert.push({
+                            condominio_id: assignedId,
+                            username: adminEmail,
+                            email: adminEmail,
+                            password: 'admin123',
+                            nombre_completo: `Administrador ${condo.nombre}`,
+                            cedula: condo.rif || null,
+                            telefono: '0414-1234567',
+                            rol: 'admin',
+                            apto_codigo: null,
+                            activo: true
+                        });
+                    }
+
+                    // Residentes
+                    units.forEach(u => {
+                        const codeClean = u.codigo.replace(/[^a-z0-9]/gi, '').toLowerCase();
+                        const resEmail = `apto${codeClean}@${domain}`;
+                        if (!existingUsernames.has(resEmail.toLowerCase())) {
+                            usersToInsert.push({
+                                condominio_id: assignedId,
+                                username: resEmail,
+                                email: resEmail,
+                                password: u.password || '123456',
+                                nombre_completo: u.propietario || `Copropietario Apto ${u.codigo}`,
+                                cedula: u.cedula || null,
+                                telefono: u.telefono || null,
+                                rol: 'residente',
+                                apto_codigo: u.codigo,
+                                activo: true
+                            });
+                        }
+                    });
+
+                    if (usersToInsert.length > 0) {
+                        for (let i = 0; i < usersToInsert.length; i += 100) {
+                            const chunk = usersToInsert.slice(i, i + 100);
+                            const { error: uErr } = await sbClient.from('usuarios').insert(chunk);
+                            if (uErr) throw new Error('Error insertando usuarios en Supabase: ' + uErr.message);
+                        }
+                    }
+
+                    this.save();
+                    this.renderSuperAdmin();
+                    if (this.superAuditCondoId === condo.id) this.renderSuperCondoAudit();
+                    this.toast(`✅ ¡"${condo.nombre}" (${units.length} apartamentos y sus usuarios) sincronizado con éxito en Supabase!`);
+
+                } catch (err) {
+                    console.error('Error en sincronizarCondominioASupabase:', err);
+                    alert(`⚠️ Error al sincronizar con Supabase: ${err.message}`);
+                } finally {
+                    setBtns(false, '');
                 }
             },
 

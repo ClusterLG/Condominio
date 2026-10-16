@@ -14,3 +14,7 @@ uploads/comprobantes/*
 !uploads/comprobantes/.gitkeep
 uploads/evidencias/*
 !uploads/evidencias/.gitkeep
+
+# Node y dependencias
+node_modules/
+scratch/

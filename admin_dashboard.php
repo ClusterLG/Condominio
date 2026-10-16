@@ -14,6 +14,28 @@ $fechaValorBCV = getConfig('tasa_bcv_fecha_valor', 'Oficial');
 $ultimaSyncBCV = getConfig('tasa_bcv_ultima_actualizacion', 'Hoy');
 $isSuperAdmin = isSuperAdmin();
 
+$userId = $_SESSION['user_id'] ?? null;
+$currentUser = null;
+if ($userId) {
+    $stmtUser = $pdo->prepare("SELECT id, username, rol, nombre, email, cedula, telefono, telefono_secundario, cargo, created_at FROM usuarios WHERE id = ? LIMIT 1");
+    $stmtUser->execute([$userId]);
+    $currentUser = $stmtUser->fetch();
+}
+if (!$currentUser) {
+    $currentUser = [
+        'id' => $userId,
+        'username' => $_SESSION['user_name'] ?? 'admin',
+        'nombre' => $_SESSION['user_name'] ?? 'Administrador',
+        'email' => '',
+        'cedula' => '',
+        'telefono' => '',
+        'telefono_secundario' => '',
+        'cargo' => 'Administrador de Condominio',
+        'rol' => $_SESSION['user_role'] ?? 'admin',
+        'created_at' => date('Y-m-d')
+    ];
+}
+
 $stmtAptosList = $pdo->prepare("SELECT id, codigo, propietario_nombre FROM apartamentos WHERE condominio_id = ? ORDER BY piso ASC, codigo ASC");
 $stmtAptosList->execute([$condominio['id'] ?? 1]);
 $condoAptos = $stmtAptosList->fetchAll();
@@ -76,16 +98,20 @@ $condoAptos = $stmtAptosList->fetchAll();
                 <i class="bi bi-gear"></i>
                 <span>Tasa y Cuentas</span>
             </button>
+            <button class="nav-item" data-view="perfil">
+                <i class="bi bi-person-gear"></i>
+                <span>Mi Perfil</span>
+            </button>
         </div>
 
         <div class="sidebar-footer">
-            <div class="user-card">
-                <div class="user-avatar"><?= $isSuperAdmin ? 'SA' : 'AD' ?></div>
+            <div class="user-card" onclick="AdminApp.switchView('perfil')" style="cursor: pointer;" title="Ver y actualizar mi perfil">
+                <div class="user-avatar" id="sidebar-user-avatar"><?= $isSuperAdmin ? 'SA' : strtoupper(substr($currentUser['nombre'] ?? 'AD', 0, 2)) ?></div>
                 <div class="user-info">
-                    <div class="user-name"><?= htmlspecialchars($_SESSION['user_name'] ?? 'Administrador') ?></div>
-                    <div class="user-role"><?= $isSuperAdmin ? 'Super Administrador' : 'Administrador Local' ?></div>
+                    <div class="user-name" id="sidebar-user-name"><?= htmlspecialchars($currentUser['nombre'] ?? $_SESSION['user_name'] ?? 'Administrador') ?></div>
+                    <div class="user-role" id="sidebar-user-role"><?= htmlspecialchars($currentUser['cargo'] ?? ($isSuperAdmin ? 'Super Administrador' : 'Administrador Local')) ?></div>
                 </div>
-                <a href="api/auth.php?action=logout" class="btn-logout" title="Cerrar sesión">
+                <a href="api/auth.php?action=logout" class="btn-logout" title="Cerrar sesión" onclick="event.stopPropagation();">
                     <i class="bi bi-box-arrow-right"></i>
                 </a>
             </div>
@@ -212,6 +238,14 @@ $condoAptos = $stmtAptosList->fetchAll();
                     </div>
                     <div class="dash-btn-title">Tasa y Cuentas</div>
                     <div class="dash-btn-desc">Sincronización BCV y bancos</div>
+                </div>
+
+                <div class="dash-btn-card" data-view="perfil">
+                    <div class="dash-btn-icon" style="background: rgba(99, 102, 241, 0.15); color: #818cf8;">
+                        <i class="bi bi-person-badge"></i>
+                    </div>
+                    <div class="dash-btn-title">Mi Perfil Admin</div>
+                    <div class="dash-btn-desc">Datos personales y clave de acceso</div>
                 </div>
             </div>
 
@@ -374,6 +408,187 @@ $condoAptos = $stmtAptosList->fetchAll();
                         </button>
                     </form>
                 </div>
+            </section>
+
+            <!-- SECCIÓN 7: MI PERFIL DE ADMINISTRADOR -->
+            <section class="section-view" id="view-perfil">
+                <!-- Banner Hero del Perfil -->
+                <div class="card" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98)); border: 1px solid rgba(99, 102, 241, 0.25); box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.2); margin-bottom: 1.5rem; position: relative; overflow: hidden;">
+                    <div style="position: absolute; right: -30px; top: -30px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
+                    
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;">
+                        <div style="display: flex; align-items: center; gap: 1.25rem;">
+                            <div style="width: 72px; height: 72px; border-radius: 18px; background: linear-gradient(135deg, #6366f1, #3b82f6); display: flex; align-items: center; justify-content: center; font-size: 1.85rem; font-weight: 800; color: #fff; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4); border: 2px solid rgba(255,255,255,0.15);" id="admin-banner-avatar">
+                                <?= strtoupper(substr($currentUser['nombre'] ?? 'AD', 0, 2)) ?>
+                            </div>
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+                                    <h2 style="font-size: 1.45rem; font-weight: 700; color: #fff; margin: 0;" id="admin-banner-name">
+                                        <?= htmlspecialchars($currentUser['nombre'] ?? 'Administrador') ?>
+                                    </h2>
+                                    <span class="badge" style="background: rgba(99, 102, 241, 0.18); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.35); font-family: 'JetBrains Mono', monospace;" id="admin-banner-username">
+                                        @<?= htmlspecialchars($currentUser['username'] ?? 'admin') ?>
+                                    </span>
+                                </div>
+                                <div style="font-size: 0.9rem; color: #cbd5e1; margin-top: 0.25rem; display: flex; align-items: center; gap: 0.5rem;" id="admin-banner-cargo">
+                                    <i class="bi bi-briefcase text-primary"></i> <?= htmlspecialchars($currentUser['cargo'] ?? 'Administrador de Condominio') ?>
+                                </div>
+                                <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 0.5rem; flex-wrap: wrap; font-size: 0.78rem;">
+                                    <span style="color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem;">
+                                        <i class="bi bi-buildings"></i> <strong id="admin-banner-condo" style="color: #94a3b8;"><?= htmlspecialchars($edificioNombre) ?></strong>
+                                    </span>
+                                    <span style="color: #10b981; display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(16, 185, 129, 0.12); padding: 0.15rem 0.5rem; border-radius: 9999px;">
+                                        <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981; display: inline-block;"></span> Cuenta Activa & Protegida
+                                    </span>
+                                    <span style="color: var(--text-muted);" id="admin-banner-created">
+                                        Miembro desde: <?= date('d/m/Y', strtotime($currentUser['created_at'] ?? 'now')) ?>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="AdminApp.loadAdminProfile()" title="Recargar información del perfil">
+                                <i class="bi bi-arrow-repeat"></i> Actualizar Vista
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulario Unificado de Perfil y Clave -->
+                <form id="form-admin-profile" onsubmit="handleAdminProfileUpdate(event)">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1.5rem;">
+                        
+                        <!-- Columna 1: Información Personal y de Contacto -->
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <div class="card-title"><i class="bi bi-person-vcard text-primary"></i> Datos Personales y Profesionales</div>
+                                    <div class="card-subtitle">Actualice su información para comunicaciones oficiales con los residentes</div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <div class="form-group">
+                                    <label class="form-label">Nombre y Apellido Completo: <span style="color: var(--danger);">*</span></label>
+                                    <input type="text" name="nombre" id="admin-profile-nombre" class="form-control" value="<?= htmlspecialchars($currentUser['nombre'] ?? '') ?>" placeholder="Ej: Lic. Carlos Mendoza" required>
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                    <div class="form-group">
+                                        <label class="form-label">Cédula de Identidad / RIF:</label>
+                                        <input type="text" name="cedula" id="admin-profile-cedula" class="form-control" value="<?= htmlspecialchars($currentUser['cedula'] ?? '') ?>" placeholder="Ej: V-14.852.963">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Cargo / Responsabilidad:</label>
+                                        <input type="text" name="cargo" id="admin-profile-cargo" class="form-control" value="<?= htmlspecialchars($currentUser['cargo'] ?? '') ?>" placeholder="Ej: Administrador Principal">
+                                    </div>
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                    <div class="form-group">
+                                        <label class="form-label">Teléfono Móvil / WhatsApp:</label>
+                                        <input type="text" name="telefono" id="admin-profile-telefono" class="form-control" value="<?= htmlspecialchars($currentUser['telefono'] ?? '') ?>" placeholder="Ej: 0414-1234567">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Teléfono Oficina / Secundario:</label>
+                                        <input type="text" name="telefono_secundario" id="admin-profile-telefono-sec" class="form-control" value="<?= htmlspecialchars($currentUser['telefono_secundario'] ?? '') ?>" placeholder="Ej: 0212-9876543">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Correo Electrónico Oficial: <span style="color: var(--danger);">*</span></label>
+                                    <input type="email" name="email" id="admin-profile-email" class="form-control" value="<?= htmlspecialchars($currentUser['email'] ?? '') ?>" placeholder="Ej: admin@condominio.com" required>
+                                    <small style="color: var(--text-muted); font-size: 0.72rem;">Se utilizará para notificaciones operativas y recuperación de cuenta.</small>
+                                </div>
+
+                                <div class="form-group" style="background: rgba(15, 23, 42, 0.4); padding: 0.85rem; border-radius: var(--radius-sm); border: 1px dashed var(--border-color);">
+                                    <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>Nombre de Usuario de Ingreso: <span style="color: var(--danger);">*</span></span>
+                                        <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; font-size: 0.68rem;">Credencial de Login</span>
+                                    </label>
+                                    <input type="text" name="username" id="admin-profile-username" class="form-control" value="<?= htmlspecialchars($currentUser['username'] ?? '') ?>" required style="font-family: 'JetBrains Mono', monospace;">
+                                    <small style="color: var(--text-muted); font-size: 0.72rem;">Este es el usuario con el que inicia sesión en la pantalla de bienvenida.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Columna 2: Seguridad y Cambio de Contraseña -->
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <div class="card-title"><i class="bi bi-shield-lock text-warning"></i> Seguridad y Contraseña de Ingreso</div>
+                                    <div class="card-subtitle">Proteja su acceso administrativo actualizando periódicamente su clave</div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: var(--radius-sm); padding: 0.75rem 1rem; font-size: 0.82rem; color: #fde68a; display: flex; align-items: flex-start; gap: 0.65rem;">
+                                    <i class="bi bi-info-circle-fill" style="color: #f59e0b; margin-top: 2px;"></i>
+                                    <div>
+                                        <strong>Cambio Opcional:</strong> Si únicamente desea modificar sus datos personales de contacto, deje estos campos de contraseña en blanco. Para cambiar la clave, complete los tres campos requeridos.
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Contraseña Actual:</label>
+                                    <div style="position: relative;">
+                                        <input type="password" name="current_password" id="admin-profile-curr-pass" class="form-control" placeholder="Ingrese su contraseña actual">
+                                        <button type="button" onclick="togglePassVisibility('admin-profile-curr-pass', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;" title="Mostrar / Ocultar">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    <small style="color: var(--text-muted); font-size: 0.72rem;">Requerida para autorizar el cambio de contraseña.</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Nueva Contraseña:</label>
+                                    <div style="position: relative;">
+                                        <input type="password" name="new_password" id="admin-profile-new-pass" class="form-control" placeholder="Mínimo 6 caracteres seguros">
+                                        <button type="button" onclick="togglePassVisibility('admin-profile-new-pass', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;" title="Mostrar / Ocultar">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Confirmar Nueva Contraseña:</label>
+                                    <div style="position: relative;">
+                                        <input type="password" name="confirm_password" id="admin-profile-confirm-pass" class="form-control" placeholder="Repita la nueva contraseña">
+                                        <button type="button" onclick="togglePassVisibility('admin-profile-confirm-pass', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;" title="Mostrar / Ocultar">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div style="background: rgba(15, 23, 42, 0.4); border-radius: var(--radius-sm); padding: 0.75rem; border: 1px solid var(--border-color); font-size: 0.75rem; color: var(--text-muted);">
+                                    <div style="font-weight: 600; margin-bottom: 0.35rem; color: var(--text-secondary);">Recomendaciones de seguridad:</div>
+                                    <div style="display: flex; flex-direction: column; gap: 0.2rem;">
+                                        <span><i class="bi bi-check2 text-success"></i> Mínimo 6 caracteres alfanuméricos</span>
+                                        <span><i class="bi bi-check2 text-success"></i> Combinación de letras y números para mayor solidez</span>
+                                        <span><i class="bi bi-check2 text-success"></i> No comparta sus credenciales con los propietarios</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Botón de Guardado Central -->
+                    <div class="card" style="margin-top: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                        <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                            <i class="bi bi-shield-check text-success"></i> Todos los cambios se guardan de forma instantánea y encriptada en la base de datos.
+                        </div>
+                        <div style="display: flex; gap: 0.75rem;">
+                            <button type="button" class="btn btn-secondary" onclick="AdminApp.loadAdminProfile()">
+                                <i class="bi bi-arrow-counterclockwise"></i> Restaurar
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="btn-save-admin-profile" style="padding: 0.65rem 1.75rem; font-weight: 600;">
+                                <i class="bi bi-save"></i> Guardar Cambios de Perfil
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </section>
 
         </div>
@@ -964,6 +1179,78 @@ async function handleConfigUpdate(e) {
     } else {
         showToast(res.message, 'error');
     }
+}
+
+function togglePassVisibility(inputId, btnEl) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const icon = btnEl.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (icon) {
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        }
+    } else {
+        input.type = 'password';
+        if (icon) {
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        }
+    }
+}
+
+async function handleAdminProfileUpdate(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btn-save-admin-profile');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Guardando...';
+
+    const formData = new FormData(e.target);
+
+    const newPass = formData.get('new_password');
+    const confirmPass = formData.get('confirm_password');
+    const currPass = formData.get('current_password');
+
+    if (newPass || confirmPass || currPass) {
+        if (!currPass) {
+            showToast('Debe ingresar su contraseña actual para confirmar el cambio de clave.', 'error');
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            return;
+        }
+        if (newPass.length < 6) {
+            showToast('La nueva contraseña debe tener al menos 6 caracteres.', 'error');
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            return;
+        }
+        if (newPass !== confirmPass) {
+            showToast('La nueva contraseña y su confirmación no coinciden.', 'error');
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            return;
+        }
+    }
+
+    const res = await apiRequest('api/auth.php?action=update_admin_profile', {
+        method: 'POST',
+        body: formData
+    });
+
+    if (res.success) {
+        showToast(res.message, 'success');
+        document.getElementById('admin-profile-curr-pass').value = '';
+        document.getElementById('admin-profile-new-pass').value = '';
+        document.getElementById('admin-profile-confirm-pass').value = '';
+        AdminApp.loadAdminProfile();
+    } else {
+        showToast(res.message || 'Error al actualizar el perfil.', 'error');
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = originalText;
 }
 </script>
 
