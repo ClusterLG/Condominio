@@ -249,10 +249,12 @@
             display: block;
         }
 
-        /* ========================================================
-           MENÚ VERTICAL RETRÁCTIL EXCLUSIVO PARA ADMINISTRADORES
-           ======================================================== */
-        .admin-shell-view {
+        /* ==========================================================================
+           SISTEMA DE SHELL Y MENÚ VERTICAL RETRÁCTIL (ADMIN, SUPERADMIN Y RESIDENTE)
+           ========================================================================== */
+        .admin-shell-view,
+        .super-shell-view,
+        .resident-shell-view {
             display: none;
             max-width: 100% !important;
             width: 100% !important;
@@ -261,12 +263,16 @@
             min-height: calc(100vh - 65px);
             box-sizing: border-box;
         }
-        .admin-shell-view.active {
+        .admin-shell-view.active,
+        .super-shell-view.active,
+        .resident-shell-view.active {
             display: flex !important;
             flex-direction: row;
         }
 
-        .admin-vertical-sidebar {
+        .admin-vertical-sidebar,
+        .super-vertical-sidebar,
+        .resident-vertical-sidebar {
             width: 260px;
             background: #111827;
             border-right: 1px solid rgba(255, 255, 255, 0.08);
@@ -282,11 +288,15 @@
             overflow: hidden;
         }
 
-        .admin-vertical-sidebar.collapsed {
+        .admin-vertical-sidebar.collapsed,
+        .super-vertical-sidebar.collapsed,
+        .resident-vertical-sidebar.collapsed {
             width: 74px;
         }
 
-        .admin-sidebar-header {
+        .admin-sidebar-header,
+        .super-sidebar-header,
+        .resident-sidebar-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -297,7 +307,9 @@
             box-sizing: border-box;
         }
 
-        .admin-sidebar-brand {
+        .admin-sidebar-brand,
+        .super-sidebar-brand,
+        .resident-sidebar-brand {
             display: flex;
             align-items: center;
             gap: 0.75rem;
@@ -305,25 +317,41 @@
             white-space: nowrap;
         }
 
-        .admin-brand-icon {
+        .admin-brand-icon,
+        .super-brand-icon,
+        .resident-brand-icon {
             width: 40px;
             height: 40px;
             border-radius: 12px;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.3rem;
             color: #fff;
             flex-shrink: 0;
+        }
+        .admin-brand-icon {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
         }
+        .super-brand-icon {
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.35);
+        }
+        .resident-brand-icon {
+            background: linear-gradient(135deg, #10b981, #06b6d4);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+        }
 
-        .admin-brand-text {
+        .admin-brand-text,
+        .super-brand-text,
+        .resident-brand-text {
             overflow: hidden;
         }
 
-        .admin-brand-title {
+        .admin-brand-title,
+        .super-brand-title,
+        .resident-brand-title {
             font-size: 1rem;
             font-weight: 800;
             color: #fff;
@@ -331,7 +359,9 @@
             line-height: 1.2;
         }
 
-        .admin-brand-subtitle {
+        .admin-brand-subtitle,
+        .super-brand-subtitle,
+        .resident-brand-subtitle {
             font-size: 0.72rem;
             color: #94a3b8;
             overflow: hidden;
@@ -340,7 +370,9 @@
             max-width: 130px;
         }
 
-        .btn-admin-sidebar-toggle {
+        .btn-admin-sidebar-toggle,
+        .btn-super-sidebar-toggle,
+        .btn-resident-sidebar-toggle {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: #94a3b8;
@@ -359,8 +391,20 @@
             color: #60a5fa;
             border-color: rgba(59, 130, 246, 0.3);
         }
+        .btn-super-sidebar-toggle:hover {
+            background: rgba(139, 92, 246, 0.15);
+            color: #c084fc;
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+        .btn-resident-sidebar-toggle:hover {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border-color: rgba(16, 185, 129, 0.3);
+        }
 
-        .admin-sidebar-nav {
+        .admin-sidebar-nav,
+        .super-sidebar-nav,
+        .resident-sidebar-nav {
             display: flex;
             flex-direction: column;
             gap: 0.4rem;
@@ -370,7 +414,9 @@
             overflow-x: hidden;
         }
 
-        .admin-nav-link {
+        .admin-nav-link,
+        .super-nav-link,
+        .resident-nav-link {
             display: flex;
             align-items: center;
             gap: 0.85rem;
@@ -391,7 +437,9 @@
             box-sizing: border-box;
         }
 
-        .admin-nav-link i {
+        .admin-nav-link i,
+        .super-nav-link i,
+        .resident-nav-link i {
             font-size: 1.15rem;
             width: 22px;
             text-align: center;
@@ -399,7 +447,9 @@
             transition: transform 0.2s, color 0.2s;
         }
 
-        .admin-nav-link:hover {
+        .admin-nav-link:hover,
+        .super-nav-link:hover,
+        .resident-nav-link:hover {
             background: rgba(255, 255, 255, 0.05);
             color: #f8fafc;
             border-color: rgba(255, 255, 255, 0.06);
@@ -409,6 +459,14 @@
             color: #60a5fa;
             transform: scale(1.1);
         }
+        .super-nav-link:hover i {
+            color: #c084fc;
+            transform: scale(1.1);
+        }
+        .resident-nav-link:hover i {
+            color: #34d399;
+            transform: scale(1.1);
+        }
 
         .admin-nav-link.active {
             background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.15));
@@ -416,12 +474,33 @@
             color: #fff;
             box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
         }
-
         .admin-nav-link.active i {
             color: #60a5fa;
         }
 
-        .admin-nav-badge {
+        .super-nav-link.active {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(236, 72, 153, 0.15));
+            border-color: rgba(139, 92, 246, 0.45);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+        }
+        .super-nav-link.active i {
+            color: #c084fc;
+        }
+
+        .resident-nav-link.active {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.22), rgba(6, 182, 212, 0.15));
+            border-color: rgba(16, 185, 129, 0.4);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+        }
+        .resident-nav-link.active i {
+            color: #34d399;
+        }
+
+        .admin-nav-badge,
+        .super-nav-badge,
+        .resident-nav-badge {
             background: #ef4444;
             color: #fff;
             font-size: 0.68rem;
@@ -431,7 +510,9 @@
             font-weight: 700;
         }
 
-        .admin-sidebar-footer {
+        .admin-sidebar-footer,
+        .super-sidebar-footer,
+        .resident-sidebar-footer {
             padding: 0.85rem;
             border-top: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
@@ -441,7 +522,9 @@
             background: rgba(11, 15, 25, 0.4);
         }
 
-        .admin-sidebar-user {
+        .admin-sidebar-user,
+        .super-sidebar-user,
+        .resident-sidebar-user {
             display: flex;
             align-items: center;
             gap: 0.65rem;
@@ -452,15 +535,18 @@
             overflow: hidden;
             flex: 1;
         }
-        .admin-sidebar-user:hover {
+        .admin-sidebar-user:hover,
+        .super-sidebar-user:hover,
+        .resident-sidebar-user:hover {
             background: rgba(255, 255, 255, 0.06);
         }
 
-        .admin-user-avatar {
+        .admin-user-avatar,
+        .super-user-avatar,
+        .resident-user-avatar {
             width: 34px;
             height: 34px;
             border-radius: 9px;
-            background: linear-gradient(135deg, #6366f1, #3b82f6);
             color: #fff;
             font-weight: 700;
             font-size: 0.82rem;
@@ -469,13 +555,26 @@
             justify-content: center;
             flex-shrink: 0;
         }
+        .admin-user-avatar {
+            background: linear-gradient(135deg, #6366f1, #3b82f6);
+        }
+        .super-user-avatar {
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+        }
+        .resident-user-avatar {
+            background: linear-gradient(135deg, #10b981, #06b6d4);
+        }
 
-        .admin-user-info {
+        .admin-user-info,
+        .super-user-info,
+        .resident-user-info {
             overflow: hidden;
             white-space: nowrap;
         }
 
-        .admin-user-name {
+        .admin-user-name,
+        .super-user-name,
+        .resident-user-name {
             font-size: 0.8rem;
             font-weight: 700;
             color: #fff;
@@ -484,12 +583,16 @@
             line-height: 1.2;
         }
 
-        .admin-user-role {
+        .admin-user-role,
+        .super-user-role,
+        .resident-user-role {
             font-size: 0.68rem;
             color: #94a3b8;
         }
 
-        .btn-admin-logout-mini {
+        .btn-admin-logout-mini,
+        .btn-super-logout-mini,
+        .btn-resident-logout-mini {
             background: transparent;
             border: 1px solid rgba(255, 255, 255, 0.08);
             color: #94a3b8;
@@ -503,7 +606,9 @@
             transition: all 0.2s;
             flex-shrink: 0;
         }
-        .btn-admin-logout-mini:hover {
+        .btn-admin-logout-mini:hover,
+        .btn-super-logout-mini:hover,
+        .btn-resident-logout-mini:hover {
             background: rgba(239, 68, 68, 0.15);
             color: #ef4444;
             border-color: rgba(239, 68, 68, 0.3);
@@ -513,31 +618,49 @@
         .admin-vertical-sidebar.collapsed .admin-brand-text,
         .admin-vertical-sidebar.collapsed .nav-label,
         .admin-vertical-sidebar.collapsed .admin-nav-badge,
-        .admin-vertical-sidebar.collapsed .admin-user-info {
+        .admin-vertical-sidebar.collapsed .admin-user-info,
+        .super-vertical-sidebar.collapsed .super-brand-text,
+        .super-vertical-sidebar.collapsed .nav-label,
+        .super-vertical-sidebar.collapsed .super-nav-badge,
+        .super-vertical-sidebar.collapsed .super-user-info,
+        .resident-vertical-sidebar.collapsed .resident-brand-text,
+        .resident-vertical-sidebar.collapsed .nav-label,
+        .resident-vertical-sidebar.collapsed .resident-nav-badge,
+        .resident-vertical-sidebar.collapsed .resident-user-info {
             display: none !important;
         }
 
-        .admin-vertical-sidebar.collapsed .admin-nav-link {
+        .admin-vertical-sidebar.collapsed .admin-nav-link,
+        .super-vertical-sidebar.collapsed .super-nav-link,
+        .resident-vertical-sidebar.collapsed .resident-nav-link {
             justify-content: center;
             padding: 0.75rem 0;
         }
 
-        .admin-vertical-sidebar.collapsed .admin-sidebar-header {
+        .admin-vertical-sidebar.collapsed .admin-sidebar-header,
+        .super-vertical-sidebar.collapsed .super-sidebar-header,
+        .resident-vertical-sidebar.collapsed .resident-sidebar-header {
             justify-content: center;
             padding: 1.15rem 0.5rem;
         }
 
-        .admin-vertical-sidebar.collapsed .admin-sidebar-brand {
+        .admin-vertical-sidebar.collapsed .admin-sidebar-brand,
+        .super-vertical-sidebar.collapsed .super-sidebar-brand,
+        .resident-vertical-sidebar.collapsed .resident-sidebar-brand {
             display: none;
         }
 
-        .admin-vertical-sidebar.collapsed .admin-sidebar-user {
+        .admin-vertical-sidebar.collapsed .admin-sidebar-user,
+        .super-vertical-sidebar.collapsed .super-sidebar-user,
+        .resident-vertical-sidebar.collapsed .resident-sidebar-user {
             justify-content: center;
             padding: 0;
         }
 
-        /* Lienzo Principal del Administrador */
-        .admin-main-canvas {
+        /* Lienzo Principal (Canvas) */
+        .admin-main-canvas,
+        .super-main-canvas,
+        .resident-main-canvas {
             flex: 1;
             min-width: 0;
             display: flex;
@@ -546,7 +669,9 @@
             overflow-x: hidden;
         }
 
-        .admin-topbar-header {
+        .admin-topbar-header,
+        .super-topbar-header,
+        .resident-topbar-header {
             background: rgba(17, 24, 39, 0.75);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -561,7 +686,9 @@
             z-index: 80;
         }
 
-        .btn-admin-topbar-toggle {
+        .btn-admin-topbar-toggle,
+        .btn-super-topbar-toggle,
+        .btn-resident-topbar-toggle {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: #fff;
@@ -580,14 +707,28 @@
             color: #60a5fa;
             border-color: rgba(59, 130, 246, 0.3);
         }
+        .btn-super-topbar-toggle:hover {
+            background: rgba(139, 92, 246, 0.15);
+            color: #c084fc;
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+        .btn-resident-topbar-toggle:hover {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border-color: rgba(16, 185, 129, 0.3);
+        }
 
-        .admin-content-inner {
+        .admin-content-inner,
+        .super-content-inner,
+        .resident-content-inner {
             padding: 1.5rem 1.75rem 3rem;
             flex: 1;
         }
 
         @media (max-width: 900px) {
-            .admin-vertical-sidebar {
+            .admin-vertical-sidebar,
+            .super-vertical-sidebar,
+            .resident-vertical-sidebar {
                 position: fixed;
                 left: -270px;
                 top: 60px;
@@ -596,29 +737,49 @@
                 width: 260px !important;
                 transition: left 0.28s ease;
             }
-            .admin-vertical-sidebar.mobile-open {
+            .admin-vertical-sidebar.mobile-open,
+            .super-vertical-sidebar.mobile-open,
+            .resident-vertical-sidebar.mobile-open {
                 left: 0;
             }
-            .admin-vertical-sidebar.collapsed {
+            .admin-vertical-sidebar.collapsed,
+            .super-vertical-sidebar.collapsed,
+            .resident-vertical-sidebar.collapsed {
                 left: -270px;
             }
-            .admin-vertical-sidebar.mobile-open.collapsed {
+            .admin-vertical-sidebar.mobile-open.collapsed,
+            .super-vertical-sidebar.mobile-open.collapsed,
+            .resident-vertical-sidebar.mobile-open.collapsed {
                 left: 0;
                 width: 260px !important;
             }
             .admin-vertical-sidebar.mobile-open.collapsed .admin-brand-text,
             .admin-vertical-sidebar.mobile-open.collapsed .nav-label,
             .admin-vertical-sidebar.mobile-open.collapsed .admin-nav-badge,
-            .admin-vertical-sidebar.mobile-open.collapsed .admin-user-info {
+            .admin-vertical-sidebar.mobile-open.collapsed .admin-user-info,
+            .super-vertical-sidebar.mobile-open.collapsed .super-brand-text,
+            .super-vertical-sidebar.mobile-open.collapsed .nav-label,
+            .super-vertical-sidebar.mobile-open.collapsed .super-nav-badge,
+            .super-vertical-sidebar.mobile-open.collapsed .super-user-info,
+            .resident-vertical-sidebar.mobile-open.collapsed .resident-brand-text,
+            .resident-vertical-sidebar.mobile-open.collapsed .nav-label,
+            .resident-vertical-sidebar.mobile-open.collapsed .resident-nav-badge,
+            .resident-vertical-sidebar.mobile-open.collapsed .resident-user-info {
                 display: block !important;
             }
-            .admin-vertical-sidebar.mobile-open.collapsed .admin-sidebar-brand {
+            .admin-vertical-sidebar.mobile-open.collapsed .admin-sidebar-brand,
+            .super-vertical-sidebar.mobile-open.collapsed .super-sidebar-brand,
+            .resident-vertical-sidebar.mobile-open.collapsed .resident-sidebar-brand {
                 display: flex !important;
             }
-            .admin-topbar-header {
+            .admin-topbar-header,
+            .super-topbar-header,
+            .resident-topbar-header {
                 padding: 0.85rem 1rem;
             }
-            .admin-content-inner {
+            .admin-content-inner,
+            .super-content-inner,
+            .resident-content-inner {
                 padding: 1rem 0.85rem 2rem;
             }
         }
@@ -1242,37 +1403,86 @@
         </div>
     </main>
 
-    <!-- VISTA: DASHBOARD SUPERADMINISTRADOR GLOBAL (clusterlg) -->
-    <section id="viewSuperAdmin" class="dashboard-view">
-        <div class="dashboard-header">
-            <div>
-                <span class="stat-badge" style="border-color: rgba(139, 92, 246, 0.4); color: #c084fc; margin-bottom: 0.4rem; display: inline-flex;">
-                    <i class="bi bi-shield-lock-fill"></i> Consola Central Super-Administrador Global (clusterlg)
-                </span>
-                <h2 style="font-size: 1.6rem; font-weight: 800; color: #fff; margin: 0;">Fiscalización y Auditoría Global de Residencias</h2>
-            </div>
-            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                <button class="btn-primary-saas" style="width: auto; background: #8b5cf6;" onclick="app.showNewCondoModal()">
-                    <i class="bi bi-plus-circle"></i> + Registrar Nuevo Condominio
+    <!-- VISTA: DASHBOARD SUPERADMINISTRADOR GLOBAL (clusterlg - CON MENÚ VERTICAL RETRÁCTIL) -->
+    <section id="viewSuperAdmin" class="dashboard-view super-shell-view">
+        <!-- BARRA LATERAL VERTICAL RETRÁCTIL DEL SUPERADMINISTRADOR -->
+        <aside class="super-vertical-sidebar" id="superVerticalSidebar">
+            <!-- Encabezado del Menú Lateral -->
+            <div class="super-sidebar-header">
+                <div class="super-sidebar-brand">
+                    <div class="super-brand-icon">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                    <div class="super-brand-text">
+                        <div class="super-brand-title">SuperAdmin</div>
+                        <div class="super-brand-subtitle">clusterlg (Global)</div>
+                    </div>
+                </div>
+                <!-- Botón de Colapsar / Desplegar Menú -->
+                <button type="button" class="btn-super-sidebar-toggle" id="btnSuperSidebarToggle" onclick="app.toggleSuperSidebar()" title="Plegar / Desplegar Menú Lateral">
+                    <i class="bi bi-chevron-left" id="superSidebarToggleIcon"></i>
                 </button>
-                <button class="demo-btn" style="padding: 0.6rem 1rem; font-size: 0.88rem;" onclick="app.showHome()">
-                    <i class="bi bi-box-arrow-left"></i> Salir del Sistema
-                </button>
             </div>
-        </div>
 
-        <!-- TABS DE NAVEGACIÓN SUPERADMIN -->
-        <div class="nav-tabs-saas" style="margin-bottom: 1.5rem;">
-            <button id="superTabBtnCondos" class="tab-item-saas active" onclick="app.switchSuperTab('condos', this)">
-                <i class="bi bi-buildings"></i> Directorio de Residencias
-            </button>
-            <button id="superTabBtnAudit" class="tab-item-saas" onclick="app.switchSuperTab('audit', this)">
-                <i class="bi bi-search"></i> Auditoría Detallada de Residencia
-            </button>
-            <button id="superTabBtnLogs" class="tab-item-saas" onclick="app.switchSuperTab('logs', this)">
-                <i class="bi bi-journal-text"></i> Registro de Logs del Sistema <span id="superLogsCountBadge" style="background: #8b5cf6; color: #fff; font-size: 0.7rem; padding: 2px 7px; border-radius: 10px; margin-left: 4px;">0</span>
-            </button>
-        </div>
+            <!-- Navegación Vertical -->
+            <nav class="super-sidebar-nav" id="superSidebarNav">
+                <button type="button" class="super-nav-link active" data-tab="condos" id="superTabBtnCondos" onclick="app.switchSuperTab('condos', this)" title="Directorio de Residencias">
+                    <i class="bi bi-buildings"></i>
+                    <span class="nav-label">Directorio Residencias</span>
+                </button>
+                <button type="button" class="super-nav-link" data-tab="audit" id="superTabBtnAudit" onclick="app.switchSuperTab('audit', this)" title="Auditoría Detallada de Residencia">
+                    <i class="bi bi-search"></i>
+                    <span class="nav-label">Auditoría Detallada</span>
+                </button>
+                <button type="button" class="super-nav-link" data-tab="logs" id="superTabBtnLogs" onclick="app.switchSuperTab('logs', this)" title="Registro de Logs del Sistema">
+                    <i class="bi bi-journal-text"></i>
+                    <span class="nav-label">Logs del Sistema</span>
+                    <span id="superLogsCountBadge" class="super-nav-badge">0</span>
+                </button>
+            </nav>
+
+            <!-- Pie del Menú Lateral -->
+            <div class="super-sidebar-footer">
+                <div class="super-sidebar-user" title="Sesión Super-Administrador Global">
+                    <div class="super-user-avatar">SA</div>
+                    <div class="super-user-info">
+                        <div class="super-user-name">clusterlg</div>
+                        <div class="super-user-role">Super Administrador</div>
+                    </div>
+                </div>
+                <button type="button" class="btn-super-logout-mini" onclick="app.showHome()" title="Salir del Sistema">
+                    <i class="bi bi-box-arrow-left"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- LIENZO PRINCIPAL DEL SUPERADMIN -->
+        <main class="super-main-canvas" id="superMainCanvas">
+            <!-- Header Compacto Superior del Canvas -->
+            <div class="super-topbar-header">
+                <div style="display: flex; align-items: center; gap: 0.85rem;">
+                    <button type="button" class="btn-super-topbar-toggle" onclick="app.toggleSuperSidebar()" title="Plegar / Desplegar Menú">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <div>
+                        <span class="stat-badge" style="border-color: rgba(139, 92, 246, 0.4); color: #c084fc; margin-bottom: 0.2rem; display: inline-flex;">
+                            <i class="bi bi-shield-lock-fill"></i> Consola Central Super-Administrador Global (clusterlg)
+                        </span>
+                        <h2 style="font-size: 1.4rem; font-weight: 800; color: #fff; margin: 0;" id="superCurrentTabHeading">Directorio de Residencias & Auditoría Global</h2>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+                    <button class="btn-primary-saas" style="width: auto; background: #8b5cf6; padding: 0.55rem 1rem; font-size: 0.85rem;" onclick="app.showNewCondoModal()">
+                        <i class="bi bi-plus-circle"></i> + Registrar Nuevo Condominio
+                    </button>
+                    <button class="demo-btn" style="padding: 0.55rem 0.95rem; font-size: 0.85rem;" onclick="app.showHome()">
+                        <i class="bi bi-box-arrow-left"></i> Salir del Sistema
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenido Interior Dinámico -->
+            <div class="super-content-inner">
 
         <!-- SUB-TAB 1: DIRECTORIO DE CONDOMINIOS -->
         <div id="superTabCondosContent">
@@ -1537,7 +1747,7 @@
                     </table>
                 </div>
             </div>
-        </div>
+        </main>
     </section>
 
     <!-- VISTA: DASHBOARD ADMINISTRADOR LOCAL (CON MENÚ VERTICAL RETRÁCTIL) -->
@@ -1878,39 +2088,89 @@
         </main><!-- /.admin-main-canvas -->
     </section>
 
-    <!-- VISTA: PORTAL RESIDENTE -->
-    <section id="viewResident" class="dashboard-view">
-        <div class="dashboard-header">
-            <div>
-                <span class="stat-badge" id="residentHeaderBadge" style="margin-bottom: 0.4rem; display: inline-flex;"><i class="bi bi-person-check"></i> Portal Residente</span>
-                <h2 style="font-size: 1.6rem; font-weight: 800; color: #fff; margin: 0;" id="residentUnitTitle">Apartamento 1A</h2>
-                <span style="font-size: 0.85rem; color: var(--text-secondary);" id="residentOwnerSubtitle">Propietario no registrado</span>
-            </div>
-            <div style="display: flex; gap: 0.75rem;">
-                <button class="btn-primary-saas" style="width: auto; background: #10b981;" onclick="app.showReportarPagoModal()">
-                    <i class="bi bi-send-check"></i> Reportar Pago
+    <!-- VISTA: PORTAL RESIDENTE (CON MENÚ VERTICAL RETRÁCTIL) -->
+    <section id="viewResident" class="dashboard-view resident-shell-view">
+        <!-- BARRA LATERAL VERTICAL RETRÁCTIL DEL RESIDENTE -->
+        <aside class="resident-vertical-sidebar" id="residentVerticalSidebar">
+            <!-- Encabezado del Menú Lateral -->
+            <div class="resident-sidebar-header">
+                <div class="resident-sidebar-brand">
+                    <div class="resident-brand-icon">
+                        <i class="bi bi-person-check-fill"></i>
+                    </div>
+                    <div class="resident-brand-text">
+                        <div class="resident-brand-title">Residente</div>
+                        <div class="resident-brand-subtitle" id="residentSidebarUnitSubtitle">Portal Oficial</div>
+                    </div>
+                </div>
+                <!-- Botón de Colapsar / Desplegar Menú -->
+                <button type="button" class="btn-resident-sidebar-toggle" id="btnResidentSidebarToggle" onclick="app.toggleResidentSidebar()" title="Plegar / Desplegar Menú Lateral">
+                    <i class="bi bi-chevron-left" id="residentSidebarToggleIcon"></i>
                 </button>
-                <button class="demo-btn" style="padding: 0.6rem 1rem; font-size: 0.88rem;" onclick="app.showHome()">
-                    <i class="bi bi-box-arrow-left"></i> Salir
-                </button>
             </div>
-        </div>
 
-        <!-- TABS DE NAVEGACIÓN DEL RESIDENTE -->
-        <div class="nav-tabs-saas" style="margin-bottom: 1.5rem;">
-            <button class="tab-item-saas active" onclick="app.switchResidentTab('finanzas', this)">
-                <i class="bi bi-wallet2"></i> Mis Pagos & Deuda
-            </button>
-            <button class="tab-item-saas" onclick="app.switchResidentTab('tickets', this)">
-                <i class="bi bi-chat-left-dots"></i> Solicitudes & Quejas (<span id="count-my-tickets">0</span>)
-            </button>
-            <button class="tab-item-saas" onclick="app.switchResidentTab('cartelera', this)">
-                <i class="bi bi-megaphone"></i> Cartelera Digital
-            </button>
-            <button class="tab-item-saas" onclick="app.switchResidentTab('perfil', this)">
-                <i class="bi bi-person-gear"></i> Mi Cuenta
-            </button>
-        </div>
+            <!-- Navegación Vertical -->
+            <nav class="resident-sidebar-nav" id="residentSidebarNav">
+                <button type="button" class="resident-nav-link active" data-tab="finanzas" onclick="app.switchResidentTab('finanzas', this)" title="Mis Pagos & Deuda">
+                    <i class="bi bi-wallet2"></i>
+                    <span class="nav-label">Mis Pagos & Deuda</span>
+                </button>
+                <button type="button" class="resident-nav-link" data-tab="tickets" onclick="app.switchResidentTab('tickets', this)" title="Solicitudes & Quejas">
+                    <i class="bi bi-chat-left-dots"></i>
+                    <span class="nav-label">Solicitudes & Quejas</span>
+                    <span id="count-my-tickets" class="resident-nav-badge" style="background:#3b82f6;">0</span>
+                </button>
+                <button type="button" class="resident-nav-link" data-tab="cartelera" onclick="app.switchResidentTab('cartelera', this)" title="Cartelera Digital">
+                    <i class="bi bi-megaphone"></i>
+                    <span class="nav-label">Cartelera Digital</span>
+                </button>
+                <button type="button" class="resident-nav-link" data-tab="perfil" onclick="app.switchResidentTab('perfil', this)" title="Mi Cuenta & Seguridad">
+                    <i class="bi bi-person-gear"></i>
+                    <span class="nav-label">Mi Cuenta / Perfil</span>
+                </button>
+            </nav>
+
+            <!-- Pie del Menú Lateral -->
+            <div class="resident-sidebar-footer">
+                <div class="resident-sidebar-user" onclick="app.switchResidentTab('perfil')" title="Ver Mi Perfil / Clave">
+                    <div class="resident-user-avatar" id="residentSidebarAvatar">1A</div>
+                    <div class="resident-user-info">
+                        <div class="resident-user-name" id="residentSidebarUserName">Residente</div>
+                        <div class="resident-user-role" id="residentSidebarUserRole">Copropietario</div>
+                    </div>
+                </div>
+                <button type="button" class="btn-resident-logout-mini" onclick="app.showHome()" title="Salir del Portal">
+                    <i class="bi bi-box-arrow-left"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- LIENZO PRINCIPAL DEL RESIDENTE -->
+        <main class="resident-main-canvas" id="residentMainCanvas">
+            <!-- Header Compacto Superior del Canvas -->
+            <div class="resident-topbar-header">
+                <div style="display: flex; align-items: center; gap: 0.85rem;">
+                    <button type="button" class="btn-resident-topbar-toggle" onclick="app.toggleResidentSidebar()" title="Plegar / Desplegar Menú">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <div>
+                        <span class="stat-badge" id="residentHeaderBadge" style="margin-bottom: 0.2rem; display: inline-flex;"><i class="bi bi-person-check"></i> Portal Residente</span>
+                        <h2 style="font-size: 1.4rem; font-weight: 800; color: #fff; margin: 0;" id="residentUnitTitle">Apartamento 1A</h2>
+                        <span style="font-size: 0.82rem; color: var(--text-secondary);" id="residentOwnerSubtitle">Propietario no registrado</span>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+                    <button class="btn-primary-saas" style="width: auto; background: #10b981; padding: 0.55rem 1rem; font-size: 0.85rem;" onclick="app.showReportarPagoModal()">
+                        <i class="bi bi-send-check"></i> Reportar Pago
+                    </button>
+                    <button class="demo-btn" style="padding: 0.55rem 0.95rem; font-size: 0.85rem;" onclick="app.showHome()">
+                        <i class="bi bi-box-arrow-left"></i> Salir
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenido Interior Dinámico -->
+            <div class="resident-content-inner">
 
         <!-- SECCIÓN 1: FINANZAS Y PAGOS -->
         <div id="residentTabFinanzas">
@@ -2073,8 +2333,8 @@
                 <button class="btn-primary-saas" style="width: auto; padding: 0.65rem 1.25rem; background: #3b82f6;" onclick="app.updateResidentPassword()">
                     <i class="bi bi-key-fill"></i> Actualizar Contraseña
                 </button>
-            </div>
-        </div>
+            </div><!-- /.resident-content-inner -->
+        </main><!-- /.resident-main-canvas -->
     </section>
 
     <!-- PIE DE PÁGINA GLOBAL DE LA PLATAFORMA CONDOHUB -->
@@ -4015,9 +4275,7 @@
             // REDIRECCIÓN DIRECTA A LA CONFIGURACIÓN DE CONTRASEÑA DESDE EL MODAL DE ALERTA
             goToResidentProfilePassword() {
                 this.closeModal('modalChangeDefaultPassword');
-                const tabBtns = document.querySelectorAll('#viewResident .tab-item-saas');
-                const perfilBtn = tabBtns[3] || tabBtns[tabBtns.length - 1];
-                this.switchResidentTab('perfil', perfilBtn);
+                this.switchResidentTab('perfil');
                 setTimeout(() => {
                     const passInput = document.getElementById('resNewPassword');
                     if (passInput) {
@@ -4270,20 +4528,55 @@
                 const superView = document.getElementById('viewSuperAdmin');
                 superView.classList.add('active');
 
+                // Restaurar preferencia colapsada de Superadmin
+                try {
+                    const savedCollapsed = localStorage.getItem('condo_super_sidebar_collapsed') === '1';
+                    const sb = document.getElementById('superVerticalSidebar');
+                    const icon = document.getElementById('superSidebarToggleIcon');
+                    if (sb && savedCollapsed && window.innerWidth > 900) {
+                        sb.classList.add('collapsed');
+                        if (icon) icon.className = 'bi bi-chevron-right';
+                    }
+                } catch (e) {}
+
                 this.switchSuperTab(this.superActiveTab || 'condos');
                 this.toast('Bienvenido Superusuario Global (clusterlg)');
+            },
+
+            toggleSuperSidebar() {
+                const sb = document.getElementById('superVerticalSidebar');
+                if (!sb) return;
+                const icon = document.getElementById('superSidebarToggleIcon');
+
+                if (window.innerWidth <= 900) {
+                    sb.classList.toggle('mobile-open');
+                } else {
+                    const isCollapsed = sb.classList.toggle('collapsed');
+                    if (icon) {
+                        icon.className = isCollapsed ? 'bi bi-chevron-right' : 'bi bi-chevron-left';
+                    }
+                    try {
+                        localStorage.setItem('condo_super_sidebar_collapsed', isCollapsed ? '1' : '0');
+                    } catch (e) {}
+                }
             },
 
             // SUB-PESTAÑAS DEL SUPERADMINISTRADOR
             switchSuperTab(tabName, btnEl) {
                 this.superActiveTab = tabName;
-                const btnCondos = document.getElementById('superTabBtnCondos');
-                const btnAudit = document.getElementById('superTabBtnAudit');
-                const btnLogs = document.getElementById('superTabBtnLogs');
+                document.querySelectorAll('#superVerticalSidebar .super-nav-link').forEach(b => b.classList.remove('active'));
+                const targetBtn = btnEl || document.querySelector(`#superVerticalSidebar .super-nav-link[data-tab="${tabName}"]`);
+                if (targetBtn) targetBtn.classList.add('active');
 
-                if (btnCondos) btnCondos.classList.toggle('active', tabName === 'condos');
-                if (btnAudit) btnAudit.classList.toggle('active', tabName === 'audit');
-                if (btnLogs) btnLogs.classList.toggle('active', tabName === 'logs');
+                const tabHeadings = {
+                    'condos': 'Directorio de Residencias & Auditoría Global',
+                    'audit': 'Auditoría Detallada de Residencia',
+                    'logs': 'Registro y Auditoría de Logs del Sistema'
+                };
+                const headingEl = document.getElementById('superCurrentTabHeading');
+                if (headingEl && tabHeadings[tabName]) {
+                    headingEl.innerText = tabHeadings[tabName];
+                }
 
                 const contentCondos = document.getElementById('superTabCondosContent');
                 const contentAudit = document.getElementById('superTabAuditContent');
@@ -4296,6 +4589,12 @@
                 if (tabName === 'condos') this.renderSuperAdmin();
                 if (tabName === 'audit') this.renderSuperCondoAudit();
                 if (tabName === 'logs') this.renderSuperLogs();
+
+                // En pantallas móviles cerrar menú al navegar
+                if (window.innerWidth <= 900) {
+                    const sb = document.getElementById('superVerticalSidebar');
+                    if (sb) sb.classList.remove('mobile-open');
+                }
             },
 
             // AL SELECCIONAR UN CONDOMINIO: NO ENTRA A MODO ADMIN, SINO A AUDITORÍA DETALLADA
@@ -6620,6 +6919,27 @@
                 const condo = this.getActiveCondo();
                 const u = this.getCondoUnits(condo.id).find(x => x.codigo === aptoCode);
 
+                // Sidebar del Residente: Avatar, Unidad y Nombre
+                const sideAvatar = document.getElementById('residentSidebarAvatar');
+                if (sideAvatar) sideAvatar.innerText = aptoCode.replace(/[^a-zA-Z0-9]/g, '').slice(0, 2).toUpperCase() || 'AP';
+                const sideSub = document.getElementById('residentSidebarUnitSubtitle');
+                if (sideSub) sideSub.innerText = `Apto ${aptoCode} • ${condo.nombre}`;
+                const sideUser = document.getElementById('residentSidebarUserName');
+                if (sideUser) sideUser.innerText = u && u.propietario ? u.propietario : 'Residente ' + aptoCode;
+                const sideRole = document.getElementById('residentSidebarUserRole');
+                if (sideRole) sideRole.innerText = u && u.propietario ? 'Copropietario' : 'Sin adjudicar';
+
+                // Restaurar preferencia colapsada de Residente
+                try {
+                    const savedCollapsed = localStorage.getItem('condo_resident_sidebar_collapsed') === '1';
+                    const sb = document.getElementById('residentVerticalSidebar');
+                    const icon = document.getElementById('residentSidebarToggleIcon');
+                    if (sb && savedCollapsed && window.innerWidth > 900) {
+                        sb.classList.add('collapsed');
+                        if (icon) icon.className = 'bi bi-chevron-right';
+                    }
+                } catch (e) {}
+
                 document.getElementById('residentUnitTitle').innerText = `Apartamento ${aptoCode}`;
                 const aptoEmail = this.getAptoEmail(condo, aptoCode);
                 document.getElementById('residentOwnerSubtitle').innerText = `${u && u.propietario ? 'Propietario: ' + u.propietario : 'Sin adjudicar'} • Usuario: ${aptoEmail}`;
@@ -6687,20 +7007,33 @@
 
                 // Mantener la pestaña que el usuario tiene abierta actualmente
                 const activeTab = this.currentResidentTab || 'finanzas';
-                const tabBtns = document.querySelectorAll('#viewResident .tab-item-saas');
-                let targetBtn = tabBtns[0];
-                if (activeTab === 'tickets') targetBtn = tabBtns[1];
-                else if (activeTab === 'cartelera') targetBtn = tabBtns[2];
-                else if (activeTab === 'perfil') targetBtn = tabBtns[3];
+                this.switchResidentTab(activeTab);
+            },
 
-                this.switchResidentTab(activeTab, targetBtn);
+            toggleResidentSidebar() {
+                const sb = document.getElementById('residentVerticalSidebar');
+                if (!sb) return;
+                const icon = document.getElementById('residentSidebarToggleIcon');
+
+                if (window.innerWidth <= 900) {
+                    sb.classList.toggle('mobile-open');
+                } else {
+                    const isCollapsed = sb.classList.toggle('collapsed');
+                    if (icon) {
+                        icon.className = isCollapsed ? 'bi bi-chevron-right' : 'bi bi-chevron-left';
+                    }
+                    try {
+                        localStorage.setItem('condo_resident_sidebar_collapsed', isCollapsed ? '1' : '0');
+                    } catch (e) {}
+                }
             },
 
             // PESTAÑAS DEL PORTAL DEL RESIDENTE
             switchResidentTab(tabName, btnEl) {
                 this.currentResidentTab = tabName;
-                document.querySelectorAll('#viewResident .tab-item-saas').forEach(b => b.classList.remove('active'));
-                if (btnEl) btnEl.classList.add('active');
+                document.querySelectorAll('#residentVerticalSidebar .resident-nav-link').forEach(b => b.classList.remove('active'));
+                const targetBtn = btnEl || document.querySelector(`#residentVerticalSidebar .resident-nav-link[data-tab="${tabName}"]`);
+                if (targetBtn) targetBtn.classList.add('active');
 
                 document.getElementById('residentTabFinanzas').style.display = tabName === 'finanzas' ? 'block' : 'none';
                 document.getElementById('residentTabTickets').style.display = tabName === 'tickets' ? 'block' : 'none';
@@ -6709,6 +7042,12 @@
 
                 if (tabName === 'tickets') this.renderResidentTickets();
                 if (tabName === 'cartelera') this.renderResidentCartelera();
+
+                // En pantallas móviles cerrar menú al navegar
+                if (window.innerWidth <= 900) {
+                    const sb = document.getElementById('residentVerticalSidebar');
+                    if (sb) sb.classList.remove('mobile-open');
+                }
             },
 
             // REDACTAR SOLICITUD / QUEJA (RESIDENTE)
