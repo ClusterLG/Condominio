@@ -125,8 +125,8 @@ export const VerticalPortalsScene: React.FC = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[
               '🗺️ Mapa de pisos con semáforo de solvencias al día.',
-              '💳 Emisión y reparto equitativo de cuotas con alícuotas blindadas.',
-              '🔍 Auditoría de pagos con visor de comprobantes y validación en 1 clic.',
+              '💳 Cuotas ordinarias, extraordinarias e individuales por apto.',
+              '🔍 Consola de conciliación, saldos a favor y recibos digitales.',
               '👤 Nuevo Módulo de Perfil con datos personales y cambio seguro de clave.',
               '📂 Menú Vertical Retráctil con memoria y colapso animado.',
             ].map((text, idx) => (
@@ -176,11 +176,11 @@ export const VerticalPortalsScene: React.FC = () => {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[
-              '💵 Consulta de saldo exacto en USD y Bolívares oficiales según BCV en vivo.',
-              '🏦 Cuentas autorizadas oficiales (Pago Móvil, Cuentas Corrientes, Zelle).',
-              '📤 Reporte ágil de pagos con capture desde cualquier celular sin app pesada.',
+              '💵 Balance en USD y Bs. con desglose de cuotas individuales.',
+              '🏦 Cuentas autorizadas oficiales (Pago Móvil, Cuentas, Zelle).',
+              '📤 Reporte ágil de pagos con capture desde cualquier celular.',
               '📂 Menú Lateral Drawer optimizado para pantallas móviles.',
-              '📝 Mesa de averías para reportar incidencias comunitarias con fotos.',
+              '📝 Mesa de averías para reportar incidencias comunitarias.',
             ].map((text, idx) => (
               <div key={idx} style={{ fontSize: 18, color: '#e2e8f0', display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span>{text}</span>

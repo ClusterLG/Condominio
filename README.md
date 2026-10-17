@@ -48,10 +48,11 @@ Sistema web rápido, moderno y altamente escalable diseñado como **estructura b
 
 | Modificación / Característica | Alcance / Rol | Detalle Técnico y Funcional |
 | :--- | :--- | :--- |
+| **Pagos Individuales y Gestión Administrativa** | Administrador, Superadmin y Residentes | Módulo completo de cobro puntual por apartamento (sin alterar alícuotas generales), reporte de pagos individuales multicanal con capture y cálculo BCV en vivo, y consola administrativa de conciliación en 1 clic con acreditación de saldos a favor y recibos digitales oficiales. |
 | **Menú Vertical Retráctil** | Administrador, Superadmin y Residente | Sustitución completa de las pestañas horizontales por una barra lateral retráctil vertical (`sidebar-drawer`). Incluye botón flotante en móviles, backdrop blur y guardado del estado en `localStorage`. |
 | **Módulo de Perfil del Administrador** | Administrador Local | Nueva vista para actualizar Cédula de Identidad, teléfonos y cargo de la Junta. Incluye cambio seguro de contraseña validando primero la contraseña actual en frontend y backend (`api/auth.php`). |
 | **Blindaje de Alícuotas Inmobiliarias** | Superadmin Exclusivo | Restricción total de edición de alícuotas únicamente para el Superadmin. En los paneles de Administrador y Residente los campos quedan en modo solo lectura (`readonly`), y la API `api/apartamentos.php` rechaza cualquier alteración no autorizada. |
-| **Presentación Dinámica Remotion** | SaaS Presentation | Video de presentación corporativo actualizado en formatos horizontal (16:9 1080p) y vertical (9:16 reels/shorts) con 7 escenas secuenciales detallando las ventajas competitivas y la evolución tecnológica. |
+| **Presentación Dinámica Remotion** | SaaS Presentation | Video de presentación corporativo actualizado en formatos horizontal (16:9 1080p) y vertical (9:16 reels/shorts) con 8 escenas secuenciales integrando la nueva escena especializada de Pagos Individuales y Conciliación Administrativa. |
 
 
 ---

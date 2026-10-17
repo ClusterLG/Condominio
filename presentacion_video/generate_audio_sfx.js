@@ -146,9 +146,9 @@ function generateRiser() {
   return samples;
 }
 
-// 6. TECH AMBIENT BEAT (45 seconds continuous background music loop)
+// 6. TECH AMBIENT BEAT (61 seconds continuous background music loop)
 function generateTechMusicBed() {
-  const duration = 46.0;
+  const duration = 61.0;
   const totalSamples = Math.floor(duration * SAMPLE_RATE);
   const samples = new Float32Array(totalSamples);
 
@@ -194,10 +194,10 @@ function generateTechMusicBed() {
     const padEnv = 0.5 + 0.5 * Math.sin(Math.PI * (timeInBar / barDuration));
     const pad = (pad1 + pad2 + pad3) * 0.08 * padEnv;
 
-    // Master fade in (0-1.5s) and fade out (43-45s)
+    // Master fade in (0-1.5s) and fade out (58.5-60.5s)
     let masterEnv = 1;
     if (t < 1.5) masterEnv = t / 1.5;
-    if (t > 43.5) masterEnv = Math.max(0, (45.0 - t) / 1.5);
+    if (t > 58.5) masterEnv = Math.max(0, (60.5 - t) / 2.0);
 
     samples[i] = (kick + hihat + bass + pad) * masterEnv * 0.85;
   }

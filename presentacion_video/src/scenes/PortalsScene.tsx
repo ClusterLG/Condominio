@@ -133,8 +133,8 @@ export const PortalsScene: React.FC = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 10 }}>
               {[
                 '🗺️ Mapa de Pisos Interactivo con semáforo de solvencias al día.',
-                '💳 Emisión y reparto equitativo de cuotas ordinarias y extraordinarias.',
-                '🔍 Bandeja de auditoría con visor de captures bancarios y aprobación en 1 clic.',
+                '💳 Emisión de cuotas ordinarias, extraordinarias e individuales por apartamento.',
+                '🔍 Consola de conciliación: auditoría de pagos, saldos a favor y recibos digitales.',
                 '👤 Módulo de Perfil con datos personales y cambio seguro de contraseña.',
                 '📂 Menú Vertical Retráctil con colapso animado, sin scroll horizontal.',
               ].map((item, idx) => (
@@ -227,9 +227,9 @@ export const PortalsScene: React.FC = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 10 }}>
               {[
-                '💵 Consulta de saldo exacto en USD y Bolívares oficiales según BCV en vivo.',
+                '💵 Consulta de saldo exacto ($ USD y Bs.) y desglose de cuotas individuales asignadas.',
                 '🏦 Acceso directo a las cuentas bancarias oficiales (Pago Móvil, Cuentas, Zelle).',
-                '📤 Reporte ágil de transferencias adjuntando el comprobante desde el celular.',
+                '📤 Reporte ágil de pagos individuales adjuntando el comprobante desde el celular.',
                 '📂 Menú Lateral Retráctil adaptable a teléfonos, tablets y computadoras.',
                 '📝 Reporte de averías comunitarias con fotos y respuesta directa de la junta.',
               ].map((item, idx) => (

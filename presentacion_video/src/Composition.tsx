@@ -5,11 +5,12 @@ import { IntroScene } from './scenes/IntroScene';
 import { ProblemSolutionScene } from './scenes/ProblemSolutionScene';
 import { CoreFeaturesScene } from './scenes/CoreFeaturesScene';
 import { UpgradesScene } from './scenes/UpgradesScene';
+import { PaymentsScene } from './scenes/PaymentsScene';
 import { StepByStepScene } from './scenes/StepByStepScene';
 import { PortalsScene } from './scenes/PortalsScene';
 import { MetricsCtaScene } from './scenes/MetricsCtaScene';
 
-const TOTAL_FRAMES = 1530; // 51 seconds at 30 FPS
+const TOTAL_FRAMES = 1770; // 59 seconds at 30 FPS
 
 export const MainPresentation: React.FC = () => {
   const frame = useCurrentFrame();
@@ -50,17 +51,22 @@ export const MainPresentation: React.FC = () => {
           <UpgradesScene />
         </Series.Sequence>
 
-        {/* Scene 5: Paso a Paso del Ciclo Mensual (7 segundos) */}
+        {/* Scene 5: Pagos Individuales y Gestión Administrativa de Cobranza (8 segundos) */}
+        <Series.Sequence durationInFrames={240}>
+          <PaymentsScene />
+        </Series.Sequence>
+
+        {/* Scene 6: Paso a Paso del Ciclo Mensual (7 segundos) */}
         <Series.Sequence durationInFrames={210}>
           <StepByStepScene />
         </Series.Sequence>
 
-        {/* Scene 6: Portales Especializados con Menú Retráctil (8 segundos) */}
+        {/* Scene 7: Portales Especializados con Menú Retráctil (8 segundos) */}
         <Series.Sequence durationInFrames={240}>
           <PortalsScene />
         </Series.Sequence>
 
-        {/* Scene 7: Métricas y Llamado a la Acción (7 segundos) */}
+        {/* Scene 8: Métricas y Llamado a la Acción (7 segundos) */}
         <Series.Sequence durationInFrames={210}>
           <MetricsCtaScene />
         </Series.Sequence>

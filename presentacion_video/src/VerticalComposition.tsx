@@ -5,11 +5,12 @@ import { VerticalIntroScene } from './scenes/VerticalIntroScene';
 import { VerticalProblemSolutionScene } from './scenes/VerticalProblemSolutionScene';
 import { VerticalCoreFeaturesScene } from './scenes/VerticalCoreFeaturesScene';
 import { VerticalUpgradesScene } from './scenes/VerticalUpgradesScene';
+import { VerticalPaymentsScene } from './scenes/VerticalPaymentsScene';
 import { VerticalStepByStepScene } from './scenes/VerticalStepByStepScene';
 import { VerticalPortalsScene } from './scenes/VerticalPortalsScene';
 import { VerticalMetricsCtaScene } from './scenes/VerticalMetricsCtaScene';
 
-const TOTAL_FRAMES = 1530; // 51 seconds at 30 FPS
+const TOTAL_FRAMES = 1770; // 59 seconds at 30 FPS
 
 export const MainVerticalPresentation: React.FC = () => {
   const frame = useCurrentFrame();
@@ -25,13 +26,13 @@ export const MainVerticalPresentation: React.FC = () => {
         overflow: 'hidden',
       }}
     >
-      {/* Background Music Bed (51s continuous techno-ambient groove) */}
+      {/* Background Music Bed (59s continuous techno-ambient groove) */}
       <Audio src={staticFile('tech_ambient.wav')} volume={0.35} />
 
       {/* Visual Ambient Background */}
       <VerticalBackground />
 
-      {/* 7 Sequential Scenes */}
+      {/* 8 Sequential Scenes */}
       <Series>
         {/* Escena 1: Intro y Branding (6 segundos / 180 frames) */}
         <Series.Sequence durationInFrames={180}>
@@ -53,17 +54,22 @@ export const MainVerticalPresentation: React.FC = () => {
           <VerticalUpgradesScene />
         </Series.Sequence>
 
-        {/* Escena 5: Flujo Mensual en 4 Pasos (7 segundos / 210 frames) */}
+        {/* Escena 5: Pagos Individuales y Gestión Administrativa (8 segundos / 240 frames) */}
+        <Series.Sequence durationInFrames={240}>
+          <VerticalPaymentsScene />
+        </Series.Sequence>
+
+        {/* Escena 6: Flujo Mensual en 4 Pasos (7 segundos / 210 frames) */}
         <Series.Sequence durationInFrames={210}>
           <VerticalStepByStepScene />
         </Series.Sequence>
 
-        {/* Escena 6: Portales Especializados con Menú Retráctil (8 segundos / 240 frames) */}
+        {/* Escena 7: Portales Especializados con Menú Retráctil (8 segundos / 240 frames) */}
         <Series.Sequence durationInFrames={240}>
           <VerticalPortalsScene />
         </Series.Sequence>
 
-        {/* Escena 7: Métricas y Contacto (7 segundos / 210 frames) */}
+        {/* Escena 8: Métricas y Contacto (7 segundos / 210 frames) */}
         <Series.Sequence durationInFrames={210}>
           <VerticalMetricsCtaScene />
         </Series.Sequence>

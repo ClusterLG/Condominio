@@ -181,14 +181,16 @@ def build_pdf():
         [
             Paragraph("<b>🏢 Para Administradores y Juntas de Condominio:</b><br/>"
                       "• <b>Mapeo Interactivo de Pisos:</b> Visualizacion en tiempo real de solvencia, morosidad y saldos a favor.<br/>"
+                      "• <b>Emision de Cuotas Globales e Individuales:</b> Asignacion de cuotas ordinarias por alicuota o cobros puntuales a un apartamento especifico sin alterar la alicuota del edificio.<br/>"
+                      "• <b>Consola Administrativa de Pagos:</b> Auditoria con visor de comprobantes bancarios, aprobacion en 1 clic, acreditacion de saldos a favor y emision de recibos digitales.<br/>"
                       "• <b>Modulo de Perfil del Administrador:</b> Actualizacion de datos de contacto y cambio seguro de clave.<br/>"
                       "• <b>Menu Vertical Retractil:</b> Navegacion lateral con colapso y memoria localStorage.<br/>"
-                      "• <b>Blindaje de Alicuotas:</b> Modificacion exclusiva por Superadmin segun Ley de Propiedad Horizontal.<br/>"
-                      "• <b>Auditoria y Conciliacion de Pagos:</b> Aprobacion de comprobantes y gestion de saldos a favor.", body_style),
+                      "• <b>Blindaje de Alicuotas:</b> Modificacion exclusiva por Superadmin segun Ley de Propiedad Horizontal.", body_style),
             Paragraph("<b>👤 Para Propietarios y Residentes:</b><br/>"
-                      "• <b>Portal Personalizado por Apartamento:</b> Consulta de balance exacto en tiempo real ($ USD y Bs).<br/>"
+                      "• <b>Portal Personalizado por Apartamento:</b> Consulta de balance exacto en tiempo real ($ USD y Bs al BCV) con desglose de cuotas individuales asignadas.<br/>"
+                      "• <b>Reporte de Pagos Multicanal 24/7:</b> Carga intuitiva de comprobantes por Pago Movil, Transferencias (Banesco/Mercantil), Zelle o Divisas con calculo automatico.<br/>"
+                      "• <b>Historial y Recibos Digitales:</b> Trazabilidad de pagos aprobados, saldo disponible y comprobante oficial emitido por la junta.<br/>"
                       "• <b>Menu Lateral Responsive:</b> Maximo espacio util en pantalla sin barras de scroll molestas.<br/>"
-                      "• <b>Reporte de Pagos Intuitivo:</b> Carga de comprobantes por Pago Movil, Transferencia o Zelle.<br/>"
                       "• <b>Modulo de Atencion / Tickets:</b> Envio y seguimiento de quejas, averias y solicitudes formales.<br/>"
                       "• <b>Seguridad Institucional:</b> Credenciales unicas por apartamento con alerta de cambio de clave.", body_style)
         ]
@@ -206,7 +208,31 @@ def build_pdf():
         ('VALIGN', (0,0), (-1,-1), 'TOP'),
     ]))
     story.append(t_features)
-    story.append(Spacer(1, 7))
+    story.append(Spacer(1, 5))
+
+    # Highlight Box: Módulo Financiero de Pagos Individuales y Conciliación
+    fin_box_data = [
+        [
+            Paragraph("<b>💼 Modulo Especializado: Pagos Individuales y Gestion Administrativa de Cobranza:</b><br/>"
+                      "<b>1. Cuotas Individuales por Unidad:</b> Permite a la administracion emitir cobros puntuales a un apartamento especifico (reparaciones exclusivas, sustitucion de llaves/tags, multas de convivencia o alquiler de areas sociales) sin impactar el prorrateo general de las alicuotas.<br/>"
+                      "<b>2. Pagos Individuales Bimoneda:</b> Los copropietarios reportan pagos parciales o totales en Bolivares (segun tasa oficial BCV automatizada) o Divisas, adjuntando la captura digital y numero de referencia para cotejo instantaneo.<br/>"
+                      "<b>3. Consola de Conciliacion y Aprobacion en 1 Clic:</b> La junta examina visualmente el capture contra el extracto bancario; al aprobar, el sistema acredita el monto, recalcula el estado de cuenta y expide el Recibo Digital Oficial.<br/>"
+                      "<b>4. Manejo de Saldos a Favor y Excedentes:</b> Los pagos por adelantado o redondeos a favor se acreditan en cuenta y se deducen automaticamente en las cuotas subsiguientes.",
+                      body_style)
+        ]
+    ]
+    t_fin_box = Table(fin_box_data, colWidths=[530])
+    t_fin_box.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#f5f3ff')),
+        ('BOX', (0,0), (-1,-1), 0.8, colors.HexColor('#c4b5fd')),
+        ('TOPPADDING', (0,0), (-1,-1), 4),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
+        ('LEFTPADDING', (0,0), (-1,-1), 7),
+        ('RIGHTPADDING', (0,0), (-1,-1), 7),
+        ('VALIGN', (0,0), (-1,-1), 'TOP'),
+    ]))
+    story.append(t_fin_box)
+    story.append(Spacer(1, 6))
 
     # ---------------- GUIA DE ACCESO PARA EL CLIENTE ----------------
     story.append(Paragraph("2. Instrucciones para la Prueba del Cliente", section_heading))
@@ -232,7 +258,7 @@ def build_pdf():
             Paragraph("<b>Administrador de Condominio</b><br/><font size='6.5' color='#64748b'>Gestion Residencias Los Samanes</font>", cell_style),
             Paragraph("<code>admin@resdlossamanes.com</code><br/><font size='6.5' color='#64748b'>Alias directo: admin</font>", cell_code),
             Paragraph("<code>admin123</code>", cell_code),
-            Paragraph("Acceso total al panel de administracion: visualizacion del mapa interactivo de 12 pisos + PB, emision de cuotas ordinarias/extraordinarias, auditoria de pagos, gestion de cuentas bancarias, comunicados y respuesta a tickets.", cell_style)
+            Paragraph("Acceso total al panel de administracion: visualizacion del mapa interactivo de 12 pisos + PB, emision de cuotas ordinarias, extraordinarias e individuales por apartamento, consola de conciliacion y aprobacion de pagos en 1 clic, acreditacion de saldos a favor, emision de recibos digitales, gestion de cuentas bancarias y respuesta a tickets.", cell_style)
         ]
     ]
     t_admin = Table(admin_table_data, colWidths=[130, 160, 75, 175])
