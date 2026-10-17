@@ -11,30 +11,34 @@
 
 Welcome to your Remotion project!
 
+## 🎬 Composiciones Disponibles
+
+| ID de Composición | Formato | Duración | Enfoque / Plataforma |
+| :--- | :--- | :--- | :--- |
+| **`UltimaEdicion1710`** | **Vertical 9:16** (`1080x1920`) | **36s** (1080 frames) | **Edición Rápida TikTok / Reels / Shorts**: El gancho, cuotas individuales, conciliación en 1 clic, mapa 2D, blindaje legal y CTA viral. |
+| **`CondoHubVertical`** | **Vertical 9:16** (`1080x1920`) | **59s** (1770 frames) | **Edición Extendida Vertical**: 8 escenas completas con portales especializados y flujo paso a paso. |
+| **`CondoHubPresentation`** | **Horizontal 16:9** (`1920x1080`) | **59s** (1770 frames) | **Presentación Institucional**: Para pantallas de asambleas, monitores y reuniones de junta de condominio. |
+
 ## Commands
 
-**Install Dependencies**
-
-```console
-npm i --loglevel=error
-```
-
-**Start Preview**
-
+**Iniciar Previsualización Interactiva (Remotion Player)**
 ```console
 npm run dev
 ```
 
-**Render video**
-
+**Renderizar la Nueva Edición TikTok / Reels (`UltimaEdicion1710`)**
 ```console
-npx remotion render
+npx remotion render UltimaEdicion1710 out/UltimaEdicion1710.mp4
 ```
 
-**Upgrade Remotion**
-
+**Renderizar Composición Vertical Extendida**
 ```console
-npx remotion upgrade
+npx remotion render CondoHubVertical out/CondoHubVertical.mp4
+```
+
+**Renderizar Composición Horizontal 16:9**
+```console
+npx remotion render CondoHubPresentation out/CondoHubPresentation.mp4
 ```
 
 ## Docs
