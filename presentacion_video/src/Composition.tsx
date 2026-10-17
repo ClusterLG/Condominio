@@ -1,5 +1,5 @@
 import React from 'react';
-import { Composition, Series, useCurrentFrame } from 'remotion';
+import { Audio, Composition, Series, staticFile, useCurrentFrame } from 'remotion';
 import { Background } from './components/Background';
 import { IntroScene } from './scenes/IntroScene';
 import { ProblemSolutionScene } from './scenes/ProblemSolutionScene';
@@ -26,6 +26,9 @@ export const MainPresentation: React.FC = () => {
         overflow: 'hidden',
       }}
     >
+      {/* Background audio track */}
+      <Audio src={staticFile('tech_ambient.wav')} volume={0.35} />
+
       {/* Background ambient animations */}
       <Background />
 

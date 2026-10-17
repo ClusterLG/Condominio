@@ -142,6 +142,9 @@ export const VerticalPaymentsScene: React.FC = () => {
                 boxShadow: `0 12px 28px -6px ${item.color}25`,
               }}
             >
+              {frame === delay && (
+                <Audio src={staticFile(idx === 2 ? 'ding.wav' : 'pop.wav')} volume={idx === 2 ? 0.75 : 0.6} />
+              )}
               <div
                 style={{
                   width: 58,

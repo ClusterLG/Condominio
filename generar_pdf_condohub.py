@@ -185,7 +185,7 @@ def build_pdf():
                       "• <b>Consola Administrativa de Pagos:</b> Auditoria con visor de comprobantes bancarios, aprobacion en 1 clic, acreditacion de saldos a favor y emision de recibos digitales.<br/>"
                       "• <b>Modulo de Perfil del Administrador:</b> Actualizacion de datos de contacto y cambio seguro de clave.<br/>"
                       "• <b>Menu Vertical Retractil:</b> Navegacion lateral con colapso y memoria localStorage.<br/>"
-                      "• <b>Blindaje de Alicuotas:</b> Modificacion exclusiva por Superadmin segun Ley de Propiedad Horizontal.", body_style),
+                      "• <b>Blindaje de Alicuotas:</b> Proteccion estricta segun documento de condominio y Ley de Propiedad Horizontal para salvaguardar la equidad.", body_style),
             Paragraph("<b>👤 Para Propietarios y Residentes:</b><br/>"
                       "• <b>Portal Personalizado por Apartamento:</b> Consulta de balance exacto en tiempo real ($ USD y Bs al BCV) con desglose de cuotas individuales asignadas.<br/>"
                       "• <b>Reporte de Pagos Multicanal 24/7:</b> Carga intuitiva de comprobantes por Pago Movil, Transferencias (Banesco/Mercantil), Zelle o Divisas con calculo automatico.<br/>"
