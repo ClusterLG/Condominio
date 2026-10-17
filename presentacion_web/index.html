@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CondoHub SaaS — Presentación del Sistema de Gestión de Condominios</title>
+  <meta name="description" content="Presentación interactiva de CondoHub SaaS: cobranza bimoneda con tasa BCV, cuotas y pagos individuales, conciliación administrativa en 1 clic, mapa de pisos y portales para Superadmin, Junta y Residentes.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <style>
+    :root {
+      --bg: #070b14;
+      --bg-2: #0d1322;
+      --card: rgba(22, 31, 50, 0.72);
+      --card-solid: #161f32;
+      --border: rgba(255, 255, 255, 0.09);
+      --text: #f8fafc;
+      --text-2: #a5b4cc;
+      --muted: #64748b;
+      --blue: #3b82f6;
+      --blue-l: #60a5fa;
+      --violet: #8b5cf6;
+      --emerald: #10b981;
+      --emerald-l: #34d399;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --cyan: #38bdf8;
+      --radius: 22px;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---------- Ambient background ---------- */
+    .ambient { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .ambient .orb {
+      position: absolute; border-radius: 50%; filter: blur(110px); opacity: .55;
+      transition: background 1.2s var(--ease), transform 1.6s var(--ease);
+    }
+    .ambient .orb.o1 { width: 620px; height: 620px; top: -180px; left: -140px; background: radial-gradient(circle, rgba(59,130,246,.55), transparent 70%); animation: float1 18s ease-in-out infinite; }
+    .ambient .orb.o2 { width: 680px; height: 680px; bottom: -220px; right: -160px; background: radial-gradient(circle, rgba(16,185,129,.42), transparent 70%); animation: float2 22s ease-in-out infinite; }
+    .ambient .orb.o3 { width: 420px; height: 420px; top: 40%; left: 55%; background: radial-gradient(circle, rgba(139,92,246,.38), transparent 70%); animation: float1 26s ease-in-out infinite reverse; }
+    .ambient .grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(ellipse at center, #000 30%, transparent 80%);
+    }
+    @keyframes float1 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(60px, 40px); } }
+    @keyframes float2 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-50px, -60px); } }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 34px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 1.05rem; letter-spacing: -.01em; }
+    .brand-icon {
+      width: 38px; height: 38px; border-radius: 11px;
+      background: linear-gradient(135deg, var(--blue), var(--violet));
+      display: grid; place-items: center; font-size: 1.15rem;
+      box-shadow: 0 0 24px rgba(59,130,246,.45);
+    }
+    .brand span.saas { color: var(--cyan); }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: .78rem; font-weight: 700; letter-spacing: .04em;
+      padding: 7px 14px; border-radius: 999px;
+      background: rgba(255,255,255,.05); border: 1px solid var(--border); color: var(--text-2);
+    }
+    .chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--emerald); box-shadow: 0 0 10px var(--emerald); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+    .icon-btn {
+      width: 38px; height: 38px; border-radius: 11px; border: 1px solid var(--border);
+      background: rgba(255,255,255,.04); color: var(--text-2); cursor: pointer;
+      display: grid; place-items: center; font-size: 1rem; transition: all .25s var(--ease);
+    }
+    .icon-btn:hover { background: rgba(255,255,255,.1); color: #fff; transform: translateY(-1px); }
+
+    /* ---------- Deck & slides ---------- */
+    .deck { position: relative; z-index: 1; width: 100%; height: 100%; }
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 96px 7vw 110px;
+      opacity: 0; visibility: hidden;
+      transform: translateX(60px) scale(.985);
+      transition: opacity .7s var(--ease), transform .7s var(--ease), visibility 0s linear .7s;
+    }
+    .slide.prev { transform: translateX(-60px) scale(.985); }
+    .slide.active {
+      opacity: 1; visibility: visible; transform: none;
+      transition: opacity .7s var(--ease), transform .7s var(--ease), visibility 0s;
+    }
+    .slide-inner { width: 100%; max-width: 1240px; }
+
+    /* Staggered reveal */
+    .reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+    .slide.active .reveal { opacity: 1; transform: none; }
+    .slide.active .reveal.d1 { transition-delay: .08s; }
+    .slide.active .reveal.d2 { transition-delay: .16s; }
+    .slide.active .reveal.d3 { transition-delay: .24s; }
+    .slide.active .reveal.d4 { transition-delay: .32s; }
+    .slide.active .reveal.d5 { transition-delay: .40s; }
+    .slide.active .reveal.d6 { transition-delay: .48s; }
+    .slide.active .reveal.d7 { transition-delay: .56s; }
+    .slide.active .reveal.d8 { transition-delay: .64s; }
+
+    /* ---------- Typography ---------- */
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: .8rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+      padding: 7px 16px; border-radius: 999px; margin-bottom: 18px;
+      color: var(--blue-l); background: rgba(59,130,246,.12); border: 1px solid rgba(59,130,246,.3);
+    }
+    .eyebrow.green { color: var(--emerald-l); background: rgba(16,185,129,.12); border-color: rgba(16,185,129,.32); }
+    .eyebrow.violet { color: #c4b5fd; background: rgba(139,92,246,.13); border-color: rgba(139,92,246,.35); }
+    .eyebrow.amber { color: #fcd34d; background: rgba(245,158,11,.12); border-color: rgba(245,158,11,.35); }
+    .eyebrow.red { color: #fca5a5; background: rgba(239,68,68,.12); border-color: rgba(239,68,68,.35); }
+    .eyebrow.cyan { color: #7dd3fc; background: rgba(56,189,248,.12); border-color: rgba(56,189,248,.32); }
+
+    h1.hero {
+      font-size: clamp(2.8rem, 6.4vw, 5.6rem); font-weight: 800; line-height: 1.02; letter-spacing: -.04em;
+    }
+    h2.title {
+      font-size: clamp(2rem, 3.8vw, 3.3rem); font-weight: 800; line-height: 1.08; letter-spacing: -.03em;
+      margin-bottom: 14px;
+    }
+    .lead { font-size: clamp(1rem, 1.35vw, 1.22rem); color: var(--text-2); line-height: 1.6; max-width: 760px; }
+    .grad { background: linear-gradient(120deg, var(--blue-l), var(--violet) 45%, var(--emerald-l)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .grad-green { background: linear-gradient(120deg, var(--emerald-l), var(--cyan)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .grad-red { background: linear-gradient(120deg, #f87171, var(--amber)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .center { text-align: center; }
+    .center .lead { margin-left: auto; margin-right: auto; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* ---------- Cards ---------- */
+    .grid { display: grid; gap: 20px; }
+    .g2 { grid-template-columns: repeat(2, 1fr); }
+    .g3 { grid-template-columns: repeat(3, 1fr); }
+    .g4 { grid-template-columns: repeat(4, 1fr); }
+    .card {
+      position: relative; overflow: hidden;
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 26px; backdrop-filter: blur(14px);
+      transition: transform .35s var(--ease), border-color .35s var(--ease), box-shadow .35s var(--ease);
+    }
+    .card:hover { transform: translateY(-5px); border-color: color-mix(in srgb, var(--accent, var(--blue)) 55%, transparent); box-shadow: 0 22px 50px -18px color-mix(in srgb, var(--accent, var(--blue)) 45%, transparent); }
+    .card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent, var(--blue)), transparent);
+    }
+    .card .ico {
+      width: 52px; height: 52px; border-radius: 15px; display: grid; place-items: center; font-size: 1.45rem;
+      margin-bottom: 16px; color: var(--accent, var(--blue));
+      background: color-mix(in srgb, var(--accent, var(--blue)) 16%, transparent);
+      border: 1px solid color-mix(in srgb, var(--accent, var(--blue)) 40%, transparent);
+    }
+    .card h3 { font-size: 1.18rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -.01em; }
+    .card p { font-size: .93rem; color: var(--text-2); line-height: 1.55; }
+    .card .tag {
+      display: inline-block; margin-top: 14px; font-size: .7rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+      padding: 5px 10px; border-radius: 7px; color: var(--accent, var(--blue));
+      background: color-mix(in srgb, var(--accent, var(--blue)) 13%, transparent);
+      border: 1px solid color-mix(in srgb, var(--accent, var(--blue)) 32%, transparent);
+    }
+    .a-blue { --accent: #3b82f6; } .a-green { --accent: #10b981; } .a-violet { --accent: #8b5cf6; }
+    .a-amber { --accent: #f59e0b; } .a-red { --accent: #ef4444; } .a-cyan { --accent: #38bdf8; } .a-pink { --accent: #ec4899; }
+
+    ul.checks { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+    ul.checks li { display: flex; gap: 10px; align-items: flex-start; font-size: .95rem; color: #dbe4f3; line-height: 1.45; }
+    ul.checks li i { color: var(--accent, var(--emerald)); margin-top: 2px; }
+
+    /* ---------- Slide 1: Cover ---------- */
+    .cover-logo {
+      width: 108px; height: 108px; border-radius: 30px; margin: 0 auto 28px;
+      display: grid; place-items: center; font-size: 3rem;
+      background: linear-gradient(135deg, var(--blue), var(--violet));
+      box-shadow: 0 0 70px rgba(59,130,246,.55), inset 0 1px 0 rgba(255,255,255,.3);
+      animation: bob 5s ease-in-out infinite;
+    }
+    @keyframes bob { 0%,100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-10px) rotate(-2deg); } }
+    .cover-pills { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 34px; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 999px;
+      background: rgba(255,255,255,.05); border: 1px solid var(--border); font-weight: 700; font-size: .9rem; color: #dbe4f3;
+    }
+    .pill i { color: var(--emerald-l); }
+    .hint { margin-top: 44px; font-size: .82rem; color: var(--muted); display: flex; align-items: center; gap: 10px; justify-content: center; }
+    kbd {
+      font-family: 'JetBrains Mono', monospace; font-size: .75rem; padding: 3px 8px; border-radius: 6px;
+      background: rgba(255,255,255,.07); border: 1px solid var(--border); border-bottom-width: 2px; color: var(--text-2);
+    }
+
+    /* ---------- Problem chat bubbles ---------- */
+    .chaos { display: flex; flex-direction: column; gap: 14px; }
+    .bubble {
+      display: flex; gap: 14px; align-items: center; padding: 16px 20px; border-radius: 18px;
+      background: rgba(239,68,68,.07); border: 1px solid rgba(239,68,68,.25);
+    }
+    .bubble .b-ico { width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center; font-size: 1.2rem; background: rgba(239,68,68,.15); color: #fca5a5; flex-shrink: 0; }
+    .bubble small { display: block; font-size: .72rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #fca5a5; margin-bottom: 2px; }
+    .bubble span { color: #f1f5f9; font-weight: 600; font-size: .98rem; }
+    .slide.active .bubble { animation: shake .5s ease .9s 1; }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+    /* ---------- Split layout ---------- */
+    .split { display: grid; grid-template-columns: 1fr 1.05fr; gap: 48px; align-items: center; }
+
+    /* ---------- Roles ---------- */
+    .role-head { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+    .role-head .ico { margin-bottom: 0; }
+    .role-head small { display: block; font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+
+    /* ---------- Individual fee mock ---------- */
+    .mock {
+      background: linear-gradient(180deg, rgba(30,41,59,.85), rgba(13,19,34,.95));
+      border: 1px solid var(--border); border-radius: 24px; padding: 24px; box-shadow: 0 30px 70px -25px rgba(0,0,0,.7);
+    }
+    .mock-bar { display: flex; gap: 7px; margin-bottom: 18px; }
+    .mock-bar span { width: 11px; height: 11px; border-radius: 50%; background: #334155; }
+    .mock-bar span:nth-child(1) { background: #ef4444; } .mock-bar span:nth-child(2) { background: #f59e0b; } .mock-bar span:nth-child(3) { background: #10b981; }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: .74rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .field .input {
+      padding: 12px 14px; border-radius: 12px; background: rgba(7,11,20,.7); border: 1px solid var(--border);
+      font-weight: 600; color: #e2e8f0; display: flex; justify-content: space-between; align-items: center;
+    }
+    .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .seg div { text-align: center; padding: 10px 6px; border-radius: 11px; font-size: .82rem; font-weight: 700; background: rgba(7,11,20,.7); border: 1px solid var(--border); color: var(--text-2); }
+    .seg div.on { background: rgba(56,189,248,.15); border-color: rgba(56,189,248,.5); color: #7dd3fc; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%;
+      padding: 14px 18px; border: 0; border-radius: 14px; cursor: pointer;
+      font-family: inherit; font-weight: 800; font-size: .98rem; color: #fff; letter-spacing: .01em;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); box-shadow: 0 10px 28px -8px rgba(59,130,246,.6);
+      transition: transform .25s var(--ease), box-shadow .25s var(--ease), background .4s;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 16px 34px -8px rgba(59,130,246,.75); }
+    .btn.success { background: linear-gradient(135deg, #059669, #10b981); box-shadow: 0 10px 28px -8px rgba(16,185,129,.6); }
+
+    /* ---------- BCV calculator ---------- */
+    .calc-row { display: flex; gap: 12px; align-items: stretch; }
+    .calc-row .field { flex: 1; }
+    .calc-input {
+      width: 100%; padding: 12px 14px; border-radius: 12px; background: rgba(7,11,20,.7); border: 1px solid var(--border);
+      color: #fff; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 1.05rem; outline: none; transition: border-color .25s;
+    }
+    .calc-input:focus { border-color: var(--emerald); }
+    .calc-result {
+      margin-top: 6px; padding: 18px; border-radius: 16px; text-align: center;
+      background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.35);
+    }
+    .calc-result .big { font-family: 'JetBrains Mono', monospace; font-size: 2rem; font-weight: 700; color: var(--emerald-l); }
+    .calc-result small { color: var(--text-2); font-size: .8rem; }
+    .methods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 18px; }
+    .method { text-align: center; padding: 14px 8px; border-radius: 14px; background: rgba(255,255,255,.04); border: 1px solid var(--border); transition: all .25s var(--ease); }
+    .method:hover { background: rgba(16,185,129,.1); border-color: rgba(16,185,129,.4); transform: translateY(-3px); }
+    .method i { font-size: 1.35rem; color: var(--emerald-l); }
+    .method b { display: block; font-size: .85rem; margin-top: 6px; }
+    .method small { color: var(--muted); font-size: .72rem; }
+
+    /* ---------- Conciliation console ---------- */
+    .queue { display: flex; flex-direction: column; gap: 10px; }
+    .q-item {
+      display: grid; grid-template-columns: auto 1fr auto auto; gap: 14px; align-items: center;
+      padding: 14px 16px; border-radius: 16px; background: rgba(7,11,20,.6); border: 1px solid var(--border);
+      transition: all .4s var(--ease);
+    }
+    .q-item .q-ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: rgba(139,92,246,.15); color: #c4b5fd; }
+    .q-item b { font-size: .95rem; } .q-item small { display: block; color: var(--muted); font-size: .76rem; margin-top: 2px; }
+    .q-amt { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: .95rem; text-align: right; }
+    .status { font-size: .68rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; padding: 5px 10px; border-radius: 7px; white-space: nowrap; }
+    .status.pend { color: #fcd34d; background: rgba(245,158,11,.13); border: 1px solid rgba(245,158,11,.35); }
+    .status.ok { color: #6ee7b7; background: rgba(16,185,129,.14); border: 1px solid rgba(16,185,129,.4); }
+    .q-item.done { border-color: rgba(16,185,129,.45); background: rgba(16,185,129,.07); }
+    .approve-btn {
+      border: 0; cursor: pointer; font-family: inherit; font-weight: 800; font-size: .78rem; padding: 8px 12px; border-radius: 10px;
+      color: #fff; background: linear-gradient(135deg, #2563eb, #7c3aed); transition: transform .2s;
+    }
+    .approve-btn:hover { transform: scale(1.05); }
+    .q-item.done .approve-btn { display: none; }
+    .console-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+    .console-stats div { padding: 12px; border-radius: 14px; background: rgba(255,255,255,.04); border: 1px solid var(--border); text-align: center; }
+    .console-stats b { display: block; font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; }
+    .console-stats small { color: var(--muted); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+
+    .receipt {
+      margin-top: 14px; padding: 14px 16px; border-radius: 16px; display: flex; align-items: center; gap: 12px;
+      background: rgba(16,185,129,.1); border: 1px dashed rgba(16,185,129,.5);
+      opacity: 0; transform: translateY(10px) scale(.98); transition: all .5s var(--ease);
+    }
+    .receipt.show { opacity: 1; transform: none; }
+    .receipt i { font-size: 1.5rem; color: var(--emerald-l); }
+
+    /* ---------- Flow steps ---------- */
+    .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; position: relative; }
+    .flow::before {
+      content: ''; position: absolute; top: 38px; left: 12%; right: 12%; height: 2px;
+      background: linear-gradient(90deg, var(--blue), var(--violet), var(--emerald)); opacity: .5;
+    }
+    .step { position: relative; text-align: center; }
+    .step .num {
+      width: 76px; height: 76px; margin: 0 auto 18px; border-radius: 50%; display: grid; place-items: center;
+      font-size: 1.7rem; background: var(--card-solid); border: 2px solid var(--accent); color: var(--accent);
+      box-shadow: 0 0 30px color-mix(in srgb, var(--accent) 35%, transparent); position: relative; z-index: 1;
+    }
+    .step .num em { position: absolute; top: -6px; right: -6px; font-style: normal; font-size: .7rem; font-weight: 800; background: var(--accent); color: #fff; border-radius: 999px; padding: 3px 7px; }
+    .step h3 { font-size: 1.08rem; font-weight: 800; margin-bottom: 8px; }
+    .step p { font-size: .88rem; color: var(--text-2); line-height: 1.5; }
+
+    /* ---------- Floor map ---------- */
+    .tower { display: flex; flex-direction: column; gap: 7px; }
+    .floor { display: grid; grid-template-columns: 64px 1fr; gap: 10px; align-items: center; }
+    .floor > span { font-size: .74rem; font-weight: 700; color: var(--muted); text-align: right; }
+    .units { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
+    .unit {
+      padding: 8px 4px; border-radius: 9px; text-align: center; font-size: .78rem; font-weight: 800; cursor: pointer;
+      border: 1.5px solid; transition: transform .2s var(--ease), box-shadow .2s;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .unit:hover { transform: scale(1.08); }
+    .unit.s { background: rgba(16,185,129,.18); border-color: rgba(16,185,129,.7); color: #6ee7b7; }
+    .unit.m { background: rgba(239,68,68,.18); border-color: rgba(239,68,68,.7); color: #fca5a5; }
+    .unit.f { background: rgba(56,189,248,.18); border-color: rgba(56,189,248,.7); color: #7dd3fc; }
+    .unit.sel { box-shadow: 0 0 0 3px #fff, 0 0 22px rgba(255,255,255,.4); transform: scale(1.08); }
+    .legend { display: flex; gap: 18px; margin-bottom: 14px; font-size: .8rem; font-weight: 700; color: var(--text-2); }
+    .legend span { display: inline-flex; align-items: center; gap: 7px; }
+    .legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .unit-detail { min-height: 190px; }
+    .unit-detail .ud-code { font-family: 'JetBrains Mono', monospace; font-size: 2.6rem; font-weight: 700; line-height: 1; }
+    .ud-rows { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .ud-rows div { display: flex; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid var(--border); font-size: .92rem; }
+    .ud-rows div span { color: var(--muted); } .ud-rows div b { font-weight: 700; }
+
+    /* ---------- Metrics ---------- */
+    .metric { text-align: center; padding: 34px 22px; }
+    .metric .val { font-size: clamp(2.6rem, 4.4vw, 3.8rem); font-weight: 800; letter-spacing: -.04em; line-height: 1; color: var(--accent); text-shadow: 0 0 40px color-mix(in srgb, var(--accent) 45%, transparent); }
+    .metric .lbl { margin-top: 12px; font-weight: 700; font-size: .98rem; }
+    .metric .sub { margin-top: 6px; font-size: .82rem; color: var(--muted); }
+    .footnote { margin-top: 22px; font-size: .78rem; color: var(--muted); text-align: center; }
+
+    /* ---------- Tech stack ---------- */
+    .stack { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+    .stack span { padding: 8px 14px; border-radius: 10px; font-size: .84rem; font-weight: 700; background: rgba(255,255,255,.05); border: 1px solid var(--border); color: #dbe4f3; }
+
+    /* ---------- CTA ---------- */
+    .cta-box {
+      max-width: 860px; margin: 0 auto; padding: 42px; border-radius: 30px; text-align: center;
+      background: linear-gradient(160deg, rgba(37,99,235,.18), rgba(124,58,237,.14) 50%, rgba(16,185,129,.14));
+      border: 1px solid rgba(255,255,255,.14); box-shadow: 0 40px 90px -30px rgba(59,130,246,.45);
+    }
+    .contact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 28px; }
+    .contact { padding: 18px; border-radius: 18px; background: rgba(7,11,20,.55); border: 1px solid var(--border); }
+    .contact i { font-size: 1.4rem; color: var(--cyan); }
+    .contact b { display: block; margin-top: 8px; font-size: .95rem; }
+    .contact small { color: var(--muted); font-size: .78rem; }
+
+    /* ---------- Navigation ---------- */
+    .nav {
+      position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%); z-index: 50;
+      display: flex; align-items: center; gap: 14px; padding: 8px 10px; border-radius: 999px;
+      background: rgba(13,19,34,.8); border: 1px solid var(--border); backdrop-filter: blur(16px);
+      box-shadow: 0 18px 40px rgba(0,0,0,.45);
+    }
+    .nav button.arrow {
+      width: 42px; height: 42px; border-radius: 50%; border: 0; cursor: pointer;
+      background: rgba(255,255,255,.06); color: #fff; font-size: 1.1rem; display: grid; place-items: center;
+      transition: all .25s var(--ease);
+    }
+    .nav button.arrow:hover:not(:disabled) { background: var(--blue); transform: scale(1.06); }
+    .nav button.arrow:disabled { opacity: .3; cursor: default; }
+    .dots { display: flex; gap: 7px; align-items: center; }
+    .dots button {
+      width: 8px; height: 8px; border-radius: 999px; border: 0; padding: 0; cursor: pointer;
+      background: rgba(255,255,255,.22); transition: all .35s var(--ease);
+    }
+    .dots button.on { width: 26px; background: linear-gradient(90deg, var(--blue), var(--emerald)); }
+    .counter { font-family: 'JetBrains Mono', monospace; font-size: .8rem; color: var(--text-2); min-width: 54px; text-align: center; }
+
+    .progress { position: fixed; top: 0; left: 0; height: 3px; z-index: 60; background: linear-gradient(90deg, var(--blue), var(--violet), var(--emerald)); box-shadow: 0 0 14px rgba(59,130,246,.8); transition: width .6s var(--ease); }
+
+    /* ---------- Overview ---------- */
+    .overview {
+      position: fixed; inset: 0; z-index: 80; background: rgba(7,11,20,.94); backdrop-filter: blur(10px);
+      display: none; padding: 80px 6vw; overflow-y: auto;
+    }
+    .overview.open { display: block; animation: fadeIn .3s var(--ease); }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .overview h3 { font-size: 1.4rem; margin-bottom: 24px; }
+    .ov-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+    .ov-item {
+      text-align: left; padding: 18px; border-radius: 16px; cursor: pointer; font-family: inherit; color: #fff;
+      background: var(--card); border: 1px solid var(--border); transition: all .25s var(--ease);
+    }
+    .ov-item:hover, .ov-item.on { border-color: var(--blue); transform: translateY(-3px); }
+    .ov-item small { font-family: 'JetBrains Mono', monospace; color: var(--blue-l); font-size: .75rem; }
+    .ov-item b { display: block; margin-top: 6px; font-size: .98rem; }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 1024px) {
+      .g4 { grid-template-columns: repeat(2, 1fr); }
+      .split { grid-template-columns: 1fr; gap: 26px; }
+      .flow { grid-template-columns: repeat(2, 1fr); }
+      .flow::before { display: none; }
+    }
+    @media (max-width: 720px) {
+      html, body { overflow: auto; }
+      .slide { padding: 84px 20px 110px; justify-content: flex-start; overflow-y: auto; }
+      .g2, .g3, .g4, .contact-grid, .methods { grid-template-columns: 1fr 1fr; }
+      .topbar { padding: 14px 16px; }
+      .chip.hide-sm { display: none; }
+      .dots { display: none; }
+      .q-item { grid-template-columns: auto 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+
+  <div class="ambient">
+    <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+    <div class="grid"></div>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">🏢</div>
+      <div>CondoHub <span class="saas">SaaS</span></div>
+    </div>
+    <div class="topbar-right">
+      <span class="chip hide-sm"><span class="dot"></span> Piloto activo · Residencias Los Samanes</span>
+      <button class="icon-btn" id="btnOverview" title="Ver todas las diapositivas (O)" aria-label="Ver todas las diapositivas"><i class="bi bi-grid-3x3-gap"></i></button>
+      <button class="icon-btn" id="btnFullscreen" title="Pantalla completa (F)" aria-label="Pantalla completa"><i class="bi bi-arrows-fullscreen"></i></button>
+    </div>
+  </header>
+
+  <main class="deck" id="deck">
+
+    <!-- 01 · PORTADA -->
+    <section class="slide" data-title="Portada">
+      <div class="slide-inner center">
+        <div class="cover-logo reveal">🏢</div>
+        <div class="reveal d1"><span class="eyebrow"><i class="bi bi-stars"></i> Sistema de gestión de condominios</span></div>
+        <h1 class="hero reveal d2">CondoHub <span class="grad">SaaS</span></h1>
+        <p class="lead reveal d3" style="margin-top:18px;">Cobranza bimoneda con tasa BCV, cuotas y pagos individuales, conciliación administrativa en un clic y portales para cada actor del edificio. Todo en una sola plataforma.</p>
+        <div class="cover-pills reveal d4">
+          <span class="pill"><i class="bi bi-currency-exchange"></i> USD / Bs. al BCV</span>
+          <span class="pill"><i class="bi bi-buildings"></i> Multi-condominio</span>
+          <span class="pill"><i class="bi bi-person-check"></i> Pagos individuales</span>
+          <span class="pill"><i class="bi bi-lightning-charge"></i> Conciliación en 1 clic</span>
+        </div>
+        <div class="hint reveal d5"><kbd>←</kbd><kbd>→</kbd> navegar · <kbd>F</kbd> pantalla completa · <kbd>O</kbd> índice</div>
+      </div>
+    </section>
+
+    <!-- 02 · PROBLEMA -->
+    <section class="slide" data-title="El problema">
+      <div class="slide-inner split">
+        <div>
+          <div class="reveal"><span class="eyebrow red"><i class="bi bi-exclamation-triangle"></i> El problema</span></div>
+          <h2 class="title reveal d1">La cobranza de condominio<br><span class="grad-red">sigue siendo un caos</span></h2>
+          <p class="lead reveal d2">Juntas que concilian a mano, vecinos que no saben cuánto deben y discusiones permanentes por la tasa del día. El resultado: morosidad, desconfianza y horas perdidas cada mes.</p>
+        </div>
+        <div class="chaos">
+          <div class="bubble reveal d2"><div class="b-ico"><i class="bi bi-whatsapp"></i></div><div><small>Grupo de WhatsApp</small><span>"¿A qué tasa me toca pagar este mes?"</span></div></div>
+          <div class="bubble reveal d3"><div class="b-ico"><i class="bi bi-image"></i></div><div><small>Comprobantes</small><span>Capturas ilegibles, referencias duplicadas o perdidas</span></div></div>
+          <div class="bubble reveal d4"><div class="b-ico"><i class="bi bi-file-earmark-x"></i></div><div><small>Recibos en papel</small><span>Extraviados en conserjería, sin historial confiable</span></div></div>
+          <div class="bubble reveal d5"><div class="b-ico"><i class="bi bi-calculator"></i></div><div><small>Cargos puntuales</small><span>Reparaciones o multas de un solo apto mezcladas con la cuota general</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 · SOLUCIÓN -->
+    <section class="slide" data-title="La solución">
+      <div class="slide-inner">
+        <div class="center">
+          <div class="reveal"><span class="eyebrow green"><i class="bi bi-check2-circle"></i> La solución</span></div>
+          <h2 class="title reveal d1">Un ecosistema digital para <span class="grad-green">todo el edificio</span></h2>
+          <p class="lead reveal d2" style="margin-bottom:36px;">CondoHub reúne finanzas, comunicación y control operativo en una sola plataforma web, sin instalar aplicaciones.</p>
+        </div>
+        <div class="grid g4">
+          <div class="card a-blue reveal d3"><div class="ico"><i class="bi bi-map"></i></div><h3>Mapa de pisos</h3><p>Semáforo de solvencia en vivo para cada apartamento, piso por piso.</p><span class="tag">Visual 2D</span></div>
+          <div class="card a-green reveal d4"><div class="ico"><i class="bi bi-currency-exchange"></i></div><h3>Cobranza bimoneda</h3><p>Presupuesto en USD con equivalente en Bs. calculado con la tasa oficial BCV.</p><span class="tag">BCV oficial</span></div>
+          <div class="card a-violet reveal d5"><div class="ico"><i class="bi bi-phone"></i></div><h3>Autogestión 24/7</h3><p>Cada residente consulta su saldo, reporta pagos y gestiona los datos de su unidad.</p><span class="tag">Portal web</span></div>
+          <div class="card a-cyan reveal d6"><div class="ico"><i class="bi bi-tools"></i></div><h3>Averías y cartelera</h3><p>Tickets de incidencias con seguimiento y comunicados oficiales de la junta.</p><span class="tag">Transparencia</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 · ROLES -->
+    <section class="slide" data-title="Tres portales">
+      <div class="slide-inner">
+        <div class="center">
+          <div class="reveal"><span class="eyebrow violet"><i class="bi bi-people"></i> Arquitectura por roles</span></div>
+          <h2 class="title reveal d1">Un portal especializado <span class="grad">para cada actor</span></h2>
+          <p class="lead reveal d2" style="margin-bottom:34px;">Cada rol ve solo lo que necesita, con permisos validados también en el servidor.</p>
+        </div>
+        <div class="grid g3">
+          <div class="card a-amber reveal d3">
+            <div class="role-head"><div class="ico"><i class="bi bi-shield-lock"></i></div><div><small>Control global</small><h3>Superadmin</h3></div></div>
+            <ul class="checks">
+              <li><i class="bi bi-check-circle-fill"></i>Vista consolidada de todos los condominios</li>
+              <li><i class="bi bi-check-circle-fill"></i>Cambio instantáneo de edificio sin cerrar sesión</li>
+              <li><i class="bi bi-check-circle-fill"></i>Generador de estructura: pisos, PB, PH y nomenclatura</li>
+              <li><i class="bi bi-check-circle-fill"></i>Única autoridad para modificar alícuotas</li>
+            </ul>
+          </div>
+          <div class="card a-blue reveal d4">
+            <div class="role-head"><div class="ico"><i class="bi bi-briefcase"></i></div><div><small>Gestión del edificio</small><h3>Junta / Administrador</h3></div></div>
+            <ul class="checks">
+              <li><i class="bi bi-check-circle-fill"></i>Emisión de cuotas ordinarias, extraordinarias e individuales</li>
+              <li><i class="bi bi-check-circle-fill"></i>Consola de conciliación con visor de comprobantes</li>
+              <li><i class="bi bi-check-circle-fill"></i>Cuentas bancarias, comunicados y tickets</li>
+              <li><i class="bi bi-check-circle-fill"></i>Perfil propio con cambio seguro de clave</li>
+            </ul>
+          </div>
+          <div class="card a-green reveal d5">
+            <div class="role-head"><div class="ico"><i class="bi bi-house-heart"></i></div><div><small>Autogestión</small><h3>Residente</h3></div></div>
+            <ul class="checks">
+              <li><i class="bi bi-check-circle-fill"></i>Saldo exacto en USD y Bs. al día</li>
+              <li><i class="bi bi-check-circle-fill"></i>Desglose de cuotas, incluidas las individuales</li>
+              <li><i class="bi bi-check-circle-fill"></i>Reporte de pagos con comprobante desde el celular</li>
+              <li><i class="bi bi-check-circle-fill"></i>Habitantes, vehículos, mascotas y averías</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 · CUOTAS INDIVIDUALES -->
+    <section class="slide" data-title="Cuotas individuales">
+      <div class="slide-inner split">
+        <div>
+          <div class="reveal"><span class="eyebrow cyan"><i class="bi bi-bullseye"></i> Nuevo · Cuotas individuales</span></div>
+          <h2 class="title reveal d1">Cobros puntuales<br>para <span class="grad">un solo apartamento</span></h2>
+          <p class="lead reveal d2">Una reparación privada, la reposición de un tag o una multa de convivencia ya no se mezclan con la cuota del edificio. La administración asigna el cargo directamente a la unidad.</p>
+          <ul class="checks reveal d3 a-cyan" style="margin-top:22px;">
+            <li><i class="bi bi-check-circle-fill"></i>Tres tipos de cuota: ordinaria, extraordinaria e individual</li>
+            <li><i class="bi bi-check-circle-fill"></i>El prorrateo por alícuota del resto del edificio queda intacto</li>
+            <li><i class="bi bi-check-circle-fill"></i>El residente la ve marcada como "Individual (exclusiva)" en su portal</li>
+          </ul>
+        </div>
+        <div class="mock reveal d3">
+          <div class="mock-bar"><span></span><span></span><span></span></div>
+          <div class="field"><label>Tipo de cuota</label>
+            <div class="seg"><div>Ordinaria</div><div>Extraordinaria</div><div class="on"><i class="bi bi-person-fill"></i> Individual</div></div>
+          </div>
+          <div class="field"><label>Apartamento destino</label><div class="input"><span><i class="bi bi-door-open" style="color:var(--cyan)"></i> Apto 4-B · Piso 4</span><i class="bi bi-chevron-down" style="color:var(--muted)"></i></div></div>
+          <div class="field"><label>Concepto</label><div class="input"><span>Reposición de llave magnética</span></div></div>
+          <div class="field"><label>Monto</label><div class="input"><span class="mono">$ 15.00 USD</span><span style="font-size:.78rem;color:var(--emerald-l);font-weight:700;">Alícuotas protegidas</span></div></div>
+          <button class="btn" id="btnAsignar" type="button"><i class="bi bi-person-check"></i> Asignar cuota individual al apartamento</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 · PAGO DEL RESIDENTE -->
+    <section class="slide" data-title="Pago del residente">
+      <div class="slide-inner split">
+        <div>
+          <div class="reveal"><span class="eyebrow green"><i class="bi bi-phone"></i> Pagos individuales del residente</span></div>
+          <h2 class="title reveal d1">Reportar un pago<br>toma <span class="grad-green">menos de un minuto</span></h2>
+          <p class="lead reveal d2">El copropietario ve su deuda en dólares y su equivalente en bolívares, elige el canal, adjunta el comprobante y listo. Sin discusiones sobre la tasa: el sistema la toma del BCV.</p>
+          <div class="methods reveal d3">
+            <div class="method"><i class="bi bi-phone-vibrate"></i><b>Pago Móvil</b><small>Bs.</small></div>
+            <div class="method"><i class="bi bi-bank"></i><b>Transferencia</b><small>Banesco · Mercantil</small></div>
+            <div class="method"><i class="bi bi-lightning-charge"></i><b>Zelle</b><small>USD</small></div>
+            <div class="method"><i class="bi bi-cash-stack"></i><b>Efectivo</b><small>Divisas</small></div>
+          </div>
+        </div>
+        <div class="mock reveal d3">
+          <div class="mock-bar"><span></span><span></span><span></span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <b style="font-size:1.05rem;">Calculadora bimoneda</b>
+            <span class="status ok"><i class="bi bi-broadcast"></i> Tasa BCV</span>
+          </div>
+          <div class="calc-row">
+            <div class="field"><label for="calcUsd">Monto en USD</label><input class="calc-input" id="calcUsd" type="number" min="0" step="0.01" value="45"></div>
+            <div class="field"><label for="calcRate">Tasa (Bs./USD)</label><input class="calc-input" id="calcRate" type="number" min="0" step="0.01" value="41.00"></div>
+          </div>
+          <div class="calc-result">
+            <small>Equivalente a pagar</small>
+            <div class="big" id="calcOut">Bs. 1.845,00</div>
+            <small>En el sistema real la tasa se sincroniza desde bcv.org.ve. Aquí puedes editarla para probar.</small>
+          </div>
+          <div class="field" style="margin-top:14px;"><label>Comprobante</label><div class="input"><span><i class="bi bi-paperclip"></i> capture_pago_movil.jpg</span><span class="mono" style="font-size:.8rem;color:var(--muted)">Ref. 84920194</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 · CONCILIACIÓN -->
+    <section class="slide" data-title="Gestión administrativa">
+      <div class="slide-inner split">
+        <div>
+          <div class="reveal"><span class="eyebrow violet"><i class="bi bi-lightning-charge"></i> Gestión administrativa de pagos</span></div>
+          <h2 class="title reveal d1">Conciliación<br><span class="grad">en un solo clic</span></h2>
+          <p class="lead reveal d2">Todos los pagos reportados llegan a una bandeja central. La junta revisa el comprobante, lo compara con el banco y aprueba. El estado de cuenta se actualiza solo.</p>
+          <ul class="checks reveal d3 a-violet" style="margin-top:22px;">
+            <li><i class="bi bi-check-circle-fill"></i>Visor de comprobantes integrado</li>
+            <li><i class="bi bi-check-circle-fill"></i>Aprobación o rechazo con trazabilidad</li>
+            <li><i class="bi bi-check-circle-fill"></i>El apartamento pasa a "Solvente" automáticamente</li>
+          </ul>
+          <p class="reveal d4" style="margin-top:18px;font-size:.85rem;color:var(--muted);"><i class="bi bi-hand-index"></i> Pruébalo: pulsa <b style="color:#c4b5fd">Aprobar</b> en la bandeja.</p>
+        </div>
+        <div class="mock reveal d3">
+          <div class="mock-bar"><span></span><span></span><span></span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <b style="font-size:1.05rem;"><i class="bi bi-inbox" style="color:#c4b5fd"></i> Pagos por conciliar</b>
+            <span class="status pend" id="pendCount">3 pendientes</span>
+          </div>
+          <div class="queue" id="queue">
+            <div class="q-item" data-amt="45" data-apto="3-B">
+              <div class="q-ico"><i class="bi bi-phone-vibrate"></i></div>
+              <div><b>Apto 3-B · Pago Móvil</b><small>Banesco → Mercantil · Ref. 84920194</small></div>
+              <div class="q-amt">$45.00</div>
+              <div><span class="status pend">Pendiente</span> <button class="approve-btn" type="button">Aprobar</button></div>
+            </div>
+            <div class="q-item" data-amt="15" data-apto="4-B">
+              <div class="q-ico"><i class="bi bi-person-fill"></i></div>
+              <div><b>Apto 4-B · Cuota individual</b><small>Zelle · Reposición de llave</small></div>
+              <div class="q-amt">$15.00</div>
+              <div><span class="status pend">Pendiente</span> <button class="approve-btn" type="button">Aprobar</button></div>
+            </div>
+            <div class="q-item" data-amt="50" data-apto="8-A" data-favor="5">
+              <div class="q-ico"><i class="bi bi-bank"></i></div>
+              <div><b>Apto 8-A · Transferencia</b><small>Pagó $50.00 sobre deuda de $45.00</small></div>
+              <div class="q-amt">$50.00</div>
+              <div><span class="status pend">Pendiente</span> <button class="approve-btn" type="button">Aprobar</button></div>
+            </div>
+          </div>
+          <div class="console-stats">
+            <div><b id="stConc" style="color:var(--emerald-l)">$0.00</b><small>Conciliado</small></div>
+            <div><b id="stFavor" style="color:var(--cyan)">$0.00</b><small>Saldo a favor</small></div>
+            <div><b id="stRec" style="color:#c4b5fd">0</b><small>Recibos</small></div>
+          </div>
+          <div class="receipt" id="receipt"><i class="bi bi-receipt-cutoff"></i><div><b id="receiptTitle">Recibo digital generado</b><br><small style="color:var(--text-2)" id="receiptSub">El apartamento queda Solvente</small></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08 · SALDOS A FAVOR Y AUDITORÍA -->
+    <section class="slide" data-title="Saldos y auditoría">
+      <div class="slide-inner">
+        <div class="center">
+          <div class="reveal"><span class="eyebrow amber"><i class="bi bi-piggy-bank"></i> Control contable</span></div>
+          <h2 class="title reveal d1">Cada dólar, <span class="grad">rastreado</span></h2>
+          <p class="lead reveal d2" style="margin-bottom:34px;">La gestión administrativa no termina en la aprobación: CondoHub cuida los excedentes, el historial y la auditoría.</p>
+        </div>
+        <div class="grid g4">
+          <div class="card a-cyan reveal d3"><div class="ico"><i class="bi bi-plus-circle"></i></div><h3>Saldos a favor</h3><p>Si un vecino paga de más o adelanta, el excedente queda acreditado para las próximas cuotas.</p></div>
+          <div class="card a-green reveal d4"><div class="ico"><i class="bi bi-receipt"></i></div><h3>Recibo digital</h3><p>Cada pago aprobado genera su comprobante, consultable por el residente en cualquier momento.</p></div>
+          <div class="card a-violet reveal d5"><div class="ico"><i class="bi bi-search"></i></div><h3>Auditoría por unidad</h3><p>El Superadmin puede revisar los pagos individuales de cualquier apartamento de cualquier edificio.</p></div>
+          <div class="card a-amber reveal d6"><div class="ico"><i class="bi bi-bank2"></i></div><h3>Cuentas oficiales</h3><p>La junta publica sus cuentas autorizadas: Pago Móvil, cuentas corrientes y Zelle.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 · CICLO MENSUAL -->
+    <section class="slide" data-title="Ciclo mensual">
+      <div class="slide-inner">
+        <div class="center">
+          <div class="reveal"><span class="eyebrow"><i class="bi bi-arrow-repeat"></i> Flujo operativo</span></div>
+          <h2 class="title reveal d1">El ciclo de cobranza <span class="grad">en 4 pasos</span></h2>
+          <p class="lead reveal d2" style="margin-bottom:48px;">De la emisión al recibo, sin hojas de cálculo ni mensajes perdidos.</p>
+        </div>
+        <div class="flow">
+          <div class="step a-blue reveal d3"><div class="num"><i class="bi bi-bank"></i><em>01</em></div><h3>Configurar cuentas</h3><p>La junta registra sus canales oficiales de recaudación.</p></div>
+          <div class="step a-cyan reveal d4"><div class="num"><i class="bi bi-file-earmark-text"></i><em>02</em></div><h3>Emitir cuotas</h3><p>Generales por alícuota o individuales para un apartamento.</p></div>
+          <div class="step a-violet reveal d5"><div class="num"><i class="bi bi-phone"></i><em>03</em></div><h3>Residente reporta</h3><p>Paga desde su banco y sube el comprobante con referencia.</p></div>
+          <div class="step a-green reveal d6"><div class="num"><i class="bi bi-check2-all"></i><em>04</em></div><h3>Conciliar</h3><p>Aprobación en 1 clic, recibo digital y estado Solvente.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 · MAPA DE PISOS -->
+    <section class="slide" data-title="Mapa de pisos">
+      <div class="slide-inner split">
+        <div class="mock reveal d2">
+          <div class="legend">
+            <span><i style="background:var(--emerald)"></i>Solvente</span>
+            <span><i style="background:var(--red)"></i>Pendiente</span>
+            <span><i style="background:var(--cyan)"></i>Saldo a favor</span>
+          </div>
+          <div class="tower" id="tower"></div>
+        </div>
+        <div>
+          <div class="reveal"><span class="eyebrow green"><i class="bi bi-map"></i> Monitoreo visual</span></div>
+          <h2 class="title reveal d1">Todo el edificio<br><span class="grad-green">de un vistazo</span></h2>
+          <p class="lead reveal d2">El mapa interactivo muestra el estado de cada unidad en tiempo real. Toca un apartamento para ver su ficha.</p>
+          <div class="card a-blue unit-detail reveal d3" style="margin-top:22px;" id="unitDetail">
+            <small style="color:var(--muted);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:.72rem;">Ficha del apartamento</small>
+            <div class="ud-code" id="udCode" style="margin-top:8px;">10-A</div>
+            <div class="ud-rows">
+              <div><span>Estado</span><b id="udStatus" style="color:var(--emerald-l)">Solvente</b></div>
+              <div><span>Alícuota</span><b id="udAli">2.00%</b></div>
+              <div><span>Balance</span><b id="udBal" class="mono">$0.00</b></div>
+            </div>
+          </div>
+          <p class="reveal d4" style="margin-top:10px;font-size:.78rem;color:var(--muted);">Datos ilustrativos para la demostración.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 · SEGURIDAD Y UX -->
+    <section class="slide" data-title="Seguridad y experiencia">
+      <div class="slide-inner">
+        <div class="center">
+          <div class="reveal"><span class="eyebrow amber"><i class="bi bi-shield-check"></i> Seguridad y experiencia</span></div>
+          <h2 class="title reveal d1">Protección legal y <span class="grad">navegación sin fricción</span></h2>
+          <p class="lead reveal d2" style="margin-bottom:34px;">Las últimas mejoras del sistema, pensadas para la junta y para el vecino.</p>
+        </div>
+        <div class="grid g3">
+          <div class="card a-amber reveal d3"><div class="ico"><i class="bi bi-shield-lock"></i></div><h3>Blindaje de alícuotas</h3><p>Conforme a la Ley de Propiedad Horizontal, solo el Superadmin puede modificar porcentajes. En los demás roles el campo es de solo lectura y la API rechaza cambios no autorizados.</p><span class="tag">Validado en backend</span></div>
+          <div class="card a-blue reveal d4"><div class="ico"><i class="bi bi-layout-sidebar-inset"></i></div><h3>Menú vertical retráctil</h3><p>Barra lateral colapsable en los tres portales. Recuerda tu preferencia y en móviles se abre como panel con fondo difuminado. Adiós al scroll horizontal.</p><span class="tag">UX 2.0</span></div>
+          <div class="card a-violet reveal d5"><div class="ico"><i class="bi bi-person-badge"></i></div><h3>Perfil del administrador</h3><p>Datos de contacto de la junta (C.I., teléfonos, cargo) y cambio de contraseña que exige verificar la clave actual.</p><span class="tag">Acceso seguro</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 · TECNOLOGÍA -->
+    <section class="slide" data-title="Tecnología">
+      <div class="slide-inner split">
+        <div>
+          <div class="reveal"><span class="eyebrow cyan"><i class="bi bi-cpu"></i> Tecnología</span></div>
+          <h2 class="title reveal d1">Ligero, escalable y<br><span class="grad">fácil de desplegar</span></h2>
+          <p class="lead reveal d2">Funciona en cualquier hosting estándar con PHP 8 y MySQL/MariaDB: cPanel, VPS o servidor local con XAMPP.</p>
+          <div class="stack reveal d3">
+            <span>PHP 8+</span><span>MySQL / MariaDB</span><span>Supabase</span><span>JavaScript</span><span>Bootstrap Icons</span><span>Variables .env</span><span>Apache .htaccess</span>
+          </div>
+        </div>
+        <div class="grid g2">
+          <div class="card a-blue reveal d3"><div class="ico"><i class="bi bi-buildings"></i></div><h3>Multi-condominio</h3><p>Un solo despliegue y una sola base de datos, con finanzas aisladas por edificio.</p></div>
+          <div class="card a-green reveal d4"><div class="ico"><i class="bi bi-arrow-repeat"></i></div><h3>Sincronización BCV</h3><p>Tasa oficial y fecha valor obtenidas desde bcv.org.ve.</p></div>
+          <div class="card a-violet reveal d5"><div class="ico"><i class="bi bi-magic"></i></div><h3>Instalación automática</h3><p>Al primer ingreso crea las tablas, el condominio base y el Superadmin.</p></div>
+          <div class="card a-amber reveal d6"><div class="ico"><i class="bi bi-lock"></i></div><h3>Endurecido</h3><p>Archivos sensibles protegidos y scripts bloqueados en la carpeta de comprobantes.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 · IMPACTO -->
+    <section class="slide" data-title="Impacto">
+      <div class="slide-inner">
+        <div class="center">
+          <div class="reveal"><span class="eyebrow green"><i class="bi bi-graph-up-arrow"></i> Impacto esperado</span></div>
+          <h2 class="title reveal d1">Lo que cambia <span class="grad-green">en tu comunidad</span></h2>
+          <p class="lead reveal d2" style="margin-bottom:34px;">De la gestión manual a un control financiero claro para todos.</p>
+        </div>
+        <div class="grid g4">
+          <div class="card metric a-blue reveal d3"><div class="val" data-count="85" data-suffix="%">0%</div><div class="lbl">Menos tiempo en cobranza</div><div class="sub">Conciliación centralizada</div></div>
+          <div class="card metric a-green reveal d4"><div class="val" data-count="95" data-suffix="%">0%</div><div class="lbl">Menos conflictos de tasa</div><div class="sub">Tasa BCV automática</div></div>
+          <div class="card metric a-violet reveal d5"><div class="val" data-count="78" data-suffix="%">0%</div><div class="lbl">Más puntualidad</div><div class="sub">Pago desde el celular</div></div>
+          <div class="card metric a-cyan reveal d6"><div class="val" data-count="24" data-suffix="/7">0</div><div class="lbl">Acceso del residente</div><div class="sub">Sin instalar apps</div></div>
+        </div>
+        <p class="footnote reveal d7">Porcentajes estimados para fines comerciales; se validarán con los datos reales del piloto.</p>
+      </div>
+    </section>
+
+    <!-- 14 · PILOTO -->
+    <section class="slide" data-title="Piloto Los Samanes">
+      <div class="slide-inner split">
+        <div>
+          <div class="reveal"><span class="eyebrow green"><i class="bi bi-geo-alt"></i> Edición piloto</span></div>
+          <h2 class="title reveal d1">Residencias<br><span class="grad-green">Los Samanes</span></h2>
+          <p class="lead reveal d2">El sistema ya opera con la estructura completa del edificio piloto: cada apartamento tiene su usuario institucional y su portal.</p>
+          <ul class="checks reveal d3" style="margin-top:22px;">
+            <li><i class="bi bi-check-circle-fill"></i>Acceso administrativo: <span class="mono" style="color:var(--blue-l)">admin@resdlossamanes.com</span></li>
+            <li><i class="bi bi-check-circle-fill"></i>Acceso residente: <span class="mono" style="color:var(--blue-l)">apto{código}@resdlossamanes.com</span></li>
+            <li><i class="bi bi-check-circle-fill"></i>Credenciales completas en el PDF de accesos del piloto</li>
+          </ul>
+        </div>
+        <div class="grid g2">
+          <div class="card metric a-blue reveal d3"><div class="val" data-count="50">0</div><div class="lbl">Apartamentos</div></div>
+          <div class="card metric a-violet reveal d4"><div class="val" data-count="12" data-prefix="PB+">PB+0</div><div class="lbl">Pisos</div></div>
+          <div class="card metric a-green reveal d5"><div class="val" data-count="3">0</div><div class="lbl">Portales por rol</div></div>
+          <div class="card metric a-amber reveal d6"><div class="val">USD·Bs</div><div class="lbl">Contabilidad bimoneda</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15 · CTA -->
+    <section class="slide" data-title="Contacto">
+      <div class="slide-inner">
+        <div class="cta-box">
+          <div class="cover-logo reveal" style="width:84px;height:84px;font-size:2.3rem;border-radius:24px;margin-bottom:22px;">🏢</div>
+          <h2 class="title reveal d1">Moderniza tu condominio <span class="grad">hoy</span></h2>
+          <p class="lead reveal d2" style="margin:0 auto;">Agenda una demostración guiada para tu junta y conoce el piloto en funcionamiento.</p>
+          <div class="contact-grid">
+            <div class="contact reveal d3"><i class="bi bi-whatsapp"></i><b>0412-9031966</b><small>Soporte y demos</small></div>
+            <div class="contact reveal d4"><i class="bi bi-github"></i><b>ClusterLG/Condominio</b><small>Repositorio</small></div>
+            <div class="contact reveal d5"><i class="bi bi-geo-alt"></i><b>La Guaira</b><small>Hecho en Venezuela</small></div>
+          </div>
+          <p class="reveal d6" style="margin-top:26px;font-size:.84rem;color:var(--muted);">CondoHub es un proyecto de Leonardo Morales · Cluster LG</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="nav" aria-label="Navegación de diapositivas">
+    <button class="arrow" id="prevBtn" aria-label="Anterior"><i class="bi bi-chevron-left"></i></button>
+    <div class="dots" id="dots"></div>
+    <span class="counter" id="counter">01 / 15</span>
+    <button class="arrow" id="nextBtn" aria-label="Siguiente"><i class="bi bi-chevron-right"></i></button>
+  </nav>
+
+  <div class="overview" id="overview">
+    <h3>Índice de la presentación</h3>
+    <div class="ov-grid" id="ovGrid"></div>
+  </div>
+
+  <script>
+  (() => {
+    const slides = [...document.querySelectorAll('.slide')];
+    const total = slides.length;
+    const dotsEl = document.getElementById('dots');
+    const counter = document.getElementById('counter');
+    const progress = document.getElementById('progress');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const overview = document.getElementById('overview');
+    const ovGrid = document.getElementById('ovGrid');
+    let current = 0;
+
+    const pad = n => String(n).padStart(2, '0');
+
+    slides.forEach((s, i) => {
+      const d = document.createElement('button');
+      d.setAttribute('aria-label', `Ir a diapositiva ${i + 1}`);
+      d.addEventListener('click', () => go(i));
+      dotsEl.appendChild(d);
+
+      const o = document.createElement('button');
+      o.className = 'ov-item';
+      o.innerHTML = `<small>${pad(i + 1)}</small><b>${s.dataset.title || 'Diapositiva'}</b>`;
+      o.addEventListener('click', () => { go(i); toggleOverview(false); });
+      ovGrid.appendChild(o);
+    });
+
+    function animateCounters(slide) {
+      slide.querySelectorAll('[data-count]').forEach(el => {
+        const target = +el.dataset.count;
+        const prefix = el.dataset.prefix || '';
+        const suffix = el.dataset.suffix || '';
+        const start = performance.now();
+        const dur = 1300;
+        const tick = now => {
+          const p = Math.min(1, (now - start) / dur);
+          const eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = prefix + Math.round(target * eased) + suffix;
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        setTimeout(() => requestAnimationFrame(tick), 350);
+      });
+    }
+
+    function go(i) {
+      if (i < 0 || i >= total) return;
+      slides.forEach((s, idx) => {
+        s.classList.toggle('active', idx === i);
+        s.classList.toggle('prev', idx < i);
+      });
+      current = i;
+      [...dotsEl.children].forEach((d, idx) => d.classList.toggle('on', idx === i));
+      [...ovGrid.children].forEach((d, idx) => d.classList.toggle('on', idx === i));
+      counter.textContent = `${pad(i + 1)} / ${pad(total)}`;
+      progress.style.width = `${((i + 1) / total) * 100}%`;
+      prevBtn.disabled = i === 0;
+      nextBtn.disabled = i === total - 1;
+      animateCounters(slides[i]);
+      history.replaceState(null, '', `#${i + 1}`);
+    }
+
+    function toggleOverview(force) {
+      const open = force ?? !overview.classList.contains('open');
+      overview.classList.toggle('open', open);
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+      else document.exitFullscreen?.();
+    }
+
+    prevBtn.addEventListener('click', () => go(current - 1));
+    nextBtn.addEventListener('click', () => go(current + 1));
+    document.getElementById('btnOverview').addEventListener('click', () => toggleOverview());
+    document.getElementById('btnFullscreen').addEventListener('click', toggleFullscreen);
+
+    document.addEventListener('keydown', e => {
+      if (e.target.tagName === 'INPUT') return;
+      if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); go(current + 1); }
+      else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); go(current - 1); }
+      else if (e.key === 'Home') go(0);
+      else if (e.key === 'End') go(total - 1);
+      else if (e.key.toLowerCase() === 'f') toggleFullscreen();
+      else if (e.key.toLowerCase() === 'o') toggleOverview();
+      else if (e.key === 'Escape') toggleOverview(false);
+    });
+
+    // Touch swipe
+    let tx = null, ty = null;
+    document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+    document.addEventListener('touchend', e => {
+      if (tx === null) return;
+      const dx = e.changedTouches[0].clientX - tx;
+      const dy = e.changedTouches[0].clientY - ty;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) go(current + (dx < 0 ? 1 : -1));
+      tx = ty = null;
+    });
+
+    // ---------- Demo: asignar cuota individual ----------
+    const btnAsignar = document.getElementById('btnAsignar');
+    btnAsignar.addEventListener('click', () => {
+      btnAsignar.classList.add('success');
+      btnAsignar.innerHTML = '<i class="bi bi-check2-circle"></i> Cuota asignada al Apto 4-B ($15.00)';
+      setTimeout(() => {
+        btnAsignar.classList.remove('success');
+        btnAsignar.innerHTML = '<i class="bi bi-person-check"></i> Asignar cuota individual al apartamento';
+      }, 2600);
+    });
+
+    // ---------- Demo: calculadora BCV ----------
+    const usd = document.getElementById('calcUsd');
+    const rate = document.getElementById('calcRate');
+    const out = document.getElementById('calcOut');
+    const fmt = new Intl.NumberFormat('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const calc = () => { out.textContent = 'Bs. ' + fmt.format((+usd.value || 0) * (+rate.value || 0)); };
+    usd.addEventListener('input', calc); rate.addEventListener('input', calc); calc();
+
+    // ---------- Demo: conciliación ----------
+    let conc = 0, favor = 0, recs = 0;
+    const money = n => '$' + n.toFixed(2);
+    const receipt = document.getElementById('receipt');
+    document.querySelectorAll('#queue .q-item').forEach(item => {
+      item.querySelector('.approve-btn').addEventListener('click', () => {
+        item.classList.add('done');
+        const st = item.querySelector('.status');
+        st.className = 'status ok'; st.textContent = 'Conciliado';
+        const extra = +(item.dataset.favor || 0);
+        conc += +item.dataset.amt - extra; favor += extra; recs += 1;
+        document.getElementById('stConc').textContent = money(conc);
+        document.getElementById('stFavor').textContent = money(favor);
+        document.getElementById('stRec').textContent = recs;
+        const left = document.querySelectorAll('#queue .q-item:not(.done)').length;
+        const pc = document.getElementById('pendCount');
+        pc.textContent = left ? `${left} pendiente${left > 1 ? 's' : ''}` : 'Al día';
+        pc.className = left ? 'status pend' : 'status ok';
+        document.getElementById('receiptTitle').textContent = `Recibo digital N.º ${pad(480 + recs)} · Apto ${item.dataset.apto}`;
+        document.getElementById('receiptSub').textContent = extra
+          ? `Solvente · ${money(extra)} acreditados como saldo a favor`
+          : 'El apartamento queda Solvente';
+        receipt.classList.remove('show'); void receipt.offsetWidth; receipt.classList.add('show');
+      });
+    });
+
+    // ---------- Demo: mapa de pisos ----------
+    const floors = [
+      ['12', ['s','s','f','s']], ['11', ['s','m','s','s']], ['10', ['s','s','s','m']],
+      ['9', ['f','s','s','s']], ['8', ['s','s','m','s']], ['7', ['s','m','s','s']],
+      ['6', ['s','s','s','f']], ['5', ['s','s','m','s']], ['4', ['f','s','s','s']],
+      ['3', ['s','s','s','s']], ['2', ['s','m','s','s']], ['1', ['s','s','s','s']], ['PB', ['s','s']]
+    ];
+    const letters = ['A','B','C','D'];
+    const statusInfo = {
+      s: { label: 'Solvente', color: 'var(--emerald-l)', bal: () => '$0.00' },
+      m: { label: 'Pendiente', color: '#fca5a5', bal: () => '-$' + (45 * (1 + Math.floor(Math.random() * 2))).toFixed(2) },
+      f: { label: 'Saldo a favor', color: '#7dd3fc', bal: () => '+$' + (2.5 + Math.floor(Math.random() * 4) * 2.5).toFixed(2) }
+    };
+    const tower = document.getElementById('tower');
+    floors.forEach(([f, units]) => {
+      const row = document.createElement('div'); row.className = 'floor';
+      row.innerHTML = `<span>${f === 'PB' ? 'PB' : 'Piso ' + f}</span>`;
+      const u = document.createElement('div'); u.className = 'units';
+      units.forEach((st, i) => {
+        const code = f === 'PB' ? `PB-${letters[i]}` : `${f}-${letters[i]}`;
+        const b = document.createElement('div');
+        b.className = `unit ${st}`; b.textContent = code; b.dataset.st = st;
+        b.addEventListener('click', () => {
+          tower.querySelectorAll('.unit.sel').forEach(x => x.classList.remove('sel'));
+          b.classList.add('sel');
+          const info = statusInfo[st];
+          document.getElementById('udCode').textContent = code;
+          const s = document.getElementById('udStatus'); s.textContent = info.label; s.style.color = info.color;
+          document.getElementById('udAli').textContent = '2.00%';
+          document.getElementById('udBal').textContent = info.bal();
+        });
+        if (code === '10-A') b.classList.add('sel');
+        u.appendChild(b);
+      });
+      row.appendChild(u); tower.appendChild(row);
+    });
+
+    // Start at hash or first slide
+    const start = parseInt(location.hash.slice(1), 10);
+    go(Number.isFinite(start) && start >= 1 && start <= total ? start - 1 : 0);
+  })();
+  </script>
+</body>
+</html>
