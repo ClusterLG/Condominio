@@ -18,32 +18,57 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --bg-primary: #0b0f19;
-            --bg-secondary: #111827;
-            --bg-card: #1a2234;
-            --bg-card-hover: #222d44;
-            --bg-input: #151d2d;
-            --border-color: rgba(255, 255, 255, 0.08);
-            --border-glow: rgba(59, 130, 246, 0.25);
+            --bg-primary: #0d121f;
+            --bg-secondary: #151d2f;
+            --bg-card: #1b253b;
+            --bg-card-hover: #222e47;
+            --bg-input: #121828;
+            --border-color: rgba(226, 232, 240, 0.12);
+            --border-glow: rgba(165, 180, 252, 0.3);
             --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --primary: #3b82f6;
-            --primary-hover: #2563eb;
-            --primary-light: rgba(59, 130, 246, 0.15);
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --purple: #8b5cf6;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-light: rgba(99, 102, 241, 0.16);
+            --success: #34d399;
+            --warning: #fcd34d;
+            --danger: #fb7185;
+            --purple: #c084fc;
+            --info: #38bdf8;
+
+            /* Paleta Pastel Profesional & Acogedora */
+            --pastel-mint: #34d399;
+            --pastel-mint-bg: rgba(52, 211, 153, 0.14);
+            --pastel-mint-border: rgba(52, 211, 153, 0.28);
+            --pastel-rose: #fb7185;
+            --pastel-rose-bg: rgba(251, 113, 133, 0.14);
+            --pastel-rose-border: rgba(251, 113, 133, 0.28);
+            --pastel-lavender: #c084fc;
+            --pastel-lavender-bg: rgba(192, 132, 252, 0.14);
+            --pastel-lavender-border: rgba(192, 132, 252, 0.28);
+            --pastel-sky: #38bdf8;
+            --pastel-sky-bg: rgba(56, 189, 248, 0.14);
+            --pastel-sky-border: rgba(56, 189, 248, 0.28);
+            --pastel-amber: #fcd34d;
+            --pastel-amber-bg: rgba(252, 211, 77, 0.14);
+            --pastel-amber-border: rgba(252, 211, 77, 0.28);
+
             --radius-sm: 8px;
             --radius-md: 14px;
             --radius-lg: 20px;
+            --shadow-soft: 0 10px 25px -5px rgba(0, 0, 0, 0.35), 0 8px 10px -6px rgba(0, 0, 0, 0.25);
+            --shadow-glow: 0 0 25px rgba(99, 102, 241, 0.2);
             --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-primary);
+            background-image: 
+                radial-gradient(circle at 10% 12%, rgba(99, 102, 241, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 90% 88%, rgba(244, 114, 182, 0.07) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.04) 0%, transparent 60%);
             color: var(--text-primary);
             margin: 0;
             padding: 0;
@@ -51,16 +76,17 @@
         }
 
         .navbar-saas {
-            background: rgba(17, 24, 39, 0.85);
-            backdrop-filter: blur(12px);
+            background: rgba(21, 29, 47, 0.92);
+            backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
             z-index: 100;
-            padding: 0.75rem 1.5rem;
+            padding: 0.75rem 1.75rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         }
 
         .brand-logo {
@@ -74,15 +100,16 @@
         }
 
         .brand-icon {
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
+            background: linear-gradient(135deg, #6366f1, #c084fc);
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.15rem;
+            font-size: 1.2rem;
             color: #fff;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
         }
 
         .bcv-pill {
@@ -90,12 +117,13 @@
             align-items: center;
             gap: 0.4rem;
             font-size: 0.82rem;
-            background: rgba(16, 185, 129, 0.1);
-            color: #34d399;
+            background: var(--pastel-mint-bg);
+            color: #6ee7b7;
             padding: 0.35rem 0.85rem;
             border-radius: 9999px;
-            border: 1px solid rgba(16, 185, 129, 0.25);
+            border: 1px solid var(--pastel-mint-border);
             font-weight: 600;
+            box-shadow: 0 2px 8px rgba(52, 211, 153, 0.12);
         }
 
         /* LOGIN WRAPPER & CUADRÍCULA ÚNICA */
@@ -274,8 +302,8 @@
         .super-vertical-sidebar,
         .resident-vertical-sidebar {
             width: 260px;
-            background: #111827;
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            background: #131a2b;
+            border-right: 1px solid rgba(226, 232, 240, 0.09);
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
@@ -284,7 +312,7 @@
             top: 60px;
             height: calc(100vh - 60px);
             z-index: 90;
-            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25);
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
             overflow: hidden;
         }
 
@@ -301,7 +329,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 1.15rem 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.09);
             gap: 0.5rem;
             min-height: 72px;
             box-sizing: border-box;
@@ -331,16 +359,16 @@
             flex-shrink: 0;
         }
         .admin-brand-icon {
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
         }
         .super-brand-icon {
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.35);
+            background: linear-gradient(135deg, #c084fc, #f472b6);
+            box-shadow: 0 4px 14px rgba(192, 132, 252, 0.35);
         }
         .resident-brand-icon {
-            background: linear-gradient(135deg, #10b981, #06b6d4);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+            background: linear-gradient(135deg, #34d399, #38bdf8);
+            box-shadow: 0 4px 14px rgba(52, 211, 153, 0.35);
         }
 
         .admin-brand-text,
@@ -362,8 +390,8 @@
         .admin-brand-subtitle,
         .super-brand-subtitle,
         .resident-brand-subtitle {
-            font-size: 0.72rem;
-            color: #94a3b8;
+            font-size: 0.74rem;
+            color: var(--text-secondary);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -375,7 +403,7 @@
         .btn-resident-sidebar-toggle {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #94a3b8;
+            color: var(--text-secondary);
             width: 32px;
             height: 32px;
             border-radius: 8px;
@@ -387,19 +415,19 @@
             flex-shrink: 0;
         }
         .btn-admin-sidebar-toggle:hover {
-            background: rgba(59, 130, 246, 0.15);
-            color: #60a5fa;
-            border-color: rgba(59, 130, 246, 0.3);
+            background: rgba(99, 102, 241, 0.18);
+            color: #a5b4fc;
+            border-color: rgba(99, 102, 241, 0.35);
         }
         .btn-super-sidebar-toggle:hover {
-            background: rgba(139, 92, 246, 0.15);
-            color: #c084fc;
-            border-color: rgba(139, 92, 246, 0.3);
+            background: rgba(192, 132, 252, 0.18);
+            color: #e9d5ff;
+            border-color: rgba(192, 132, 252, 0.35);
         }
         .btn-resident-sidebar-toggle:hover {
-            background: rgba(16, 185, 129, 0.15);
-            color: #34d399;
-            border-color: rgba(16, 185, 129, 0.3);
+            background: rgba(52, 211, 153, 0.18);
+            color: #a7f3d0;
+            border-color: rgba(52, 211, 153, 0.35);
         }
 
         .admin-sidebar-nav,
@@ -424,7 +452,7 @@
             border-radius: 10px;
             background: transparent;
             border: 1px solid transparent;
-            color: #94a3b8;
+            color: var(--text-secondary);
             font-size: 0.88rem;
             font-weight: 600;
             text-align: left;
@@ -452,74 +480,75 @@
         .resident-nav-link:hover {
             background: rgba(255, 255, 255, 0.05);
             color: #f8fafc;
-            border-color: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.08);
         }
 
         .admin-nav-link:hover i {
-            color: #60a5fa;
+            color: #a5b4fc;
             transform: scale(1.1);
         }
         .super-nav-link:hover i {
-            color: #c084fc;
+            color: #e9d5ff;
             transform: scale(1.1);
         }
         .resident-nav-link:hover i {
-            color: #34d399;
+            color: #6ee7b7;
             transform: scale(1.1);
         }
 
         .admin-nav-link.active {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.15));
-            border-color: rgba(59, 130, 246, 0.4);
-            color: #fff;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(192, 132, 252, 0.14));
+            border-color: rgba(99, 102, 241, 0.45);
+            color: #c7d2fe;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
         }
         .admin-nav-link.active i {
-            color: #60a5fa;
+            color: #a5b4fc;
         }
 
         .super-nav-link.active {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(236, 72, 153, 0.15));
-            border-color: rgba(139, 92, 246, 0.45);
-            color: #fff;
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+            background: linear-gradient(135deg, rgba(192, 132, 252, 0.22), rgba(244, 114, 182, 0.14));
+            border-color: rgba(192, 132, 252, 0.45);
+            color: #f5d0fe;
+            box-shadow: 0 4px 15px rgba(192, 132, 252, 0.2);
         }
         .super-nav-link.active i {
-            color: #c084fc;
+            color: #e9d5ff;
         }
 
         .resident-nav-link.active {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.22), rgba(6, 182, 212, 0.15));
-            border-color: rgba(16, 185, 129, 0.4);
-            color: #fff;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+            background: linear-gradient(135deg, rgba(52, 211, 153, 0.2), rgba(56, 189, 248, 0.14));
+            border-color: rgba(52, 211, 153, 0.45);
+            color: #a7f3d0;
+            box-shadow: 0 4px 15px rgba(52, 211, 153, 0.2);
         }
         .resident-nav-link.active i {
-            color: #34d399;
+            color: #6ee7b7;
         }
 
         .admin-nav-badge,
         .super-nav-badge,
         .resident-nav-badge {
-            background: #ef4444;
+            background: #fb7185;
             color: #fff;
             font-size: 0.68rem;
             padding: 1px 6px;
             border-radius: 10px;
             margin-left: auto;
             font-weight: 700;
+            box-shadow: 0 2px 6px rgba(251, 113, 133, 0.35);
         }
 
         .admin-sidebar-footer,
         .super-sidebar-footer,
         .resident-sidebar-footer {
             padding: 0.85rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(226, 232, 240, 0.09);
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 0.5rem;
-            background: rgba(11, 15, 25, 0.4);
+            background: rgba(14, 19, 34, 0.6);
         }
 
         .admin-sidebar-user,
@@ -556,13 +585,13 @@
             flex-shrink: 0;
         }
         .admin-user-avatar {
-            background: linear-gradient(135deg, #6366f1, #3b82f6);
+            background: linear-gradient(135deg, #6366f1, #a855f7);
         }
         .super-user-avatar {
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            background: linear-gradient(135deg, #c084fc, #f472b6);
         }
         .resident-user-avatar {
-            background: linear-gradient(135deg, #10b981, #06b6d4);
+            background: linear-gradient(135deg, #34d399, #38bdf8);
         }
 
         .admin-user-info,
@@ -587,15 +616,15 @@
         .super-user-role,
         .resident-user-role {
             font-size: 0.68rem;
-            color: #94a3b8;
+            color: var(--text-secondary);
         }
 
         .btn-admin-logout-mini,
         .btn-super-logout-mini,
         .btn-resident-logout-mini {
             background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: #94a3b8;
+            border: 1px solid rgba(226, 232, 240, 0.1);
+            color: var(--text-secondary);
             width: 32px;
             height: 32px;
             border-radius: 8px;
@@ -609,9 +638,9 @@
         .btn-admin-logout-mini:hover,
         .btn-super-logout-mini:hover,
         .btn-resident-logout-mini:hover {
-            background: rgba(239, 68, 68, 0.15);
-            color: #ef4444;
-            border-color: rgba(239, 68, 68, 0.3);
+            background: rgba(251, 113, 133, 0.15);
+            color: #fb7185;
+            border-color: rgba(251, 113, 133, 0.35);
         }
 
         /* Ocultar elementos cuando el sidebar está retraído */
@@ -665,36 +694,37 @@
             min-width: 0;
             display: flex;
             flex-direction: column;
-            background: #0b0f19;
-            overflow-x: hidden;
+            background: transparent;
+            overflow-x: clip;
         }
 
         .admin-topbar-header,
         .super-topbar-header,
         .resident-topbar-header {
-            background: rgba(17, 24, 39, 0.75);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 1rem 1.75rem;
+            background: linear-gradient(135deg, rgba(27, 37, 59, 0.95), rgba(21, 29, 47, 0.95));
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(165, 180, 252, 0.14);
+            padding: 1.1rem 1.75rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
-            position: sticky;
-            top: 60px;
-            z-index: 80;
+            position: relative;
+            top: auto;
+            z-index: 10;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
         }
 
         .btn-admin-topbar-toggle,
         .btn-super-topbar-toggle,
         .btn-resident-topbar-toggle {
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             color: #fff;
             width: 38px;
             height: 38px;
-            border-radius: 8px;
+            border-radius: 9px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -703,19 +733,19 @@
             transition: all 0.2s;
         }
         .btn-admin-topbar-toggle:hover {
-            background: rgba(59, 130, 246, 0.15);
-            color: #60a5fa;
-            border-color: rgba(59, 130, 246, 0.3);
+            background: rgba(99, 102, 241, 0.18);
+            color: #a5b4fc;
+            border-color: rgba(99, 102, 241, 0.35);
         }
         .btn-super-topbar-toggle:hover {
-            background: rgba(139, 92, 246, 0.15);
-            color: #c084fc;
-            border-color: rgba(139, 92, 246, 0.3);
+            background: rgba(192, 132, 252, 0.18);
+            color: #e9d5ff;
+            border-color: rgba(192, 132, 252, 0.35);
         }
         .btn-resident-topbar-toggle:hover {
-            background: rgba(16, 185, 129, 0.15);
-            color: #34d399;
-            border-color: rgba(16, 185, 129, 0.3);
+            background: rgba(52, 211, 153, 0.18);
+            color: #a7f3d0;
+            border-color: rgba(52, 211, 153, 0.35);
         }
 
         .admin-content-inner,
@@ -857,27 +887,38 @@
         }
 
         .tab-item-saas.active {
-            background: var(--primary);
+            background: linear-gradient(135deg, #6366f1, #818cf8);
             color: #fff;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
         }
 
         .stat-badge {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            padding: 0.25rem 0.65rem;
-            border-radius: 6px;
+            background: rgba(165, 180, 252, 0.12);
+            border: 1px solid rgba(165, 180, 252, 0.28);
+            padding: 0.3rem 0.8rem;
+            border-radius: 9999px;
             font-size: 0.8rem;
-            color: var(--text-secondary);
+            font-weight: 600;
+            color: #c7d2fe;
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
+            letter-spacing: 0.01em;
         }
 
-        .stat-badge.clean {
-            background: rgba(16, 185, 129, 0.1);
-            color: #10b981;
-            border-color: rgba(16, 185, 129, 0.25);
+        .stat-badge.clean,
+        .stat-badge.solvente {
+            background: var(--pastel-mint-bg);
+            color: #6ee7b7;
+            border-color: var(--pastel-mint-border);
+            font-weight: 600;
+        }
+
+        .stat-badge.moroso,
+        .stat-badge.deuda {
+            background: var(--pastel-rose-bg);
+            color: #fda4af;
+            border-color: var(--pastel-rose-border);
             font-weight: 600;
         }
 
@@ -889,6 +930,7 @@
             display: flex;
             align-items: center;
             gap: 1rem;
+            box-shadow: var(--shadow-soft);
         }
 
         .stat-icon-saas {
@@ -907,6 +949,7 @@
             border-radius: var(--radius-md);
             margin-bottom: 1rem;
             padding: 1rem 1.25rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
         }
 
         .floor-title {
@@ -928,8 +971,8 @@
         .unit-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 0.85rem;
+            border-radius: 12px;
+            padding: 0.9rem;
             cursor: pointer;
             transition: var(--transition);
         }
@@ -938,47 +981,48 @@
             border-color: var(--primary);
             transform: translateY(-2px);
             background: var(--bg-card-hover);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
         }
 
         .unit-card.clean {
-            border-left: 3px dashed #64748b;
+            border-left: 3px dashed var(--text-muted);
         }
 
         .unit-card.solvente {
-            border-left: 3px solid #10b981;
+            border-left: 3px solid #34d399;
         }
 
         .unit-card.moroso {
-            border-left: 3px solid #ef4444;
-            background: rgba(239, 68, 68, 0.04);
+            border-left: 3px solid #fb7185;
+            background: rgba(251, 113, 133, 0.05);
         }
 
         .badge-status {
             display: inline-flex;
             align-items: center;
             gap: 0.28rem;
-            padding: 0.18rem 0.5rem;
-            border-radius: 6px;
-            font-size: 0.7rem;
+            padding: 0.22rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.72rem;
             font-weight: 700;
         }
 
         .badge-moroso {
-            background: rgba(239, 68, 68, 0.15);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            background: var(--pastel-rose-bg);
+            color: #fda4af;
+            border: 1px solid var(--pastel-rose-border);
         }
 
         .badge-solvente {
-            background: rgba(16, 185, 129, 0.15);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.3);
+            background: var(--pastel-mint-bg);
+            color: #6ee7b7;
+            border: 1px solid var(--pastel-mint-border);
         }
 
         .badge-disponible {
             background: rgba(148, 163, 184, 0.12);
-            color: #94a3b8;
-            border: 1px solid rgba(148, 163, 184, 0.22);
+            color: var(--text-secondary);
+            border: 1px solid rgba(148, 163, 184, 0.25);
         }
 
         .unit-code {
@@ -2175,17 +2219,21 @@
         <!-- SECCIÓN 1: FINANZAS Y PAGOS -->
         <div id="residentTabFinanzas">
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 1.75rem;">
-                <!-- TARJETA DE DEUDA: ROJO SI DEBE, VERDE SOLO SI TIENE SALDO A FAVOR -->
-                <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;" id="residentDebtCard">
-                    <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.4rem;" id="residentDebtLabel">Estado de Deuda Actual</div>
-                    <div style="font-size: 2.2rem; font-weight: 800; color: #ef4444; transition: color 0.3s;" id="residentDebtUSD">$0.00 USD</div>
-                    <div style="font-size: 0.92rem; color: var(--text-muted); margin-top: 0.25rem;" id="residentDebtBs">Equivalente: 0.00 Bs</div>
-                    <div id="residentDebtBadge" class="stat-badge" style="margin-top: 1rem;"><i class="bi bi-check2"></i> Solvente al Día</div>
+                <!-- TARJETA DE DEUDA: ROJO/PASTEL SI DEBE, VERDE SOLO SI TIENE SALDO A FAVOR -->
+                <div style="background: linear-gradient(145deg, rgba(27, 37, 59, 0.8), rgba(21, 29, 47, 0.9)); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.6rem; box-shadow: var(--shadow-soft); transition: var(--transition);" id="residentDebtCard">
+                    <div style="font-size: 0.84rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.4rem;" id="residentDebtLabel">
+                        <i class="bi bi-wallet2" style="color: var(--primary);"></i> Estado de Deuda Actual
+                    </div>
+                    <div style="font-size: 2.35rem; font-weight: 800; color: var(--pastel-rose); transition: color 0.3s; letter-spacing: -0.02em;" id="residentDebtUSD">$0.00 USD</div>
+                    <div style="font-size: 0.92rem; color: var(--text-secondary); margin-top: 0.35rem;" id="residentDebtBs">Equivalente: 0.00 Bs</div>
+                    <div id="residentDebtBadge" class="stat-badge clean" style="margin-top: 1.15rem;"><i class="bi bi-check2"></i> Solvente al Día</div>
                 </div>
 
-                <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;">
-                    <div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.4rem;">Cuentas para Pago</div>
-                    <div style="font-size: 0.85rem; color: #fff; line-height: 1.5;" id="residentBankInfo">
+                <div style="background: linear-gradient(145deg, rgba(27, 37, 59, 0.8), rgba(21, 29, 47, 0.9)); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: var(--radius-md); padding: 1.6rem; box-shadow: var(--shadow-soft);">
+                    <div style="font-size: 0.84rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
+                        <i class="bi bi-bank" style="color: var(--info);"></i> Cuentas para Pago Oficial
+                    </div>
+                    <div style="font-size: 0.86rem; color: var(--text-primary); line-height: 1.6;" id="residentBankInfo">
                         <strong>Pago Móvil (Solo Bs):</strong> 0134 | V-12345678 | 0414-1234567<br>
                         <strong>Transferencia (Solo Bs):</strong> Banesco 0134-0000-00-0000000000<br>
                         <strong>Zelle (Solo USD):</strong> condominio.samanes@gmail.com
@@ -6963,40 +7011,53 @@
                 const debtBadge = document.getElementById('residentDebtBadge');
                 const debtLabel = document.getElementById('residentDebtLabel');
 
-                // REGLA: ROJO SI TIENE DEUDA (> 0), VERDE SOLO SI TIENE SALDO A FAVOR (< 0)
+                // REGLA: ROJO/PASTEL SI TIENE DEUDA (> 0), VERDE SOLO SI TIENE SALDO A FAVOR (< 0)
+                const residentDebtCard = document.getElementById('residentDebtCard');
                 if (balance > 0.005) {
-                    debtElUSD.style.color = '#ef4444'; // ROJO
+                    debtElUSD.style.color = '#fb7185'; // PASTEL ROSE
                     debtElUSD.innerText = `$${balance.toFixed(2)} USD`;
                     const bsEquiv = (balance * condo.tasa_dolar).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                    debtElBs.innerHTML = `Equivalente en Bolívares: <strong style="color: #fbbf24;">Bs. ${bsEquiv}</strong> (Tasa BCV ${condo.tasa_dolar.toFixed(2)})`;
-                    debtLabel.innerText = "Deuda Pendiente de Pago";
-                    debtBadge.className = "stat-badge";
-                    debtBadge.style.background = "rgba(239, 68, 68, 0.15)";
-                    debtBadge.style.color = "#ef4444";
-                    debtBadge.style.borderColor = "rgba(239, 68, 68, 0.3)";
-                    debtBadge.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> Deuda Pendiente de Cancelación`;
+                    debtElBs.innerHTML = `Equivalente en Bolívares: <strong style="color: #fcd34d;">Bs. ${bsEquiv}</strong> (Tasa BCV ${condo.tasa_dolar.toFixed(2)})`;
+                    debtLabel.innerHTML = `<i class="bi bi-wallet2" style="color: #fb7185;"></i> Deuda Pendiente de Pago`;
+                    debtBadge.className = "stat-badge deuda";
+                    debtBadge.style.background = "var(--pastel-rose-bg)";
+                    debtBadge.style.color = "#fda4af";
+                    debtBadge.style.borderColor = "var(--pastel-rose-border)";
+                    debtBadge.innerHTML = `<i class="bi bi-exclamation-circle-fill"></i> Deuda Pendiente de Cancelación`;
+                    if (residentDebtCard) {
+                        residentDebtCard.style.borderColor = "var(--pastel-rose-border)";
+                        residentDebtCard.style.boxShadow = "0 10px 25px -5px rgba(0, 0, 0, 0.35), 0 0 20px rgba(251, 113, 133, 0.08)";
+                    }
                 } else if (balance < -0.005) {
-                    debtElUSD.style.color = '#10b981'; // VERDE SOLO CUANDO TIENE SALDO A FAVOR
+                    debtElUSD.style.color = '#34d399'; // PASTEL MINT
                     const favorUSD = Math.abs(balance).toFixed(2);
                     debtElUSD.innerText = `+$${favorUSD} USD`;
                     const bsFavor = (Math.abs(balance) * condo.tasa_dolar).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                    debtElBs.innerHTML = `Saldo a Favor en Bs: <strong style="color: #34d399;">Bs. ${bsFavor}</strong>`;
-                    debtLabel.innerText = "Saldo a Favor del Copropietario";
+                    debtElBs.innerHTML = `Saldo a Favor en Bs: <strong style="color: #6ee7b7;">Bs. ${bsFavor}</strong>`;
+                    debtLabel.innerHTML = `<i class="bi bi-wallet2" style="color: #34d399;"></i> Saldo a Favor del Copropietario`;
                     debtBadge.className = "stat-badge clean";
-                    debtBadge.style.background = "";
-                    debtBadge.style.color = "";
-                    debtBadge.style.borderColor = "";
+                    debtBadge.style.background = "var(--pastel-mint-bg)";
+                    debtBadge.style.color = "#6ee7b7";
+                    debtBadge.style.borderColor = "var(--pastel-mint-border)";
                     debtBadge.innerHTML = `<i class="bi bi-check-circle-fill"></i> Saldo a Favor Disponible`;
+                    if (residentDebtCard) {
+                        residentDebtCard.style.borderColor = "var(--pastel-mint-border)";
+                        residentDebtCard.style.boxShadow = "0 10px 25px -5px rgba(0, 0, 0, 0.35), 0 0 20px rgba(52, 211, 153, 0.08)";
+                    }
                 } else {
                     debtElUSD.style.color = '#f8fafc'; // NEUTRAL (BLANCO/GRIS)
                     debtElUSD.innerText = `$0.00 USD`;
                     debtElBs.innerText = `Al día • Sin deudas acumuladas (0.00 Bs)`;
-                    debtLabel.innerText = "Estado de Cuenta";
-                    debtBadge.className = "stat-badge";
-                    debtBadge.style.background = "var(--bg-card)";
-                    debtBadge.style.color = "var(--text-secondary)";
-                    debtBadge.style.borderColor = "var(--border-color)";
+                    debtLabel.innerHTML = `<i class="bi bi-wallet2" style="color: var(--primary);"></i> Estado de Cuenta`;
+                    debtBadge.className = "stat-badge clean";
+                    debtBadge.style.background = "var(--pastel-mint-bg)";
+                    debtBadge.style.color = "#6ee7b7";
+                    debtBadge.style.borderColor = "var(--pastel-mint-border)";
                     debtBadge.innerHTML = `<i class="bi bi-check2"></i> Solvente al Día`;
+                    if (residentDebtCard) {
+                        residentDebtCard.style.borderColor = "rgba(226, 232, 240, 0.12)";
+                        residentDebtCard.style.boxShadow = "var(--shadow-soft)";
+                    }
                 }
 
                 // Renderizar listado de cuotas, pagos, tickets y cartelera del residente
