@@ -2460,15 +2460,97 @@
         </div>
     </div>
 
-    <!-- MODAL: ADJUDICAR PROPIETARIO A APARTAMENTO -->
+    <!-- MODAL: ADJUDICAR PROPIETARIO A APARTAMENTO CON STATUS DE PAGO -->
     <div id="modalAdjudicar" class="modal-backdrop-saas">
-        <div class="modal-box-saas">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
-                <h3 style="font-size: 1.2rem; color: #fff; margin: 0;" id="adjModalTitle">Adjudicar Apartamento</h3>
+        <div class="modal-box-saas" style="max-width: 620px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.15rem;">
+                <div>
+                    <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff; margin: 0;" id="adjModalTitle">Ficha & Adjudicación: Apartamento</h3>
+                    <span style="font-size: 0.8rem; color: var(--text-secondary);" id="adjModalSubtitle">Información de copropiedad y solvencia financiera</span>
+                </div>
                 <button class="close-btn" onclick="app.closeModal('modalAdjudicar')">&times;</button>
             </div>
             <div>
                 <input type="hidden" id="adjAptoCode">
+
+                <!-- TARJETA: STATUS DE PAGO & ESTADO FINANCIERO DE LA UNIDAD -->
+                <div id="adjPaymentCard" style="background: linear-gradient(145deg, rgba(27, 37, 59, 0.85), rgba(21, 29, 47, 0.95)); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.15rem 1.25rem; margin-bottom: 1.35rem; box-shadow: var(--shadow-soft); transition: var(--transition);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
+                        <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); display: flex; align-items: center; gap: 0.4rem;">
+                            <i class="bi bi-wallet2" style="color: var(--primary);"></i> Status Financiero & Pagos
+                        </span>
+                        <span id="adjStatusBadge" class="stat-badge clean">
+                            <i class="bi bi-check-circle-fill"></i> Solvente al Día
+                        </span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.85rem; margin-bottom: 0.75rem;">
+                        <!-- Saldo / Deuda -->
+                        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(226, 232, 240, 0.08); border-radius: 10px; padding: 0.75rem 0.9rem;">
+                            <div style="font-size: 0.74rem; color: var(--text-secondary); margin-bottom: 0.2rem;" id="adjBalanceLabel">Balance / Deuda Actual</div>
+                            <div style="font-size: 1.45rem; font-weight: 800; color: var(--pastel-rose); line-height: 1.2;" id="adjBalanceUSD">$0.00 USD</div>
+                            <div style="font-size: 0.76rem; color: var(--text-secondary); margin-top: 0.2rem;" id="adjBalanceBs">Equivalente: 0.00 Bs</div>
+                        </div>
+
+                        <!-- Resumen Cuotas & Pagos -->
+                        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(226, 232, 240, 0.08); border-radius: 10px; padding: 0.75rem 0.9rem;">
+                            <div style="font-size: 0.74rem; color: var(--text-secondary); margin-bottom: 0.2rem;">Cuotas & Historial</div>
+                            <div style="font-size: 0.85rem; color: #fff; font-weight: 700; margin-top: 0.15rem;" id="adjCuotasInfo">0 cuota(s) asignadas</div>
+                            <div style="font-size: 0.76rem; color: var(--text-secondary); margin-top: 0.2rem;" id="adjPagosInfo">0 pago(s) aprobados</div>
+                        </div>
+                    </div>
+
+                    <!-- Detalle de último pago o alerta -->
+                    <div id="adjPaymentNotice" style="font-size: 0.78rem; padding: 0.5rem 0.75rem; border-radius: 8px; background: rgba(255, 255, 255, 0.04); color: var(--text-secondary); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                        <span id="adjPaymentNoticeText"><i class="bi bi-info-circle"></i> Sin movimientos recientes</span>
+                        <button type="button" class="demo-btn" style="padding: 0.25rem 0.6rem; font-size: 0.72rem; border-color: rgba(99, 102, 241, 0.35); color: #a5b4fc;" onclick="app.toggleAdjHistory()">
+                            <i class="bi bi-list-ul"></i> <span id="adjHistoryToggleBtnText">Ver Desglose</span>
+                        </button>
+                    </div>
+
+                    <!-- Desglose colapsable de Cuotas y Pagos recientes de esta unidad -->
+                    <div id="adjHistoryDetails" style="display: none; margin-top: 0.85rem; border-top: 1px solid rgba(226, 232, 240, 0.08); padding-top: 0.75rem;">
+                        <div style="font-size: 0.76rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.4rem;">
+                            <i class="bi bi-receipt text-primary"></i> Cuotas Asignadas a esta Unidad:
+                        </div>
+                        <div style="max-height: 120px; overflow-y: auto; margin-bottom: 0.65rem;">
+                            <table class="table-saas" style="font-size: 0.78rem;">
+                                <thead>
+                                    <tr>
+                                        <th style="padding: 0.35rem 0.5rem;">Fecha</th>
+                                        <th style="padding: 0.35rem 0.5rem;">Concepto</th>
+                                        <th style="padding: 0.35rem 0.5rem;">Tipo</th>
+                                        <th style="padding: 0.35rem 0.5rem;">Monto USD</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adjCuotasTableBody"></tbody>
+                            </table>
+                        </div>
+
+                        <div style="font-size: 0.76rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.4rem;">
+                            <i class="bi bi-cash-coin text-success"></i> Pagos Registrados por esta Unidad:
+                        </div>
+                        <div style="max-height: 120px; overflow-y: auto;">
+                            <table class="table-saas" style="font-size: 0.78rem;">
+                                <thead>
+                                    <tr>
+                                        <th style="padding: 0.35rem 0.5rem;">Fecha</th>
+                                        <th style="padding: 0.35rem 0.5rem;">Método / Ref</th>
+                                        <th style="padding: 0.35rem 0.5rem;">Monto</th>
+                                        <th style="padding: 0.35rem 0.5rem;">Estatus</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adjPagosTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FORMULARIO DE COPROPIETARIO -->
+                <div style="font-size: 0.84rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
+                    <i class="bi bi-person-badge" style="color: var(--primary);"></i> Datos del Propietario / Adjudicatario
+                </div>
+
                 <div class="form-group">
                     <label class="form-label">Nombre del Propietario / Adjudicatario:</label>
                     <input type="text" id="adjNombre" class="form-control" placeholder="Ej. Carlos Mendoza">
@@ -2488,7 +2570,7 @@
                 <div class="form-group">
                     <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
                         <span>Alícuota (%):</span>
-                        <span id="adjAlicuotaLockBadge" style="background: rgba(239, 68, 68, 0.15); color: #f87171; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: 600;">
+                        <span id="adjAlicuotaLockBadge" style="background: rgba(251, 113, 133, 0.15); color: #fb7185; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: 600;">
                             <i class="bi bi-lock-fill"></i> Solo Superadmin
                         </span>
                     </label>
@@ -2501,7 +2583,7 @@
                     <button class="btn-primary-saas" onclick="app.saveAdjudicacion()">
                         <i class="bi bi-check2"></i> Guardar Adjudicación
                     </button>
-                    <button class="demo-btn" onclick="app.liberarApartamento()" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.4);">
+                    <button class="demo-btn" onclick="app.liberarApartamento()" style="color: #fb7185; border-color: rgba(251, 113, 133, 0.4);">
                         <i class="bi bi-trash"></i> Desadjudicar
                     </button>
                 </div>
@@ -5629,7 +5711,7 @@
                 this.logActivity('SEGURIDAD', `Contraseña de acceso del Administrador actualizada exitosamente`, 'admin', condo.nombre);
             },
 
-            // ADJUDICAR
+            // ADJUDICAR Y FICHA CON STATUS FINANCIERO
             openAdjudicarModal(aptoCode) {
                 const condo = this.getActiveCondo();
                 const u = this.getCondoUnits(condo.id).find(x => x.codigo === aptoCode);
@@ -5637,6 +5719,178 @@
 
                 document.getElementById('adjAptoCode').value = u.codigo;
                 document.getElementById('adjModalTitle').innerText = `Ficha & Adjudicación: Apartamento ${u.codigo}`;
+                const subTitle = document.getElementById('adjModalSubtitle');
+                if (subTitle) subTitle.innerText = `${condo.nombre} • ${u.piso === 0 ? 'Planta Baja (PB)' : 'Piso ' + u.piso}`;
+
+                // --- 1. CÁLCULO DE STATUS DE PAGO Y BALANCES ---
+                const targetNorm = this.normCode(aptoCode);
+                const balance = this.getAptoBalance(condo.id, aptoCode);
+
+                // Cuotas aplicadas a la unidad
+                const cuotasCondo = this.state.cuotas.filter(c => {
+                    if (String(c.condoId) !== String(condo.id)) return false;
+                    if (c.tipo === 'individual') return this.normCode(c.apto) === targetNorm;
+                    return true;
+                });
+                const totalCuotasUSD = cuotasCondo.reduce((acc, c) => acc + (parseFloat(c.monto_usd) || 0), 0);
+
+                // Pagos reportados por la unidad
+                const pagosUnidad = this.state.pagos.filter(p => String(p.condoId) === String(condo.id) && this.normCode(p.apto) === targetNorm);
+                const pagosAprobados = pagosUnidad.filter(p => p.estado === 'aprobado');
+                const totalPagadoUSD = pagosAprobados.reduce((acc, p) => {
+                    let mUSD = p.moneda === 'USD' ? p.monto : (p.monto / condo.tasa_dolar);
+                    return acc + mUSD;
+                }, 0);
+
+                const cardEl = document.getElementById('adjPaymentCard');
+                const badgeEl = document.getElementById('adjStatusBadge');
+                const balLabelEl = document.getElementById('adjBalanceLabel');
+                const balUsdEl = document.getElementById('adjBalanceUSD');
+                const balBsEl = document.getElementById('adjBalanceBs');
+                const cuotasInfoEl = document.getElementById('adjCuotasInfo');
+                const pagosInfoEl = document.getElementById('adjPagosInfo');
+                const noticeTextEl = document.getElementById('adjPaymentNoticeText');
+
+                if (cuotasInfoEl) cuotasInfoEl.innerText = `${cuotasCondo.length} cuota(s) emitidas ($${totalCuotasUSD.toFixed(2)} USD)`;
+                if (pagosInfoEl) pagosInfoEl.innerText = `${pagosAprobados.length} pago(s) aprobados ($${totalPagadoUSD.toFixed(2)} USD)`;
+
+                // Tabla de cuotas asignadas
+                const cuotasTbody = document.getElementById('adjCuotasTableBody');
+                if (cuotasTbody) {
+                    if (cuotasCondo.length === 0) {
+                        cuotasTbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 0.6rem;">Sin cuotas registradas para este apartamento.</td></tr>`;
+                    } else {
+                        cuotasTbody.innerHTML = cuotasCondo.slice().reverse().map(c => `
+                            <tr>
+                                <td style="padding: 0.35rem 0.5rem;">${c.fecha || 'N/A'}</td>
+                                <td style="padding: 0.35rem 0.5rem; font-weight: 600; color: #fff;">${c.titulo}</td>
+                                <td style="padding: 0.35rem 0.5rem;"><span style="text-transform: capitalize; font-size: 0.72rem; color: #a5b4fc;">${c.tipo}</span></td>
+                                <td style="padding: 0.35rem 0.5rem; font-weight: 700; color: #f8fafc;">$${parseFloat(c.monto_usd).toFixed(2)}</td>
+                            </tr>
+                        `).join('');
+                    }
+                }
+
+                // Tabla de pagos realizados
+                const pagosTbody = document.getElementById('adjPagosTableBody');
+                if (pagosTbody) {
+                    if (pagosUnidad.length === 0) {
+                        pagosTbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 0.6rem;">Sin comprobantes ni pagos reportados.</td></tr>`;
+                    } else {
+                        pagosTbody.innerHTML = pagosUnidad.slice().reverse().map(p => {
+                            let badgeClass = p.estado === 'aprobado' ? 'badge-solvente' : (p.estado === 'rechazado' ? 'badge-moroso' : 'badge-disponible');
+                            return `
+                                <tr>
+                                    <td style="padding: 0.35rem 0.5rem;">${p.fecha || 'N/A'}</td>
+                                    <td style="padding: 0.35rem 0.5rem;">${p.metodo || 'Pago'} • <span style="font-family: monospace; font-size: 0.75rem;">${p.referencia || 'S/R'}</span></td>
+                                    <td style="padding: 0.35rem 0.5rem; font-weight: 700; color: #f8fafc;">$${parseFloat(p.monto).toFixed(2)} ${p.moneda || 'USD'}</td>
+                                    <td style="padding: 0.35rem 0.5rem;"><span class="badge-status ${badgeClass}" style="font-size: 0.68rem; text-transform: capitalize;">${p.estado}</span></td>
+                                </tr>
+                            `;
+                        }).join('');
+                    }
+                }
+
+                // Colapsar desglose por defecto
+                const histDiv = document.getElementById('adjHistoryDetails');
+                const histBtn = document.getElementById('adjHistoryToggleBtnText');
+                if (histDiv) histDiv.style.display = 'none';
+                if (histBtn) histBtn.innerText = 'Ver Desglose';
+
+                // Configurar status visual y colores pastel
+                if (!u.propietario) {
+                    if (badgeEl) {
+                        badgeEl.className = "stat-badge";
+                        badgeEl.style.background = "rgba(148, 163, 184, 0.12)";
+                        badgeEl.style.color = "var(--text-secondary)";
+                        badgeEl.style.borderColor = "rgba(148, 163, 184, 0.25)";
+                        badgeEl.innerHTML = `<i class="bi bi-dash-circle"></i> Unidad No Adjudicada`;
+                    }
+                    if (balLabelEl) balLabelEl.innerText = "Estado Financiero";
+                    if (balUsdEl) {
+                        balUsdEl.style.color = "var(--text-secondary)";
+                        balUsdEl.innerText = "$0.00 USD";
+                    }
+                    if (balBsEl) balBsEl.innerText = "Disponible para asignación de copropietario";
+                    if (noticeTextEl) noticeTextEl.innerHTML = `<i class="bi bi-info-circle"></i> Apartamento actualmente vacante o sin adjudicar.`;
+                    if (cardEl) {
+                        cardEl.style.borderColor = "rgba(226, 232, 240, 0.1)";
+                        cardEl.style.boxShadow = "var(--shadow-soft)";
+                    }
+                } else if (balance > 0.005) {
+                    const bsEquiv = (balance * condo.tasa_dolar).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    if (badgeEl) {
+                        badgeEl.className = "stat-badge deuda";
+                        badgeEl.style.background = "var(--pastel-rose-bg)";
+                        badgeEl.style.color = "#fda4af";
+                        badgeEl.style.borderColor = "var(--pastel-rose-border)";
+                        badgeEl.innerHTML = `<i class="bi bi-exclamation-circle-fill"></i> Moroso (Deuda Pendiente)`;
+                    }
+                    if (balLabelEl) balLabelEl.innerText = "Deuda Pendiente de Cancelación";
+                    if (balUsdEl) {
+                        balUsdEl.style.color = "#fb7185";
+                        balUsdEl.innerText = `$${balance.toFixed(2)} USD`;
+                    }
+                    if (balBsEl) balBsEl.innerHTML = `Equivalente: <strong style="color: #fcd34d;">Bs. ${bsEquiv}</strong> (Tasa ${condo.tasa_dolar.toFixed(2)})`;
+                    
+                    const ultimoPago = pagosUnidad.length > 0 ? pagosUnidad[pagosUnidad.length - 1] : null;
+                    if (noticeTextEl) {
+                        noticeTextEl.innerHTML = ultimoPago 
+                            ? `<i class="bi bi-clock-history" style="color: #fcd34d;"></i> Último pago reportado: ${ultimoPago.fecha} ($${ultimoPago.monto} ${ultimoPago.moneda} - ${ultimoPago.estado})`
+                            : `<i class="bi bi-exclamation-triangle" style="color: #fb7185;"></i> Esta unidad no posee pagos reportados a la fecha.`;
+                    }
+                    if (cardEl) {
+                        cardEl.style.borderColor = "var(--pastel-rose-border)";
+                        cardEl.style.boxShadow = "0 10px 25px -5px rgba(0, 0, 0, 0.35), 0 0 20px rgba(251, 113, 133, 0.08)";
+                    }
+                } else if (balance < -0.005) {
+                    const favorUSD = Math.abs(balance).toFixed(2);
+                    const bsFavor = (Math.abs(balance) * condo.tasa_dolar).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    if (badgeEl) {
+                        badgeEl.className = "stat-badge clean";
+                        badgeEl.style.background = "var(--pastel-mint-bg)";
+                        badgeEl.style.color = "#6ee7b7";
+                        badgeEl.style.borderColor = "var(--pastel-mint-border)";
+                        badgeEl.innerHTML = `<i class="bi bi-plus-circle-fill"></i> Saldo a Favor`;
+                    }
+                    if (balLabelEl) balLabelEl.innerText = "Saldo a Favor del Copropietario";
+                    if (balUsdEl) {
+                        balUsdEl.style.color = "#34d399";
+                        balUsdEl.innerText = `+$${favorUSD} USD`;
+                    }
+                    if (balBsEl) balBsEl.innerHTML = `A favor: <strong style="color: #6ee7b7;">Bs. ${bsFavor}</strong>`;
+                    if (noticeTextEl) noticeTextEl.innerHTML = `<i class="bi bi-check2-circle" style="color: #34d399;"></i> Posee saldo a favor disponible para próximas cuotas.`;
+                    if (cardEl) {
+                        cardEl.style.borderColor = "var(--pastel-mint-border)";
+                        cardEl.style.boxShadow = "0 10px 25px -5px rgba(0, 0, 0, 0.35), 0 0 20px rgba(52, 211, 153, 0.08)";
+                    }
+                } else {
+                    if (badgeEl) {
+                        badgeEl.className = "stat-badge clean";
+                        badgeEl.style.background = "var(--pastel-mint-bg)";
+                        badgeEl.style.color = "#6ee7b7";
+                        badgeEl.style.borderColor = "var(--pastel-mint-border)";
+                        badgeEl.innerHTML = `<i class="bi bi-check-circle-fill"></i> Solvente al Día`;
+                    }
+                    if (balLabelEl) balLabelEl.innerText = "Estado de Cuenta";
+                    if (balUsdEl) {
+                        balUsdEl.style.color = "#f8fafc";
+                        balUsdEl.innerText = "$0.00 USD";
+                    }
+                    if (balBsEl) balBsEl.innerText = "Al día • Sin deudas acumuladas (0.00 Bs)";
+                    const ultimoPago = pagosUnidad.length > 0 ? pagosUnidad[pagosUnidad.length - 1] : null;
+                    if (noticeTextEl) {
+                        noticeTextEl.innerHTML = ultimoPago 
+                            ? `<i class="bi bi-check2-all" style="color: #34d399;"></i> Solvente. Último pago verificado: ${ultimoPago.fecha}`
+                            : `<i class="bi bi-check2-all" style="color: #34d399;"></i> Solvente al día. Sin cargos pendientes.`;
+                    }
+                    if (cardEl) {
+                        cardEl.style.borderColor = "var(--pastel-mint-border)";
+                        cardEl.style.boxShadow = "var(--shadow-soft)";
+                    }
+                }
+
+                // --- 2. DATOS DE ADJUDICACIÓN DEL PROPIETARIO ---
                 document.getElementById('adjNombre').value = u.propietario || '';
                 document.getElementById('adjCedula').value = u.cedula || '';
                 document.getElementById('adjTelefono').value = u.telefono || '';
@@ -5655,7 +5909,7 @@
                         alicuotaInput.style.cursor = 'text';
                         alicuotaInput.style.opacity = '1';
                         if (lockBadge) {
-                            lockBadge.style.background = 'rgba(16, 185, 129, 0.15)';
+                            lockBadge.style.background = 'rgba(52, 211, 153, 0.15)';
                             lockBadge.style.color = '#34d399';
                             lockBadge.innerHTML = '<i class="bi bi-unlock-fill"></i> Modo Superadmin (Editable)';
                         }
@@ -5668,8 +5922,8 @@
                         alicuotaInput.style.cursor = 'not-allowed';
                         alicuotaInput.style.opacity = '0.85';
                         if (lockBadge) {
-                            lockBadge.style.background = 'rgba(239, 68, 68, 0.15)';
-                            lockBadge.style.color = '#f87171';
+                            lockBadge.style.background = 'rgba(251, 113, 133, 0.15)';
+                            lockBadge.style.color = '#fb7185';
                             lockBadge.innerHTML = '<i class="bi bi-lock-fill"></i> Solo Superadmin';
                         }
                         if (helpText) {
@@ -5679,6 +5933,19 @@
                 }
 
                 this.openModal('modalAdjudicar');
+            },
+
+            toggleAdjHistory() {
+                const el = document.getElementById('adjHistoryDetails');
+                const btnText = document.getElementById('adjHistoryToggleBtnText');
+                if (!el) return;
+                if (el.style.display === 'none' || !el.style.display) {
+                    el.style.display = 'block';
+                    if (btnText) btnText.innerText = 'Ocultar Desglose';
+                } else {
+                    el.style.display = 'none';
+                    if (btnText) btnText.innerText = 'Ver Desglose';
+                }
             },
 
             async saveAdjudicacion() {
